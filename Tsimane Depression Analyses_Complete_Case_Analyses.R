@@ -379,6 +379,39 @@ mod3_density_plots <- mod3_density_plots +
     axis.text.y = element_text(family = "Helvetica", size = 11))
 
 
+########### Plotting Effect of Interview Date
+
+## Draw conditional effects plot
+spline_plot_mod3 <- conditional_effects(mod3, "Interview_Date") 
+
+## Get the data conditional effects used to generate this plot
+time_effect_data_mod3 <- spline_plot_mod3$Interview_Date
+
+# Step 2: Reverse the standardization in this dataset to make the graph more readable (i.e. Original Interview Date instead of standardised interview date)
+# The original Interview_Date was transformed as follows:
+# Interview_Date_numeric = as.numeric(Interview_Date)
+# Interview_Date_standardized = (Interview_Date_numeric - mean(Interview_Date_numeric)) / sd(Interview_Date_numeric)
+
+# To reverse it, use the mean and sd of Interview_Date from the original dataset where interview dates weren't transformed:
+## Note we use depression_data_v2 instead of dep_data. This is because dep_data has a standardised version of interview dates, which the former dataset doesn't
+depression_data_v2 <- na.omit(depression_data)
+depression_data_v2$InterviewDate <- as.POSIXct(depression_data_v2$InterviewDate, tz = "UTC")
+
+mean_interview_date <- mean(as.numeric(depression_data_v2$InterviewDate))
+sd_interview_date <- sd(as.numeric(depression_data_v2$InterviewDate))
+
+## Reversing the standardisatiob and converting it to date format
+time_effect_data_mod3$Interview_Date <- (time_effect_data_mod3$Interview_Date * sd_interview_date) + mean_interview_date
+time_effect_data_mod3$Interview_Date <- as.POSIXct(time_effect_data_mod3$Interview_Date, origin = "1970-01-01")
+
+# Step 3: Update the plot
+time_effect_mod3_plot <- ggplot(time_effect_data_mod3, aes(x = Interview_Date, y = estimate__)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.1) +
+  geom_point(data = time_effect_data_mod3[time_effect_data_mod3$points__, ], aes(x = Interview_Date, y = estimate__)) +
+  labs(x = "Interview Date", y = "Standardized Depression Score") +
+  theme_minimal()
+
 
 
 
@@ -492,6 +525,37 @@ mod4_density_plots <- mod4_density_plots +
     plot.title = element_text(family = "Helvetica", size = 15, face = "bold", hjust = 0.5),  # Center the title
     axis.text.x = element_text(family = "Helvetica", size = 7),
     axis.text.y = element_text(family = "Helvetica", size = 11))
+
+
+########### Plotting Effect of Interview Date
+
+## Draw conditional effects plot
+spline_plot_mod4 <- conditional_effects(mod4, "Interview_Date") 
+
+## Get the data conditional effects used to generate this plot
+time_effect_data_mod4 <- spline_plot_mod4$Interview_Date
+
+# Step 2: Reverse the standardization in this dataset to make the graph more readable (i.e. Original Interview Date instead of standardised interview date)
+## Mean and SD already calculated above
+
+## Reversing the standardisation and converting it to date format
+time_effect_data_mod4$Interview_Date <- (time_effect_data_mod4$Interview_Date * sd_interview_date) + mean_interview_date
+time_effect_data_mod4$Interview_Date <- as.POSIXct(time_effect_data_mod3$Interview_Date, origin = "1970-01-01")
+
+# Step 3: Update the plot
+time_effect_mod4_plot <- ggplot(time_effect_data_mod4, aes(x = Interview_Date, y = estimate__)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.1) +
+  geom_point(data = time_effect_data_mod4[time_effect_data_mod4$points__, ], aes(x = Interview_Date, y = estimate__)) +
+  labs(x = "Interview Date", y = "Standardized Depression Score") +
+  theme_minimal()
+
+
+
+
+
+
+
 
 
 ############### Plots and Tables presented in the manuscript
