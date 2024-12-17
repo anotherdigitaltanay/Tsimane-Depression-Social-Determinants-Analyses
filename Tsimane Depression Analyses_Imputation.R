@@ -368,7 +368,7 @@ icc_data$group <- factor(icc_data$group, levels = c("Residual", "Individual"))
 # Final Plot for model 1
 plot1 <- ggplot(icc_data, aes(x = value, color = group)) +
   geom_density(size = 1.0) +
-  labs(title = "ICC Density Plots for Model 1",
+  labs(title = " (a) Model 1",
        x = "ICC",
        y = "Density",
        color = "ICC Type") +
@@ -376,8 +376,14 @@ plot1 <- ggplot(icc_data, aes(x = value, color = group)) +
   coord_cartesian(ylim = c(0, 25)) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
   scale_color_manual(values = c("Residual" = "Green", "Individual" = "Blue")) +
-  theme(plot.title = element_text(color = "darkblue"))
-
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
 
 ####################### Plotting model co-efficients
 
@@ -400,12 +406,12 @@ mod1_density_plots <- mcmc_areas(
 
 mod1_density_plots <- mod1_density_plots + 
   scale_x_continuous(limits = c(-0.5, 0.5), breaks = seq(-0.5, 0.5, by = 0.1)) +
-  labs(title = "Model 1") +
+  labs(title = "(a) Model 1") +
   geom_line(color = "black", size = 1) +
   theme(
-    plot.title = element_text(family = "Helvetica", size = 15, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 9),
-    axis.text.y = element_text(family = "Helvetica", size = 11))
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
 
 
 
@@ -485,7 +491,7 @@ icc_data_2$group <- factor(icc_data_2$group, levels = c("Residual", "Individual"
 # Final Plot for model 2
 plot2 <- ggplot(icc_data_2, aes(x = value, color = group)) +
   geom_density(size = 1.0) +
-  labs(title = "ICC Density Plots for Model 2",
+  labs(title = "(b) Model 2",
        x = "ICC",
        y = "Density",
        color = "ICC Type") +
@@ -493,7 +499,15 @@ plot2 <- ggplot(icc_data_2, aes(x = value, color = group)) +
   coord_cartesian(ylim = c(0, 25)) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
   scale_color_manual(values = c("Residual" = "Green", "Individual" = "Blue", "Household" = "orange", "Community" = "red", "Region" = "darkgray")) +
-  theme(plot.title = element_text(color = "darkblue"))
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
+
 
 
 ####################### Plotting model co-efficients
@@ -516,12 +530,12 @@ mod2_density_plots <- mcmc_areas(
 
 mod2_density_plots <- mod2_density_plots +
   scale_x_continuous(limits = c(-0.5, 0.5), breaks = seq(-0.5, 0.5, by = 0.1)) +
-  labs(title = "Model 2") +
+  labs(title = "(b) Model 2") +
   geom_line(color = "black", size = 1) +
   theme(
-    plot.title = element_text(family = "Helvetica", size = 15, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 9),
-    axis.text.y = element_text(family = "Helvetica", size = 11))
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
 
 
 
@@ -606,7 +620,7 @@ icc_data_3$group <- factor(icc_data_3$group, levels = c("Residual", "Individual"
 # Final Plot for model 3
 plot3 <- ggplot(icc_data_3, aes(x = value, color = group)) +
   geom_density(size = 1.0) +
-  labs(title = "ICC Density Plots for Model 3",
+  labs(title = "(c) Model 3",
        x = "ICC",
        y = "Density",
        color = "ICC Type") +
@@ -614,7 +628,14 @@ plot3 <- ggplot(icc_data_3, aes(x = value, color = group)) +
   coord_cartesian(ylim = c(0, 25)) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
   scale_color_manual(values = c("Residual" = "Green", "Individual" = "Blue", "Household" = "orange", "Community" = "red", "Region" = "darkgray", "Interviewer" = "darkcyan")) +
-  theme(plot.title = element_text(color = "darkblue"))
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
 
 
 ####################### Plotting model co-efficients
@@ -638,12 +659,12 @@ mod3_density_plots <- mcmc_areas(
 
 mod3_density_plots <- mod3_density_plots +
   scale_x_continuous(limits = c(-0.5, 0.5), breaks = seq(-0.5, 0.5, by = 0.1)) +
-  labs(title = "Model 4") +
+  labs(title = "(c) Model 3") +
   geom_line(color = "black", size = 1) +
   theme(
-    plot.title = element_text(family = "Helvetica", size = 15, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 7),
-    axis.text.y = element_text(family = "Helvetica", size = 11))
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
 
 
 ########### Plotting Effect of Interview Date
@@ -761,7 +782,7 @@ icc_data_4$group <- factor(icc_data_4$group, levels = c("Residual", "Individual"
 # Final Plot for model 4
 plot4 <- ggplot(icc_data_4, aes(x = value, color = group)) +
   geom_density(size = 1.0) +
-  labs(title = "ICC Density Plots for Model 4",
+  labs(title = "(d) Model 4",
        x = "ICC",
        y = "Density",
        color = "ICC Type") +
@@ -769,7 +790,14 @@ plot4 <- ggplot(icc_data_4, aes(x = value, color = group)) +
   coord_cartesian(ylim = c(0, 25)) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
   scale_color_manual(values = c("Residual" = "Green", "Individual" = "Blue", "Household" = "orange", "Community" = "red", "Region" = "darkgray", "Interviewer" = "darkcyan")) +
-  theme(plot.title = element_text(color = "darkblue"))
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
 
 
 ## Renaming Co-efficient Names for easy interpretability (in figure)
@@ -794,12 +822,12 @@ mod4_density_plots <- mcmc_areas(
 
 mod4_density_plots <- mod4_density_plots +
   scale_x_continuous(limits = c(-0.5, 0.5), breaks = seq(-0.5, 0.5, by = 0.1)) +
-  labs(title = "Model 4") +
+  labs(title = "(d) Model 4") +
   geom_line(color = "black", size = 1) +
   theme(
-    plot.title = element_text(family = "Helvetica", size = 15, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 7),
-    axis.text.y = element_text(family = "Helvetica", size = 11))
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 13),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
 
 
 ########### Plotting Effect of Interview Date
