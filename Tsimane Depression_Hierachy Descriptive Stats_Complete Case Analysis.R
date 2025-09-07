@@ -88,9 +88,6 @@ multilevel_summary_stats_ft
 
 
 
-
-
-
 #### Visualising the multilevel structure of the dataset via plots
 ##################################################################
 
@@ -207,6 +204,47 @@ plot4 <- ggplot(obs_per_id, aes(x = factor(n), y = num_id)) +
 combined_hierarchy_plot <- (plot1 | plot2) / (plot3 | plot4)
 
 
+#### Visualising Distribution of Datapoints across interviewers
+##################################################################
+
+# First, create anonmyized interviewer names
+interviewer_key <- dep_data %>%
+  distinct(Interviewer) %>%
+  mutate(interviewer_anon = paste0("Interviewer_", row_number()))
+
+# Next, let's create anonmyized region names
+region_key <- dep_data %>%
+  distinct(Region) %>%
+  mutate(region_anon = paste0("Region_", row_number()))
+
+## Sync these anonymous names to the dataset
+dep_data <- dep_data %>%
+  left_join(interviewer_key, by = "Interviewer") %>%
+  left_join(region_key, by = "Region")
+
+## Count the number of observations per interviewer now
+interviewer_count <- dep_data %>%
+  count(interviewer_anon, region_anon)
+
+## Now lets plot
+interviewer_plot <- ggplot(interviewer_count, aes(x = interviewer_anon, y = n, fill = region_anon)) +
+  geom_bar(stat = "identity") +
+  scale_fill_brewer(palette = "Set3") + 
+  labs(
+    title = "Observations Recorded Per Interviewer Across Different Regions",
+    x = "Interviewer",
+    y = "Number of Observations",
+    fill = "Region"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
 
 
 
