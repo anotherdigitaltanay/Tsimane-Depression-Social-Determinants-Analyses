@@ -1,4 +1,4 @@
-############### This script contains the Tsimane social determinants depression analyses for the EMPH MAPPING Special Issue Paper       #################
+############### This script contains the Tsimane social determinants depression analyses                                           #################
 ############### The analyses here are conducted only on the imputed dataset (i.e. imputation during model fitting)                 #################
 ############### The script also generates a cleaned csv file that will be used for the complete case analyses (i.e. excluding missing data) in another script #################
 ############### Summary Tables and Plots that are used in the manuscript are generated towards the end of the script           #################
@@ -256,6 +256,10 @@ depression_data_v2 <- depression_data_v2 %>%
 ## 1098 families/households -- 1876 individuals
 depression_data_v2 %>% count(UniqueFamID)
 depression_data_v2 %>% count(PID_FAMID)
+
+## Computing correlation between age and disability score that can be reported in discussion section of main manuscript
+## Vital to talk about the age effect found further in our models
+cor(depression_data_v2$Age, depression_data_v2$DisabilityScore, use = "complete.obs")
 
 ## Converting this to a csv file that will be used for the complete case analyses as this will save time from additional cleaning
 ## IMP: CHANGE DIRECTORY AS PER YOUR COMPUTER
@@ -697,6 +701,23 @@ time_effect_mod3_plot <- ggplot(time_effect_data_mod3, aes(x = Interview_Date, y
   labs(x = "Interview Date", y = "Standardized Depression Score") +
   theme_minimal()
 
+######################### Plotting Interviewer Intercepts
+
+## Extract the random effects parameters fist
+x <- ranef(mod3)
+
+## Let's focus on just the interviewer intercepts
+interviewer_estimates <- as.data.frame(x$Interviewer, row.names = NULL)
+
+## Adding the interviewer names as they aren't being read as a column currently
+interviewer_estimates <- data.frame(Interviewer = rownames(interviewer_estimates), interviewer_estimates)
+
+## Generate the plot
+ggplot(interviewer_estimates, aes(x = Interviewer, y = Estimate.D_Intercept)) +
+  geom_point() + 
+  geom_errorbar(aes(ymin = Q2.5.D_Intercept, ymax = Q97.5.D_Intercept)) +
+  labs(x = "Interviewer", y = "Depression Score")
+
 
 
 
@@ -875,16 +896,6 @@ print(combined_density_plot)
 
 
 ################### Tables
-
-#### Summarizing the multilevel structure of the dataset
-#########################################################
-
-# Make summary dataframe for the multilevel structure of our dataset
-multilevel_summary_stats <- depression_data_v2 %>%
-  summarise(
-    Variable = c("Individuals", "Households", "Communities", "Regions", "Interviewers", "Total Observations contributed by all these levels"),
-    N = c(n_distinct(PID_FAMID), n_distinct(UniqueFamID), n_distinct(ComID), n_distinct(region), n_distinct(Interviewer), n()))
-
 
 ######## Summarizing all the predictors used in our analyses
 #########################################################
@@ -1197,19 +1208,6 @@ summary_stats_ft <- autofit(summary_stats_ft)
 
 ## Can copy the table directly from here on to word
 summary_stats_ft
-
-
-################### Now the summary table of the multilevel structure of our data table
-multilevel_summary_stats_ft <- flextable(multilevel_summary_stats)
-
-# Bold the column headers, apply a grey backdrop to the first column and autofit the table
-multilevel_summary_stats_ft <- bold(multilevel_summary_stats_ft, part = "header")
-multilevel_summary_stats_ft <- bg(multilevel_summary_stats_ft, j = 1, bg = "#D3D3D3", part = "body")
-multilevel_summary_stats_ft <- autofit(multilevel_summary_stats_ft)
-
-## Can copy the table directly from here on to word
-multilevel_summary_stats_ft
-
 
 
 ################## Now the model summary output
