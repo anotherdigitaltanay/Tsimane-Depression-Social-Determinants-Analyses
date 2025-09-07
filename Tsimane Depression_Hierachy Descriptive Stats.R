@@ -285,11 +285,6 @@ multilevel_summary_stats_ft <- autofit(multilevel_summary_stats_ft)
 multilevel_summary_stats_ft
 
 
-
-
-
-
-
 #### Visualising the multilevel structure of the dataset via plots
 ##################################################################
 
@@ -406,58 +401,52 @@ plot4 <- ggplot(obs_per_id, aes(x = factor(n), y = num_id)) +
 combined_hierarchy_plot <- (plot1 | plot2) / (plot3 | plot4)
 
 
+#### Visualising Distribution of Datapoints across interviewers
+##################################################################
 
-
-
-
-
-
-
-
-
-
-# Create anonymized interviewer names
+# First, create anonmyized interviewer names
 interviewer_key <- depression_data_v2 %>%
   distinct(Interviewer) %>%
   mutate(interviewer_anon = paste0("Interviewer_", row_number()))
 
-# Create anonymized region names
+# Next, let's create anonmyized region names
 region_key <- depression_data_v2 %>%
   distinct(region) %>%
   mutate(region_anon = paste0("Region_", row_number()))
 
+## Sync these anonymous names to the dataset
 depression_data_v2 <- depression_data_v2 %>%
   left_join(interviewer_key, by = "Interviewer") %>%
   left_join(region_key, by = "region")
 
+## Count the number of observations per interviewer now
+interviewer_count <- depression_data_v2 %>%
+  count(interviewer_anon, region_anon)
 
-
-
-# First, build a simplified crosswalk table
-interviewer_links <- depression_data_v2 %>%
-  distinct(interviewer_anon, region_anon)  # or use community/household if more granular
-
-
-ggplot(interviewer_links, aes(x = interviewer_anon, y = region_anon)) +
-  geom_jitter(width = 0.2, height = 0.2, alpha = 0.6, color = "steelblue") +
+## Now lets plot
+interviewer_plot <- ggplot(interviewer_count, aes(x = interviewer_anon, y = n, fill = region_anon)) +
+  geom_bar(stat = "identity") +
+  scale_fill_brewer(palette = "Set3") + 
   labs(
-    title = "Interviewers Work Across Multiple Regions",
+    title = "Observations Recorded Per Interviewer Across Different Regions",
     x = "Interviewer",
-    y = "Region"
+    y = "Number of Observations",
+    fill = "Region"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
 
 
 
 
 
-
-
-# Make summary dataframe for the multilevel structure of our dataset
-multilevel_summary_stats <- depression_data_v2 %>%
-  summarise(
-    Variable = c("Individuals", "Households", "Communities", "Regions", "Interviewers", "Total Observations contributed by all these levels"),
-    N = c(n_distinct(PID_FAMID), n_distinct(UniqueFamID), n_distinct(ComID), n_distinct(region), n_distinct(Interviewer), n()))
 
 
 ######## Summarizing all the predictors used in our analyses
