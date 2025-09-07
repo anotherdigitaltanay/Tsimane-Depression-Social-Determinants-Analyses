@@ -1,4 +1,4 @@
-############### This script contains the latest depression analyses for the EMPH MAPPING Special Issue Paper                   #################
+############### This script contains the latest Tsimane depression analyses                                                    #################
 ############### The analyses here are conducted only on the complete dataset (excluding missing observations)                  #################
 ############### Summary Tables and Plots that are used in the manuscript are generated towards the end of the script           #################
 
@@ -607,18 +607,6 @@ print(combined_density_plot)
 
 ################### Tables
 
-#### Summarizing the multilevel structure of the dataset
-##################################################################################################################
-##################################################################################################################
-
-# Make summary dataframe for the multilevel structure of our dataset
-multilevel_summary_stats <- dep_data %>%
-  summarise(
-    Variable = c("Individuals", "Households", "Communities", "Regions", "Interviewers", "Total Observations contributed by all these levels"),
-    N = c(n_distinct(PID_FAMID), n_distinct(UniqueFamID), n_distinct(ComID), n_distinct(Region), n_distinct(Interviewer), n()))
-
-
-
 ## We now descriptively summarise all the predictors used in our analyses
 ##################################################################################################################
 ##################################################################################################################
@@ -831,9 +819,6 @@ models_summary <- data.frame(Predictors = c("Intercept", "Age", "Sex", "Social C
 #################### Generating the summary tables that are used in the manuscript
 ##################################################################################
 ##################################################################################
-
-################### First the summary table of the multilevel structure of our data table
-multilevel_summary_stats_ft <- flextable(multilevel_summary_stats)
 
 # Bold the column headers, apply a grey backdrop to the first column and autofit the table
 multilevel_summary_stats_ft <- bold(multilevel_summary_stats_ft, part = "header")
