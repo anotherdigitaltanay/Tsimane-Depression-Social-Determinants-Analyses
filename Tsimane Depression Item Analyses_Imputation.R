@@ -8,6 +8,7 @@
 
 ########### If you haven't installed some of the packages below previously, type install.packages("the package name you want to install") ############
 library(rstan)
+library(cmdstanr)
 library(rethinking)
 library(dplyr)
 library(tidyverse)
@@ -23,6 +24,8 @@ library(flextable)
 library(sjPlot)
 library(labelled)
 library(mice)
+library(viridis)
+
 
 ## Setting seed for reproducibility
 set.seed(77832)
@@ -1223,7 +1226,7 @@ icc_item_data_com <- data.frame(
   group = rep(c("Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7"), each = length(icc_int_i1))
 )
 
-## Combining initial community icc vectors into a dataframe
+## Combining initial household icc vectors into a dataframe
 icc_item_data_hh <- data.frame(
   value = c(icc_hh_i1, icc_hh_i2, icc_hh_i3, icc_hh_i4, icc_hh_i5, icc_hh_i6, icc_hh_i7),
   group = rep(c("Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7"), each = length(icc_int_i1))
@@ -1234,5 +1237,259 @@ icc_item_data_hh <- data.frame(
 write.csv(icc_item_data, "Interviewer_ICC_I1_I7.csv")
 write.csv(icc_item_data_com, "Community_ICC_I1_I7.csv")      
 write.csv(icc_item_data_hh, "Household_ICC_I1_I7.csv")        
-         
-     
+
+
+#############################################################
+#############################################################
+### Reload these files and think of starting this script afresh, where we are now calculating the ICCs of the remaining items
+
+icc_item_data <- read.csv("Interviewer_ICC_I1_I7.csv")
+icc_item_data_com <- read.csv("Community_ICC_I1_I7.csv")
+icc_item_data_hh <- read.csv("Household_ICC_I1_I7.csv")
+
+# Okay, now let's calculate the Interviewer Adjusted ICCs for Item 8 - 18
+#############################################################
+
+## Item 8
+icc_int_i8 <- ((i8$sd_Interviewer__D8CantConcentrate_Intercept)^2) / ((i8$sd_Region__D8CantConcentrate_Intercept)^2 + (i8$`sd_Region:ComID__D8CantConcentrate_Intercept`)^2 + (i8$`sd_Region:ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2 + 
+                                                            (i8$`sd_Region:ComID:UniqueFamID:PID__D8CantConcentrate_Intercept`)^2 + (i8$sd_Interviewer__D8CantConcentrate_Intercept)^2  + (((pi)^2)/3))
+dens(icc_int_i8, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 8")
+
+## Item 9
+icc_int_i9 <- ((i9$sd_Interviewer__D9Nervous_Intercept)^2) / ((i9$sd_Region__D9Nervous_Intercept)^2 + (i9$`sd_Region:ComID__D9Nervous_Intercept`)^2 + (i9$`sd_Region:ComID:UniqueFamID__D9Nervous_Intercept`)^2 + 
+                                                                        (i9$`sd_Region:ComID:UniqueFamID:PID__D9Nervous_Intercept`)^2 + (i9$sd_Interviewer__D9Nervous_Intercept)^2  + (((pi)^2)/3))
+dens(icc_int_i9, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 9")
+
+## Item 10
+icc_int_i10 <- ((i10$sd_Interviewer__D10Paranoid_Intercept)^2) / ((i10$sd_Region__D10Paranoid_Intercept)^2 + (i10$`sd_Region:ComID__D10Paranoid_Intercept`)^2 + (i10$`sd_Region:ComID:UniqueFamID__D10Paranoid_Intercept`)^2 + 
+                                                                (i10$`sd_Region:ComID:UniqueFamID:PID__D10Paranoid_Intercept`)^2 + (i10$sd_Interviewer__D10Paranoid_Intercept)^2  + (((pi)^2)/3))
+dens(icc_int_i10, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 10")
+
+## Item 11
+icc_int_i11 <- ((i11$sd_Interviewer__D11CantSleep_Intercept)^2) / ((i11$sd_Region__D11CantSleep_Intercept)^2 + (i11$`sd_Region:ComID__D11CantSleep_Intercept`)^2 + (i11$`sd_Region:ComID:UniqueFamID__D11CantSleep_Intercept`)^2 + 
+                                                                    (i11$`sd_Region:ComID:UniqueFamID:PID__D11CantSleep_Intercept`)^2 + (i11$sd_Interviewer__D11CantSleep_Intercept)^2  + (((pi)^2)/3))
+dens(icc_int_i11, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 11")
+
+## Item 12
+icc_int_i12 <- ((i12$sd_Interviewer__D12CantEat_Intercept)^2) / ((i12$sd_Region__D12CantEat_Intercept)^2 + (i12$`sd_Region:ComID__D12CantEat_Intercept`)^2 + (i12$`sd_Region:ComID:UniqueFamID__D12CantEat_Intercept`)^2 + 
+                                                                     (i12$`sd_Region:ComID:UniqueFamID:PID__D12CantEat_Intercept`)^2 + (i12$sd_Interviewer__D12CantEat_Intercept)^2  + (((pi)^2)/3))
+dens(icc_int_i12, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 12")
+
+## Item 13
+icc_int_i13 <- ((i13$sd_Interviewer__D13CantFuck_Intercept)^2) / ((i13$sd_Region__D13CantFuck_Intercept)^2 + (i13$`sd_Region:ComID__D13CantFuck_Intercept`)^2 + (i13$`sd_Region:ComID:UniqueFamID__D13CantFuck_Intercept`)^2 + 
+                                                                   (i13$`sd_Region:ComID:UniqueFamID:PID__D13CantFuck_Intercept`)^2 + (i13$sd_Interviewer__D13CantFuck_Intercept)^2  + (((pi)^2)/3))
+dens(icc_int_i13, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 13")
+
+## Item 14
+icc_int_i14 <- ((i14$sd_Interviewer__D14Pessimistic_Intercept)^2) / ((i14$sd_Region__D14Pessimistic_Intercept)^2 + (i14$`sd_Region:ComID__D14Pessimistic_Intercept`)^2 + (i14$`sd_Region:ComID:UniqueFamID__D14Pessimistic_Intercept`)^2 + 
+                                                                    (i14$`sd_Region:ComID:UniqueFamID:PID__D14Pessimistic_Intercept`)^2 + (i14$sd_Interviewer__D14Pessimistic_Intercept)^2  + (((pi)^2)/3))
+dens(icc_int_i14, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 14")
+
+## Item 16
+icc_int_i16 <- ((i16$sd_Interviewer__D16PunishMe_Intercept)^2) / ((i16$sd_Region__D16PunishMe_Intercept)^2 + (i16$`sd_Region:ComID__D16PunishMe_Intercept`)^2 + (i16$`sd_Region:ComID:UniqueFamID__D16PunishMe_Intercept`)^2 + 
+                                                                       (i16$`sd_Region:ComID:UniqueFamID:PID__D16PunishMe_Intercept`)^2 + (i16$sd_Interviewer__D16PunishMe_Intercept)^2  + (((pi)^2)/3))
+dens(icc_int_i16, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 16")
+
+## Item 18
+icc_int_i18 <- ((i18$sd_Interviewer__D18HeavyThoughts_Intercept)^2) / ((i18$sd_Region__D18HeavyThoughts_Intercept)^2 + (i18$`sd_Region:ComID__D18HeavyThoughts_Intercept`)^2 + (i18$`sd_Region:ComID:UniqueFamID__D18HeavyThoughts_Intercept`)^2 + 
+                                                                    (i18$`sd_Region:ComID:UniqueFamID:PID__D18HeavyThoughts_Intercept`)^2 + (i18$sd_Interviewer__D18HeavyThoughts_Intercept)^2  + (((pi)^2)/3))
+dens(icc_int_i18, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 18")
+
+
+## Now calculate community adjusted ICC for each item
+#########################################################
+
+## Item 8
+icc_com_i8 <- ((i8$`sd_Region:ComID__D8CantConcentrate_Intercept`)^2) / ((i8$sd_Region__D8CantConcentrate_Intercept)^2 + (i8$`sd_Region:ComID__D8CantConcentrate_Intercept`)^2 + (i8$`sd_Region:ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2 + 
+                                                                        (i8$`sd_Region:ComID:UniqueFamID:PID__D8CantConcentrate_Intercept`)^2 + (i8$sd_Interviewer__D8CantConcentrate_Intercept)^2  + (((pi)^2)/3))
+dens(icc_com_i8, col=2, lwd=4 , xlab="ICC (Community) of Item 8")
+
+## Item 9
+icc_com_i9 <- ((i9$`sd_Region:ComID__D9Nervous_Intercept`)^2) / ((i9$sd_Region__D9Nervous_Intercept)^2 + (i9$`sd_Region:ComID__D9Nervous_Intercept`)^2 + (i9$`sd_Region:ComID:UniqueFamID__D9Nervous_Intercept`)^2 + 
+                                                                (i9$`sd_Region:ComID:UniqueFamID:PID__D9Nervous_Intercept`)^2 + (i9$sd_Interviewer__D9Nervous_Intercept)^2  + (((pi)^2)/3))
+dens(icc_com_i9, col=2, lwd=4 , xlab="ICC (Community) of Item 9")
+
+## Item 10
+icc_com_i10 <- ((i10$`sd_Region:ComID__D10Paranoid_Intercept`)^2) / ((i10$sd_Region__D10Paranoid_Intercept)^2 + (i10$`sd_Region:ComID__D10Paranoid_Intercept`)^2 + (i10$`sd_Region:ComID:UniqueFamID__D10Paranoid_Intercept`)^2 + 
+                                                                    (i10$`sd_Region:ComID:UniqueFamID:PID__D10Paranoid_Intercept`)^2 + (i10$sd_Interviewer__D10Paranoid_Intercept)^2  + (((pi)^2)/3))
+dens(icc_com_i10, col=2, lwd=4 , xlab="ICC (Community) of Item 10")
+
+## Item 11
+icc_com_i11 <- ((i11$`sd_Region:ComID__D11CantSleep_Intercept`)^2) / ((i11$sd_Region__D11CantSleep_Intercept)^2 + (i11$`sd_Region:ComID__D11CantSleep_Intercept`)^2 + (i11$`sd_Region:ComID:UniqueFamID__D11CantSleep_Intercept`)^2 + 
+                                                                     (i11$`sd_Region:ComID:UniqueFamID:PID__D11CantSleep_Intercept`)^2 + (i11$sd_Interviewer__D11CantSleep_Intercept)^2  + (((pi)^2)/3))
+dens(icc_com_i11, col=2, lwd=4 , xlab="ICC (Community) of Item 11")
+
+## Item 12
+icc_com_i12 <- ((i12$`sd_Region:ComID__D12CantEat_Intercept`)^2) / ((i12$sd_Region__D12CantEat_Intercept)^2 + (i12$`sd_Region:ComID__D12CantEat_Intercept`)^2 + (i12$`sd_Region:ComID:UniqueFamID__D12CantEat_Intercept`)^2 + 
+                                                                   (i12$`sd_Region:ComID:UniqueFamID:PID__D12CantEat_Intercept`)^2 + (i12$sd_Interviewer__D12CantEat_Intercept)^2  + (((pi)^2)/3))
+dens(icc_com_i12, col=2, lwd=4 , xlab="ICC (Community) of Item 12")
+
+## Item 13
+icc_com_i13 <- ((i13$`sd_Region:ComID__D13CantFuck_Intercept`)^2) / ((i13$sd_Region__D13CantFuck_Intercept)^2 + (i13$`sd_Region:ComID__D13CantFuck_Intercept`)^2 + (i13$`sd_Region:ComID:UniqueFamID__D13CantFuck_Intercept`)^2 + 
+                                                                    (i13$`sd_Region:ComID:UniqueFamID:PID__D13CantFuck_Intercept`)^2 + (i13$sd_Interviewer__D13CantFuck_Intercept)^2  + (((pi)^2)/3))
+dens(icc_com_i13, col=2, lwd=4 , xlab="ICC (Community) of Item 13")
+
+## Item 14
+icc_com_i14 <- ((i14$`sd_Region:ComID__D14Pessimistic_Intercept`)^2) / ((i14$sd_Region__D14Pessimistic_Intercept)^2 + (i14$`sd_Region:ComID__D14Pessimistic_Intercept`)^2 + (i14$`sd_Region:ComID:UniqueFamID__D14Pessimistic_Intercept`)^2 + 
+                                                                       (i14$`sd_Region:ComID:UniqueFamID:PID__D14Pessimistic_Intercept`)^2 + (i14$sd_Interviewer__D14Pessimistic_Intercept)^2  + (((pi)^2)/3))
+dens(icc_com_i14, col=2, lwd=4 , xlab="ICC (Community) of Item 14")
+
+## Item 16
+icc_com_i16 <- ((i16$`sd_Region:ComID__D16PunishMe_Intercept`)^2) / ((i16$sd_Region__D16PunishMe_Intercept)^2 + (i16$`sd_Region:ComID__D16PunishMe_Intercept`)^2 + (i16$`sd_Region:ComID:UniqueFamID__D16PunishMe_Intercept`)^2 + 
+                                                                    (i16$`sd_Region:ComID:UniqueFamID:PID__D16PunishMe_Intercept`)^2 + (i16$sd_Interviewer__D16PunishMe_Intercept)^2  + (((pi)^2)/3))
+dens(icc_com_i16, col=2, lwd=4 , xlab="ICC (Community) of Item 16")
+
+## Item 18
+icc_com_i18 <- ((i18$`sd_Region:ComID__D18HeavyThoughts_Intercept`)^2) / ((i18$sd_Region__D18HeavyThoughts_Intercept)^2 + (i18$`sd_Region:ComID__D18HeavyThoughts_Intercept`)^2 + (i18$`sd_Region:ComID:UniqueFamID__D18HeavyThoughts_Intercept`)^2 + 
+                                                                         (i18$`sd_Region:ComID:UniqueFamID:PID__D18HeavyThoughts_Intercept`)^2 + (i18$sd_Interviewer__D18HeavyThoughts_Intercept)^2  + (((pi)^2)/3))
+dens(icc_com_i18, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 18")
+
+
+## Now calculate household adjusted ICC for each item
+#########################################################
+
+## Item 8
+icc_hh_i8 <- ((i8$`sd_Region:ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2) / ((i8$sd_Region__D8CantConcentrate_Intercept)^2 + (i8$`sd_Region:ComID__D8CantConcentrate_Intercept`)^2 + (i8$`sd_Region:ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2 + 
+                                                                           (i8$`sd_Region:ComID:UniqueFamID:PID__D8CantConcentrate_Intercept`)^2 + (i8$sd_Interviewer__D8CantConcentrate_Intercept)^2  + (((pi)^2)/3))
+dens(icc_hh_i8, col=2, lwd=4 , xlab="ICC (Household) of Item 8")
+
+## Item 9
+icc_hh_i9 <- ((i9$`sd_Region:ComID:UniqueFamID__D9Nervous_Intercept`)^2) / ((i9$sd_Region__D9Nervous_Intercept)^2 + (i9$`sd_Region:ComID__D9Nervous_Intercept`)^2 + (i9$`sd_Region:ComID:UniqueFamID__D9Nervous_Intercept`)^2 + 
+                                                                   (i9$`sd_Region:ComID:UniqueFamID:PID__D9Nervous_Intercept`)^2 + (i9$sd_Interviewer__D9Nervous_Intercept)^2  + (((pi)^2)/3))
+dens(icc_hh_i9, col=2, lwd=4 , xlab="ICC (Household) of Item 9")
+
+## Item 10
+icc_hh_i10 <- ((i10$`sd_Region:ComID:UniqueFamID__D10Paranoid_Intercept`)^2) / ((i10$sd_Region__D10Paranoid_Intercept)^2 + (i10$`sd_Region:ComID__D10Paranoid_Intercept`)^2 + (i10$`sd_Region:ComID:UniqueFamID__D10Paranoid_Intercept`)^2 + 
+                                                                       (i10$`sd_Region:ComID:UniqueFamID:PID__D10Paranoid_Intercept`)^2 + (i10$sd_Interviewer__D10Paranoid_Intercept)^2  + (((pi)^2)/3))
+dens(icc_hh_i10, col=2, lwd=4 , xlab="ICC (Household) of Item 10")
+
+## Item 11
+icc_hh_i11 <- ((i11$`sd_Region:ComID:UniqueFamID__D11CantSleep_Intercept`)^2) / ((i11$sd_Region__D11CantSleep_Intercept)^2 + (i11$`sd_Region:ComID__D11CantSleep_Intercept`)^2 + (i11$`sd_Region:ComID:UniqueFamID__D11CantSleep_Intercept`)^2 + 
+                                                                        (i11$`sd_Region:ComID:UniqueFamID:PID__D11CantSleep_Intercept`)^2 + (i11$sd_Interviewer__D11CantSleep_Intercept)^2  + (((pi)^2)/3))
+dens(icc_hh_i11, col=2, lwd=4 , xlab="ICC (Household) of Item 11")
+
+## Item 12
+icc_hh_i12 <- ((i12$`sd_Region:ComID:UniqueFamID__D12CantEat_Intercept`)^2) / ((i12$sd_Region__D12CantEat_Intercept)^2 + (i12$`sd_Region:ComID__D12CantEat_Intercept`)^2 + (i12$`sd_Region:ComID:UniqueFamID__D12CantEat_Intercept`)^2 + 
+                                                                      (i12$`sd_Region:ComID:UniqueFamID:PID__D12CantEat_Intercept`)^2 + (i12$sd_Interviewer__D12CantEat_Intercept)^2  + (((pi)^2)/3))
+dens(icc_hh_i12, col=2, lwd=4 , xlab="ICC (Household) of Item 12")
+
+## Item 13
+icc_hh_i13 <- ((i13$`sd_Region:ComID:UniqueFamID__D13CantFuck_Intercept`)^2) / ((i13$sd_Region__D13CantFuck_Intercept)^2 + (i13$`sd_Region:ComID__D13CantFuck_Intercept`)^2 + (i13$`sd_Region:ComID:UniqueFamID__D13CantFuck_Intercept`)^2 + 
+                                                                       (i13$`sd_Region:ComID:UniqueFamID:PID__D13CantFuck_Intercept`)^2 + (i13$sd_Interviewer__D13CantFuck_Intercept)^2  + (((pi)^2)/3))
+dens(icc_hh_i13, col=2, lwd=4 , xlab="ICC (Household) of Item 13")
+
+## Item 14
+icc_hh_i14 <- ((i14$`sd_Region:ComID:UniqueFamID__D14Pessimistic_Intercept`)^2) / ((i14$sd_Region__D14Pessimistic_Intercept)^2 + (i14$`sd_Region:ComID__D14Pessimistic_Intercept`)^2 + (i14$`sd_Region:ComID:UniqueFamID__D14Pessimistic_Intercept`)^2 + 
+                                                                          (i14$`sd_Region:ComID:UniqueFamID:PID__D14Pessimistic_Intercept`)^2 + (i14$sd_Interviewer__D14Pessimistic_Intercept)^2  + (((pi)^2)/3))
+dens(icc_hh_i14, col=2, lwd=4 , xlab="ICC (Household) of Item 14")
+
+## Item 16
+icc_hh_i16 <- ((i16$`sd_Region:ComID:UniqueFamID__D16PunishMe_Intercept`)^2) / ((i16$sd_Region__D16PunishMe_Intercept)^2 + (i16$`sd_Region:ComID__D16PunishMe_Intercept`)^2 + (i16$`sd_Region:ComID:UniqueFamID__D16PunishMe_Intercept`)^2 + 
+                                                                       (i16$`sd_Region:ComID:UniqueFamID:PID__D16PunishMe_Intercept`)^2 + (i16$sd_Interviewer__D16PunishMe_Intercept)^2  + (((pi)^2)/3))
+dens(icc_hh_i16, col=2, lwd=4 , xlab="ICC (Household) of Item 16")
+
+## Item 18
+icc_hh_i18 <- ((i18$`sd_Region:ComID:UniqueFamID__D18HeavyThoughts_Intercept`)^2) / ((i18$sd_Region__D18HeavyThoughts_Intercept)^2 + (i18$`sd_Region:ComID__D18HeavyThoughts_Intercept`)^2 + (i18$`sd_Region:ComID:UniqueFamID__D18HeavyThoughts_Intercept`)^2 + 
+                                                                            (i18$`sd_Region:ComID:UniqueFamID:PID__D18HeavyThoughts_Intercept`)^2 + (i18$sd_Interviewer__D18HeavyThoughts_Intercept)^2  + (((pi)^2)/3))
+dens(icc_hh_i18, col=2, lwd=4 , xlab="ICC (Household) of Item 18")
+
+
+############## Final steps to now combine previous ICC data
+#############################################################
+
+## Combining the recent interviewer icc vectors into a dataframe
+icc_item_data_v2 <- data.frame(
+  value = c(icc_int_i8, icc_int_i9, icc_int_i10, icc_int_i11, icc_int_i12, icc_int_i13, icc_int_i14, icc_int_i16, icc_int_i18),
+  group = rep(c("Item8", "Item9", "Item10", "Item11", "Item12", "Item13", "Item14", "Item16", "Item18"), each = length(icc_int_i8))
+)
+
+## Combining recent community icc vectors into a dataframe
+icc_item_data_com_v2 <- data.frame(
+  value = c(icc_com_i8, icc_com_i9, icc_com_i10, icc_com_i11, icc_com_i12, icc_com_i13, icc_com_i14, icc_com_i16, icc_com_i18),
+  group = rep(c("Item8", "Item9", "Item10", "Item11", "Item12", "Item13", "Item14", "Item16", "Item18"), each = length(icc_com_i8))
+)
+
+## Combining initial community icc vectors into a dataframe
+icc_item_data_hh_v2 <- data.frame(
+  value = c(icc_hh_i8, icc_hh_i9, icc_hh_i10, icc_hh_i11, icc_hh_i12, icc_hh_i13, icc_hh_i14, icc_hh_i16, icc_hh_i18),
+  group = rep(c("Item8", "Item9", "Item10", "Item11", "Item12", "Item13", "Item14", "Item16", "Item18"), each = length(icc_hh_i8))
+)
+
+
+### Now we aim to combine our initial and recently created icc dataframes so that we can visualise ICCs across items
+
+## First, remove the first extra column (added due to loading it as a csv) from the previous dataframes
+icc_item_data <- icc_item_data[, -1]
+icc_item_data_com <- icc_item_data_com[, -1]
+icc_item_data_hh <- icc_item_data_hh[, -1]
+
+## Now combine the dataframes
+icc_item_data_combined <- rbind(icc_item_data, icc_item_data_v2)
+icc_item_data_com_combined <- rbind(icc_item_data_com, icc_item_data_com_v2)
+icc_item_data_hh_combined <- rbind(icc_item_data_hh, icc_item_data_hh_v2)
+
+## Convert the group column here into a factor and order it to make the color legend on the final plot easier to read
+icc_item_data_combined$group <- factor(icc_item_data_combined$group, levels = c("Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7", "Item8", "Item9", "Item10", "Item11", "Item12", "Item13", "Item14", "Item16", "Item18"))
+icc_item_data_com_combined$group <- factor(icc_item_data_com_combined$group, levels = c("Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7", "Item8", "Item9", "Item10", "Item11", "Item12", "Item13", "Item14", "Item16", "Item18"))
+icc_item_data_hh_combined$group <- factor(icc_item_data_hh_combined$group, levels = c("Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7", "Item8", "Item9", "Item10", "Item11", "Item12", "Item13", "Item14", "Item16", "Item18"))
+
+## Now let's plot interviewer ICC of all items in one graph
+int_icc_plot <- ggplot(icc_item_data_combined, aes(x = value, color = group)) +
+  geom_density(size = 1.0) +
+  labs(title = "Adjusted ICC for Interviewers Across Different Items",
+       x = "ICC",
+       y = "Density",
+       color = "Depression Scale Item") +
+  theme_minimal()  +
+  coord_cartesian(ylim = c(0, 25)) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
+
+## Now let's plot community ICC of all items in one graph
+com_icc_plot <- ggplot(icc_item_data_com_combined, aes(x = value, color = group)) +
+  geom_density(size = 1.0) +
+  labs(title = "Adjusted ICC for Community Across Different Items",
+       x = "ICC",
+       y = "Density",
+       color = "Depression Scale Item") +
+  theme_minimal()  +
+  coord_cartesian(ylim = c(0, 25)) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
+
+## Now let's plot household ICC of all items in one graph
+hh_icc_plot <- ggplot(icc_item_data_hh_combined, aes(x = value, color = group)) +
+  geom_density(size = 1.0) +
+  labs(title = "Adjusted ICC for Household Across Different Items",
+       x = "ICC",
+       y = "Density",
+       color = "Depression Scale Item") +
+  theme_minimal()  +
+  coord_cartesian(ylim = c(0, 25)) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
+
+
+## Now let's combine community and household ICCs into one plot
+combined_icc_plot <- (com_icc_plot | hh_icc_plot)
