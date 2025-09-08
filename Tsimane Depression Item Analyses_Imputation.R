@@ -1490,6 +1490,112 @@ hh_icc_plot <- ggplot(icc_item_data_hh_combined, aes(x = value, color = group)) 
         axis.text.y = element_text(size = 14)
   )
 
-
 ## Now let's combine community and household ICCs into one plot
 combined_icc_plot <- (com_icc_plot | hh_icc_plot)
+
+
+### Okay, let's illustrate caterpillar plots for the same ICCs now to enhance readability
+
+#################### First for interviewers 
+
+## Manually calculating the mean, adn the 95% intervals 
+icc_int_summary <- icc_item_data_combined %>%
+  group_by(group) %>%
+  summarise(
+    mean = mean(value),
+    lower = quantile(value, 0.025),
+    upper = quantile(value, 0.975)
+  ) %>%
+  ungroup()
+
+## Plot
+int_icc_caterpillar_plot <- ggplot(icc_int_summary, aes(x = mean, y = group)) +
+  geom_point(color = "darkcyan", size = 3) +
+  geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0.2, color = "darkcyan") +
+  scale_y_discrete(limits = rev(levels(icc_int_summary$group))) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Caterpillar Plot of Interviewer ICCs across Items",
+    x = "Adjusted ICC Estimate",
+    y = "Item"
+  ) +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
+
+#################### Now for communities
+
+## Manually calculating the mean, adn the 95% intervals 
+icc_com_summary <- icc_item_data_com_combined %>%
+  group_by(group) %>%
+  summarise(
+    mean = mean(value),
+    lower = quantile(value, 0.025),
+    upper = quantile(value, 0.975)
+  ) %>%
+  ungroup()
+
+## Plot
+com_icc_caterpillar_plot <- ggplot(icc_com_summary, aes(x = mean, y = group)) +
+  geom_point(color = "red", size = 3) +
+  geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0.2, color = "red") +
+  scale_y_discrete(limits = rev(levels(icc_com_summary$group))) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Caterpillar Plot of Community ICCs across Items",
+    x = "Adjusted ICC Estimate",
+    y = "Item"
+  ) +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
+
+
+#################### Now for households
+
+## Manually calculating the mean, and the 95% intervals 
+icc_hh_summary <- icc_item_data_hh_combined %>%
+  group_by(group) %>%
+  summarise(
+    mean = mean(value),
+    lower = quantile(value, 0.025),
+    upper = quantile(value, 0.975)
+  ) %>%
+  ungroup()
+
+## Plot
+hh_icc_caterpillar_plot <- ggplot(icc_hh_summary, aes(x = mean, y = group)) +
+  geom_point(color = "orange", size = 3) +
+  geom_errorbarh(aes(xmin = lower, xmax = upper), height = 0.2, color = "orange") +
+  scale_y_discrete(limits = rev(levels(icc_hh_summary$group))) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Caterpillar Plot of Household ICCs across Items",
+    x = "Adjusted ICC Estimate",
+    y = "Item"
+  ) +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
+
+
+### Now, first combining interviewer ICC plots (both caterpillar and distributions)
+int_icc_plot_combined <- (int_icc_plot | int_icc_caterpillar_plot)
+
+### Now, first combining other ICC plots (both caterpillar and distributions)
+hh_com_icc_plot_combined <- (com_icc_plot | hh_icc_plot) / (com_icc_caterpillar_plot | hh_icc_caterpillar_plot)
