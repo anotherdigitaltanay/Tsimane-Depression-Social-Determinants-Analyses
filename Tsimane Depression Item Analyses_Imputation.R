@@ -1436,7 +1436,7 @@ icc_item_data_hh_combined$group <- factor(icc_item_data_hh_combined$group, level
 ## Now let's plot interviewer ICC of all items in one graph
 int_icc_plot <- ggplot(icc_item_data_combined, aes(x = value, color = group)) +
   geom_density(size = 1.0) +
-  labs(title = "Adjusted ICC for Interviewers Across Different Items",
+  labs(title = "(a) ICC for Interviewers Across Different Items",
        x = "ICC",
        y = "Density",
        color = "Depression Scale Item") +
@@ -1455,7 +1455,7 @@ int_icc_plot <- ggplot(icc_item_data_combined, aes(x = value, color = group)) +
 ## Now let's plot community ICC of all items in one graph
 com_icc_plot <- ggplot(icc_item_data_com_combined, aes(x = value, color = group)) +
   geom_density(size = 1.0) +
-  labs(title = "Adjusted ICC for Community Across Different Items",
+  labs(title = "(a) ICC for Community Across Different Items",
        x = "ICC",
        y = "Density",
        color = "Depression Scale Item") +
@@ -1474,7 +1474,7 @@ com_icc_plot <- ggplot(icc_item_data_com_combined, aes(x = value, color = group)
 ## Now let's plot household ICC of all items in one graph
 hh_icc_plot <- ggplot(icc_item_data_hh_combined, aes(x = value, color = group)) +
   geom_density(size = 1.0) +
-  labs(title = "Adjusted ICC for Household Across Different Items",
+  labs(title = "(b) ICC for Household Across Different Items",
        x = "ICC",
        y = "Density",
        color = "Depression Scale Item") +
@@ -1489,9 +1489,6 @@ hh_icc_plot <- ggplot(icc_item_data_hh_combined, aes(x = value, color = group)) 
         axis.text.x = element_text(size = 11.5),  # Increase x axis number size
         axis.text.y = element_text(size = 14)
   )
-
-## Now let's combine community and household ICCs into one plot
-combined_icc_plot <- (com_icc_plot | hh_icc_plot)
 
 
 ### Okay, let's illustrate caterpillar plots for the same ICCs now to enhance readability
@@ -1515,8 +1512,8 @@ int_icc_caterpillar_plot <- ggplot(icc_int_summary, aes(x = mean, y = group)) +
   scale_y_discrete(limits = rev(levels(icc_int_summary$group))) +
   theme_minimal(base_size = 14) +
   labs(
-    title = "Caterpillar Plot of Interviewer ICCs across Items",
-    x = "Adjusted ICC Estimate",
+    title = "(b) Caterpillar Plot of Interviewer ICCs across Items",
+    x = "ICC",
     y = "Item"
   ) +
   theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
@@ -1547,8 +1544,8 @@ com_icc_caterpillar_plot <- ggplot(icc_com_summary, aes(x = mean, y = group)) +
   scale_y_discrete(limits = rev(levels(icc_com_summary$group))) +
   theme_minimal(base_size = 14) +
   labs(
-    title = "Caterpillar Plot of Community ICCs across Items",
-    x = "Adjusted ICC Estimate",
+    title = "(c) Caterpillar Plot of Community ICCs across Items",
+    x = "ICC",
     y = "Item"
   ) +
   theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
@@ -1580,8 +1577,8 @@ hh_icc_caterpillar_plot <- ggplot(icc_hh_summary, aes(x = mean, y = group)) +
   scale_y_discrete(limits = rev(levels(icc_hh_summary$group))) +
   theme_minimal(base_size = 14) +
   labs(
-    title = "Caterpillar Plot of Household ICCs across Items",
-    x = "Adjusted ICC Estimate",
+    title = " (d) Caterpillar Plot of Household ICCs across Items",
+    x = "ICC",
     y = "Item"
   ) +
   theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
@@ -1599,3 +1596,984 @@ int_icc_plot_combined <- (int_icc_plot | int_icc_caterpillar_plot)
 
 ### Now, first combining other ICC plots (both caterpillar and distributions)
 hh_com_icc_plot_combined <- (com_icc_plot | hh_icc_plot) / (com_icc_caterpillar_plot | hh_icc_caterpillar_plot)
+
+
+# PLOTTING VARYING ASSOCIATIONS OF HIGHER LEVEL DETERMINANTS BETWEEN ITEMS
+##########################################################################
+#########################################################################
+
+# Let's start with the predictors
+##########################################################################
+
+# First, distance to market town
+## Again, we are doing certain items initially (due to my local machine's memory constraints)
+# We are exponentiating to make the associations interpretable to odds-ratio
+I1_dist <- exp(i1$b_D1Sad_Town_Distance)
+I2_dist <- exp(i2$b_D2Cry_Town_Distance)
+I3_dist <- exp(i3$b_D3SelfCritical_Town_Distance)
+I4_dist <- exp(i4$b_D4LifeNotValuable_Town_Distance)
+I5_dist <- exp(i5$b_D5Useless_Town_Distance)
+I6_dist <- exp(i6$b_D6NoInterest_Town_Distance)
+I7_dist <- exp(i7$b_D7Tired_Town_Distance)
+I8_dist <- exp(i8$b_D8CantConcentrate_Town_Distance)
+
+## Now doing this for Community Size
+I1_comsize <- exp(i1$b_D1Sad_Com_Size)
+I2_comsize <- exp(i2$b_D2Cry_Com_Size)
+I3_comsize <- exp(i3$b_D3SelfCritical_Com_Size)
+I4_comsize <- exp(i4$b_D4LifeNotValuable_Com_Size)
+I5_comsize <- exp(i5$b_D5Useless_Com_Size)
+I6_comsize <- exp(i6$b_D6NoInterest_Com_Size)
+I7_comsize <- exp(i7$b_D7Tired_Com_Size)
+I8_comsize <- exp(i8$b_D8CantConcentrate_Com_Size)
+
+## Now doing this for Household Size
+I1_hhsize <- exp(i1$bsp_D1Sad_miHH_Size)
+I2_hhsize <- exp(i2$bsp_D2Cry_miHH_Size)
+I3_hhsize <- exp(i3$bsp_D3SelfCritical_miHH_Size)
+I4_hhsize <- exp(i4$bsp_D4LifeNotValuable_miHH_Size)
+I5_hhsize <- exp(i5$bsp_D5Useless_miHH_Size)
+I6_hhsize <- exp(i6$bsp_D6NoInterest_miHH_Size)
+I7_hhsize <- exp(i7$bsp_D7Tired_miHH_Size)
+I8_hhsize <- exp(i8$bsp_D8CantConcentrate_miHH_Size)
+
+
+############## Intermediate steps to preserve computer memory
+#############################################################
+
+# Combining distance to market town posteriors into a data frame (columns = items)
+posterior_com_dist <- as.data.frame(cbind(
+  Item1 = I1_dist,
+  Item2 = I2_dist,
+  Item3 = I3_dist,
+  Item4 = I4_dist,
+  Item5 = I5_dist,
+  Item6 = I6_dist,
+  Item7 = I7_dist,
+  Item8 = I8_dist
+))
+
+# Combining community size posteriors into a data frame (columns = items)
+posterior_com_size <- as.data.frame(cbind(
+  Item1 = I1_comsize,
+  Item2 = I2_comsize,
+  Item3 = I3_comsize,
+  Item4 = I4_comsize,
+  Item5 = I5_comsize,
+  Item6 = I6_comsize,
+  Item7 = I7_comsize,
+  Item8 = I8_comsize
+))
+
+# Combining household size posteriors into a data frame (columns = items)
+posterior_hh_size <- as.data.frame(cbind(
+  Item1 = I1_hhsize,
+  Item2 = I2_hhsize,
+  Item3 = I3_hhsize,
+  Item4 = I4_hhsize,
+  Item5 = I5_hhsize,
+  Item6 = I6_hhsize,
+  Item7 = I7_hhsize,
+  Item8 = I8_hhsize
+))
+
+
+## Saving this all to csv files
+write.csv(posterior_com_dist, "Com_Dist_I1_I8.csv")
+write.csv(posterior_com_size, "Com_Size_I1_I8.csv")      
+write.csv(posterior_hh_size, "HH_Size_I1_I8.csv")        
+
+
+#############################################################
+#############################################################
+### Reload these files and think of starting this script afresh, where we are now extracting the posteriors of the remaining items
+
+posterior_com_dist <- read.csv("Com_Dist_I1_I8.csv")
+posterior_com_size <- read.csv("Com_Size_I1_I8.csv")
+posterior_hh_size <- read.csv("HH_Size_I1_I8.csv")
+
+
+#############################################################
+#############################################################
+## Now extracting posteriors of predictors for the other 8 items
+
+### First for distance to market town
+I9_dist <- exp(i9$b_D9Nervous_Town_Distance)
+I10_dist <- exp(i10$b_D10Paranoid_Town_Distance)
+I11_dist <- exp(i11$b_D11CantSleep_Town_Distance)
+I12_dist <- exp(i12$b_D12CantEat_Town_Distance)
+I13_dist <- exp(i13$b_D13CantFuck_Town_Distance)
+I14_dist <- exp(i14$b_D14Pessimistic_Town_Distance)
+I16_dist <- exp(i16$b_D16PunishMe_Town_Distance)
+I18_dist <- exp(i18$b_D18HeavyThoughts_Town_Distance)
+
+### Now for community size
+I9_comsize <- exp(i9$b_D9Nervous_Com_Size)
+I10_comsize <- exp(i10$b_D10Paranoid_Com_Size)
+I11_comsize <- exp(i11$b_D11CantSleep_Com_Size)
+I12_comsize <- exp(i12$b_D12CantEat_Com_Size)
+I13_comsize <- exp(i13$b_D13CantFuck_Com_Size)
+I14_comsize <- exp(i14$b_D14Pessimistic_Com_Size)
+I16_comsize <- exp(i16$b_D16PunishMe_Com_Size)
+I18_comsize <- exp(i18$b_D18HeavyThoughts_Com_Size)
+
+### Now for household size
+I9_hhsize <- exp(i9$bsp_D9Nervous_miHH_Size)
+I10_hhsize <- exp(i10$bsp_D10Paranoid_miHH_Size)
+I11_hhsize <- exp(i11$bsp_D11CantSleep_miHH_Size)
+I12_hhsize <- exp(i12$bsp_D12CantEat_miHH_Size)
+I13_hhsize <- exp(i13$bsp_D13CantFuck_miHH_Size)
+I14_hhsize <- exp(i14$bsp_D14Pessimistic_miHH_Size)
+I16_hhsize <- exp(i16$bsp_D16PunishMe_miHH_Size)
+I18_hhsize <- exp(i18$bsp_D18HeavyThoughts_miHH_Size)
+
+## Now combining all of these into a dataframe
+
+# Combining distance to market town posteriors into a data frame 
+posterior_com_dist_v2 <- as.data.frame(cbind(
+  Item9 = I9_dist,
+  Item10 = I10_dist,
+  Item11 = I11_dist,
+  Item12 = I12_dist,
+  Item13 = I13_dist,
+  Item14 = I14_dist,
+  Item16 = I16_dist,
+  Item18 = I18_dist
+))
+
+# Now Combining community size posteriors into a data frame 
+posterior_com_size_v2 <- as.data.frame(cbind(
+  Item9  = I9_comsize,
+  Item10 = I10_comsize,
+  Item11 = I11_comsize,
+  Item12 = I12_comsize,
+  Item13 = I13_comsize,
+  Item14 = I14_comsize,
+  Item16 = I16_comsize,
+  Item18 = I18_comsize
+))
+
+# Now Combining household size posteriors into a data frame 
+posterior_hh_size_v2 <- as.data.frame(cbind(
+  Item9  = I9_hhsize,
+  Item10 = I10_hhsize,
+  Item11 = I11_hhsize,
+  Item12 = I12_hhsize,
+  Item13 = I13_hhsize,
+  Item14 = I14_hhsize,
+  Item16 = I16_hhsize,
+  Item18 = I18_hhsize
+))
+
+
+### Now we aim to combine our initial and recently created posterior dataframes so that we can visualise posteriors of predictors across items
+
+## First, remove the first extra column (added due to loading it as a csv) from the previous dataframes
+posterior_com_dist <- posterior_com_dist[, -1]
+posterior_com_size <- posterior_com_size[, -1]
+posterior_hh_size <- posterior_hh_size[, -1]
+
+## Now combine the dataframes
+posterior_com_dist_combined <- bind_cols(posterior_com_dist, posterior_com_dist_v2)
+posterior_com_size_combined <- bind_cols(posterior_com_size, posterior_com_size_v2)
+posterior_hh_size_combined <- bind_cols(posterior_hh_size, posterior_hh_size_v2)
+
+
+### Now, PLOTTING TIME
+
+### Plotting posteriors now for distance to market town across items
+com_dist_density_plots <- mcmc_areas(
+  posterior_com_dist_combined,
+  prob = 0.90,     # inner interval
+  prob_outer = 0.95, # outer interval
+  point_est = "mean"
+) +
+  geom_vline(xintercept = 1.00, color = "black", linetype = "solid", size = 0.6) +
+  scale_x_continuous(breaks = seq(0.5, 1.75, by = 0.25), limits = c(0.5, 1.75)) +
+  labs(title = "(a) Distance to Market Town") +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
+
+
+## Plotting posteriors now for community size across items
+com_size_density_plots <- mcmc_areas(
+  posterior_com_size_combined,
+  prob = 0.90,     # inner interval
+  prob_outer = 0.95, # outer interval
+  point_est = "mean"
+) +
+  geom_vline(xintercept = 1.00, color = "black", linetype = "solid", size = 0.6) +
+  scale_x_continuous(breaks = seq(0.5, 1.75, by = 0.25), limits = c(0.5, 1.75)) +
+  labs(title = "(b) Community Size") +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
+
+
+## Plotting posteriors now for household size across items
+hh_size_density_plots <- mcmc_areas(
+  posterior_hh_size_combined,
+  prob = 0.90,     # inner interval
+  prob_outer = 0.95, # outer interval
+  point_est = "mean"
+) +
+  geom_vline(xintercept = 1.00, color = "black", linetype = "solid", size = 0.6) +
+  scale_x_continuous(breaks = seq(0.5, 1.75, by = 0.25), limits = c(0.5, 1.75)) + 
+  labs(title = "(c) Household Size") +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
+
+##### Combine all plots into 1 plot
+post_plots_combined <- (com_dist_density_plots | com_size_density_plots | hh_size_density_plots)
+
+
+######## Summarizing all model outputs in one table (Item 1 - Item 4)
+#########################################################
+
+### Okay, let's quickly calculate the ICC for the residual, individual and region for Item 1
+i1_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i1$sd_Region__D1Sad_Intercept)^2 + 
+    (i1$`sd_Region:ComID__D1Sad_Intercept`)^2 + 
+    (i1$`sd_Region:ComID:UniqueFamID__D1Sad_Intercept`)^2 + 
+    (i1$`sd_Region:ComID:UniqueFamID:PID__D1Sad_Intercept`)^2 + 
+    (i1$sd_Interviewer__D1Sad_Intercept)^2  +  
+    (((pi)^2)/3)
+  )
+
+
+i1_icc_indi <- ((i1$`sd_Region:ComID:UniqueFamID:PID__D1Sad_Intercept`)^2) / ((i1$sd_Region__D1Sad_Intercept)^2 + (i1$`sd_Region:ComID__D1Sad_Intercept`)^2 + (i1$`sd_Region:ComID:UniqueFamID__D1Sad_Intercept`)^2 + 
+                                                                          (i1$`sd_Region:ComID:UniqueFamID:PID__D1Sad_Intercept`)^2 + (i1$sd_Interviewer__D1Sad_Intercept)^2  + (((pi)^2)/3))
+
+i1_icc_reg <- ((i1$`sd_Region:ComID__D1Sad_Intercept`)^2) / ((i1$sd_Region__D1Sad_Intercept)^2 + (i1$`sd_Region:ComID__D1Sad_Intercept`)^2 + (i1$`sd_Region:ComID:UniqueFamID__D1Sad_Intercept`)^2 + 
+                                                                                (i1$`sd_Region:ComID:UniqueFamID:PID__D1Sad_Intercept`)^2 + (i1$sd_Interviewer__D1Sad_Intercept)^2  + (((pi)^2)/3))
+
+### Now the same for Item 2
+
+i2_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i2$sd_Region__D2Cry_Intercept)^2 + 
+    (i2$`sd_Region:ComID__D2Cry_Intercept`)^2 + 
+    (i2$`sd_Region:ComID:UniqueFamID__D2Cry_Intercept`)^2 + 
+    (i2$`sd_Region:ComID:UniqueFamID:PID__D2Cry_Intercept`)^2 + 
+    (i2$sd_Interviewer__D2Cry_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+i2_icc_indi <- ((i2$`sd_Region:ComID:UniqueFamID:PID__D2Cry_Intercept`)^2) / ((i2$sd_Region__D2Cry_Intercept)^2 + (i2$`sd_Region:ComID__D2Cry_Intercept`)^2 + (i2$`sd_Region:ComID:UniqueFamID__D2Cry_Intercept`)^2 + 
+                                                                                (i2$`sd_Region:ComID:UniqueFamID:PID__D2Cry_Intercept`)^2 + (i2$sd_Interviewer__D2Cry_Intercept)^2  + (((pi)^2)/3))
+
+i2_icc_reg <- ((i2$`sd_Region:ComID__D2Cry_Intercept`)^2) / ((i2$sd_Region__D2Cry_Intercept)^2 + (i2$`sd_Region:ComID__D2Cry_Intercept`)^2 + (i2$`sd_Region:ComID:UniqueFamID__D2Cry_Intercept`)^2 + 
+                                                               (i2$`sd_Region:ComID:UniqueFamID:PID__D2Cry_Intercept`)^2 + (i2$sd_Interviewer__D2Cry_Intercept)^2  + (((pi)^2)/3))
+
+
+## Now for Item 3
+i3_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i3$sd_Region__D3SelfCritical_Intercept)^2 + 
+    (i3$`sd_Region:ComID__D3SelfCritical_Intercept`)^2 + 
+    (i3$`sd_Region:ComID:UniqueFamID__D3SelfCritical_Intercept`)^2 + 
+    (i3$`sd_Region:ComID:UniqueFamID:PID__D3SelfCritical_Intercept`)^2 + 
+    (i3$sd_Interviewer__D3SelfCritical_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+
+i3_icc_indi <- ((i3$`sd_Region:ComID:UniqueFamID:PID__D3SelfCritical_Intercept`)^2) / ((i3$sd_Region__D3SelfCritical_Intercept)^2 + (i3$`sd_Region:ComID__D3SelfCritical_Intercept`)^2 + (i3$`sd_Region:ComID:UniqueFamID__D3SelfCritical_Intercept`)^2 + 
+                                                                                         (i3$`sd_Region:ComID:UniqueFamID:PID__D3SelfCritical_Intercept`)^2 + (i3$sd_Interviewer__D3SelfCritical_Intercept)^2  + (((pi)^2)/3))
+
+i3_icc_reg <- ((i3$`sd_Region:ComID__D3SelfCritical_Intercept`)^2) / ((i3$sd_Region__D3SelfCritical_Intercept)^2 + (i3$`sd_Region:ComID__D3SelfCritical_Intercept`)^2 + (i3$`sd_Region:ComID:UniqueFamID__D3SelfCritical_Intercept`)^2 + 
+                                                                        (i3$`sd_Region:ComID:UniqueFamID:PID__D3SelfCritical_Intercept`)^2 + (i3$sd_Interviewer__D3SelfCritical_Intercept)^2  + (((pi)^2)/3))
+
+## Now the same for Item 4
+i4_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i4$sd_Region__D4LifeNotValuable_Intercept)^2 + 
+    (i4$`sd_Region:ComID__D4LifeNotValuable_Intercept`)^2 + 
+    (i4$`sd_Region:ComID:UniqueFamID__D4LifeNotValuable_Intercept`)^2 + 
+    (i4$`sd_Region:ComID:UniqueFamID:PID__D4LifeNotValuable_Intercept`)^2 + 
+    (i4$sd_Interviewer__D4LifeNotValuable_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+
+i4_icc_indi <- ((i4$`sd_Region:ComID:UniqueFamID:PID__D4LifeNotValuable_Intercept`)^2) / ((i4$sd_Region__D4LifeNotValuable_Intercept)^2 + (i4$`sd_Region:ComID__D4LifeNotValuable_Intercept`)^2 + (i4$`sd_Region:ComID:UniqueFamID__D4LifeNotValuable_Intercept`)^2 + 
+                                                                                            (i4$`sd_Region:ComID:UniqueFamID:PID__D4LifeNotValuable_Intercept`)^2 + (i4$sd_Interviewer__D4LifeNotValuable_Intercept)^2  + (((pi)^2)/3))
+
+i4_icc_reg <- ((i4$`sd_Region:ComID__D4LifeNotValuable_Intercept`)^2) / ((i4$sd_Region__D4LifeNotValuable_Intercept)^2 + (i4$`sd_Region:ComID__D4LifeNotValuable_Intercept`)^2 + (i4$`sd_Region:ComID:UniqueFamID__D4LifeNotValuable_Intercept`)^2 + 
+                                                                           (i4$`sd_Region:ComID:UniqueFamID:PID__D4LifeNotValuable_Intercept`)^2 + (i4$sd_Interviewer__D4LifeNotValuable_Intercept)^2  + (((pi)^2)/3))
+
+
+### Okay, let's quickly calculate the ICC for the residual, individual and region for Item 5
+i5_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i5$sd_Region__D5Useless_Intercept)^2 + 
+    (i5$`sd_Region:ComID__D5Useless_Intercept`)^2 + 
+    (i5$`sd_Region:ComID:UniqueFamID__D5Useless_Intercept`)^2 + 
+    (i5$`sd_Region:ComID:UniqueFamID:PID__D5Useless_Intercept`)^2 + 
+    (i5$sd_Interviewer__D5Useless_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+i5_icc_indi <- ((i5$`sd_Region:ComID:UniqueFamID:PID__D5Useless_Intercept`)^2) / ((i5$sd_Region__D5Useless_Intercept)^2 + (i5$`sd_Region:ComID__D5Useless_Intercept`)^2 + (i5$`sd_Region:ComID:UniqueFamID__D5Useless_Intercept`)^2 + 
+                                                                                    (i5$`sd_Region:ComID:UniqueFamID:PID__D5Useless_Intercept`)^2 + (i5$sd_Interviewer__D5Useless_Intercept)^2  + (((pi)^2)/3))
+
+i5_icc_reg <- ((i5$`sd_Region:ComID__D5Useless_Intercept`)^2) / ((i5$sd_Region__D5Useless_Intercept)^2 + (i5$`sd_Region:ComID__D5Useless_Intercept`)^2 + (i5$`sd_Region:ComID:UniqueFamID__D5Useless_Intercept`)^2 + 
+                                                                   (i5$`sd_Region:ComID:UniqueFamID:PID__D5Useless_Intercept`)^2 + (i5$sd_Interviewer__D5Useless_Intercept)^2  + (((pi)^2)/3))
+
+### Now the same for Item 6
+
+i6_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i6$sd_Region__D6NoInterest_Intercept)^2 + 
+    (i6$`sd_Region:ComID__D6NoInterest_Intercept`)^2 + 
+    (i6$`sd_Region:ComID:UniqueFamID__D6NoInterest_Intercept`)^2 + 
+    (i6$`sd_Region:ComID:UniqueFamID:PID__D6NoInterest_Intercept`)^2 + 
+    (i6$sd_Interviewer__D6NoInterest_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+i6_icc_indi <- ((i6$`sd_Region:ComID:UniqueFamID:PID__D6NoInterest_Intercept`)^2) / ((i6$sd_Region__D6NoInterest_Intercept)^2 + (i6$`sd_Region:ComID__D6NoInterest_Intercept`)^2 + (i6$`sd_Region:ComID:UniqueFamID__D6NoInterest_Intercept`)^2 + 
+                                                                                       (i6$`sd_Region:ComID:UniqueFamID:PID__D6NoInterest_Intercept`)^2 + (i6$sd_Interviewer__D6NoInterest_Intercept)^2  + (((pi)^2)/3))
+
+i6_icc_reg <- ((i6$`sd_Region:ComID__D6NoInterest_Intercept`)^2) / ((i6$sd_Region__D6NoInterest_Intercept)^2 + (i6$`sd_Region:ComID__D6NoInterest_Intercept`)^2 + (i6$`sd_Region:ComID:UniqueFamID__D6NoInterest_Intercept`)^2 + 
+                                                                      (i6$`sd_Region:ComID:UniqueFamID:PID__D6NoInterest_Intercept`)^2 + (i6$sd_Interviewer__D6NoInterest_Intercept)^2  + (((pi)^2)/3))
+
+
+## Now for Item 7
+i7_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i7$sd_Region__D7Tired_Intercept)^2 + 
+    (i7$`sd_Region:ComID__D7Tired_Intercept`)^2 + 
+    (i7$`sd_Region:ComID:UniqueFamID__D7Tired_Intercept`)^2 + 
+    (i7$`sd_Region:ComID:UniqueFamID:PID__D7Tired_Intercept`)^2 + 
+    (i7$sd_Interviewer__D7Tired_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+
+i7_icc_indi <- ((i7$`sd_Region:ComID:UniqueFamID:PID__D7Tired_Intercept`)^2) / ((i7$sd_Region__D7Tired_Intercept)^2 + (i7$`sd_Region:ComID__D7Tired_Intercept`)^2 + (i7$`sd_Region:ComID:UniqueFamID__D7Tired_Intercept`)^2 + 
+                                                                                  (i7$`sd_Region:ComID:UniqueFamID:PID__D7Tired_Intercept`)^2 + (i7$sd_Interviewer__D7Tired_Intercept)^2  + (((pi)^2)/3))
+
+i7_icc_reg <- ((i7$`sd_Region:ComID__D7Tired_Intercept`)^2) / ((i7$sd_Region__D7Tired_Intercept)^2 + (i7$`sd_Region:ComID__D7Tired_Intercept`)^2 + (i7$`sd_Region:ComID:UniqueFamID__D7Tired_Intercept`)^2 + 
+                                                                 (i7$`sd_Region:ComID:UniqueFamID:PID__D7Tired_Intercept`)^2 + (i7$sd_Interviewer__D7Tired_Intercept)^2  + (((pi)^2)/3))
+
+## Now the same for Item 8
+i8_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i8$sd_Region__D8CantConcentrate_Intercept)^2 + 
+    (i8$`sd_Region:ComID__D8CantConcentrate_Intercept`)^2 + 
+    (i8$`sd_Region:ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2 + 
+    (i8$`sd_Region:ComID:UniqueFamID:PID__D8CantConcentrate_Intercept`)^2 + 
+    (i8$sd_Interviewer__D8CantConcentrate_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+
+i8_icc_indi <- ((i8$`sd_Region:ComID:UniqueFamID:PID__D8CantConcentrate_Intercept`)^2) / ((i8$sd_Region__D8CantConcentrate_Intercept)^2 + (i8$`sd_Region:ComID__D8CantConcentrate_Intercept`)^2 + (i8$`sd_Region:ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2 + 
+                                                                                            (i8$`sd_Region:ComID:UniqueFamID:PID__D8CantConcentrate_Intercept`)^2 + (i8$sd_Interviewer__D8CantConcentrate_Intercept)^2  + (((pi)^2)/3))
+
+i8_icc_reg <- ((i8$`sd_Region:ComID__D8CantConcentrate_Intercept`)^2) / ((i8$sd_Region__D8CantConcentrate_Intercept)^2 + (i8$`sd_Region:ComID__D8CantConcentrate_Intercept`)^2 + (i8$`sd_Region:ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2 + 
+                                                                           (i8$`sd_Region:ComID:UniqueFamID:PID__D8CantConcentrate_Intercept`)^2 + (i8$sd_Interviewer__D8CantConcentrate_Intercept)^2  + (((pi)^2)/3))
+
+
+
+
+######## Now making the dataframe (Item 1 - Item 4)
+#########################################################
+models_summary_i1_i4 <- data.frame( Predictors = c("Intercept[1]", 
+                                                   "Intercept[2]", 
+                                                   "Intercept[3]", 
+                                                   "Age", 
+                                                   "Sex", 
+                                                   "Social Conflict Index (SCI)", 
+                                                   
+                                                   "Spanish Fluency", 
+                                                   "Interview Date (Spline Fixed Effect)", 
+                                                   "Interview Date (Spline Smooth Term)",
+                                                   "Distance to Town", 
+                                                   "Maximum Community Size", 
+                                                   "Household Size", 
+                                                   "Residual Standard Deviation", 
+                                                   
+                                                   "Between-Cluster Standard Deviation (in log-odds)", 
+                                                   " ", 
+                                                   " ", 
+                                                   " ", 
+                                                   " ", 
+                                                   " ",
+                                                   
+                                                   " ICC", 
+                                                   " ", 
+                                                   " ", 
+                                                   " ", 
+                                                   " ", 
+                                                   " ",
+                                                   " "),
+                                   
+                                    Estimates_Model_1 = c( round( mean(i1$`b_D1Sad_Intercept[1]`), 2), 
+                                                           round( mean(i1$`b_D1Sad_Intercept[2]`), 2), 
+                                                           round( mean(i1$`b_D1Sad_Intercept[3]`), 2), 
+                                                           round( mean(exp(i1$b_D1Sad_Age)), 2), 
+                                                           round( mean(exp(i1$b_D1Sad_Sex1)), 2), 
+                                                           round( mean(exp(i1$bsp_D1Sad_miSCI)), 2),
+                                                          
+                                                           round( mean(exp(i1$bsp_D1Sad_miSFluency)),2), 
+                                                           round( mean(i1$bs_D1Sad_sInterview_Date_1),2), 
+                                                           round( mean(i1$sds_D1Sad_sInterview_Date_1), 2), 
+                                                           round( mean(exp(i1$b_D1Sad_Town_Distance)), 2), 
+                                                           round( mean(exp(i1$b_D1Sad_Com_Size)), 2), 
+                                                           round( mean(exp(i1$bsp_D1Sad_miHH_Size)), 2), 
+                                                           round((((pi)^2)/3), 2),
+                                                           
+                                                           " ",
+                                                           round( mean(i1$`sd_Region:ComID:UniqueFamID:PID__D1Sad_Intercept`), 2), 
+                                                           round( mean(i1$`sd_Region:ComID:UniqueFamID__D1Sad_Intercept`), 2), 
+                                                           round( mean(i1$`sd_Region:ComID__D1Sad_Intercept`), 2), 
+                                                           round( mean(i1$sd_Region__D1Sad_Intercept), 2), 
+                                                           round( mean(i1$sd_Interviewer__D1Sad_Intercept), 2),
+                                                           
+                                                           "-",
+                                                           round( mean(i1_icc_residual), 2),
+                                                           round( mean(i1_icc_indi), 2),
+                                                           round( mean(icc_hh_i1),2), 
+                                                           round( mean(icc_com_i1), 2), 
+                                                           round( mean(i1_icc_reg), 2),
+                                                           round(mean(icc_int_i1), 2)
+                                                        ),
+                                    
+                                    CI_Model_1 = c ( paste( round( quantile(i1$`b_D1Sad_Intercept[1]`, 0.025), 2), "-", round( quantile(i1$`b_D1Sad_Intercept[1]`, 0.975), 2)),
+                                                     paste( round( quantile(i1$`b_D1Sad_Intercept[2]`, 0.025), 2), "-", round( quantile(i1$`b_D1Sad_Intercept[2]`, 0.975), 2)),
+                                                     paste( round( quantile(i1$`b_D1Sad_Intercept[3]`, 0.025), 2), "-", round( quantile(i1$`b_D1Sad_Intercept[3]`, 0.975), 2)),
+                                                     paste( round( quantile( exp(i1$b_D1Sad_Age), 0.025), 2), "-", round( quantile( exp(i1$b_D1Sad_Age), 0.975), 2)),
+                                                     paste( round( quantile( exp(i1$b_D1Sad_Sex1), 0.025), 2), "-", round( quantile( exp(i1$b_D1Sad_Sex1), 0.975), 2)),
+                                                     paste( round( quantile( exp(i1$bsp_D1Sad_miSCI), 0.025), 2), "-", round( quantile( exp(i1$bsp_D1Sad_miSCI), 0.975), 2)),
+                                                     
+                                                     paste( round( quantile( exp(i1$bsp_D1Sad_miSFluency), 0.025), 2), "-", round( quantile( exp(i1$bsp_D1Sad_miSFluency), 0.975), 2)),
+                                                     paste( round( quantile( i1$bs_D1Sad_sInterview_Date_1, 0.025), 2), "-", round( quantile( i1$bs_D1Sad_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( i1$sds_D1Sad_sInterview_Date_1, 0.025), 2), "-", round( quantile( i1$sds_D1Sad_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( exp(i1$b_D1Sad_Town_Distance), 0.025), 2), "-", round( quantile( exp(i1$b_D1Sad_Town_Distance), 0.975), 2)),
+                                                     paste( round( quantile( exp(i1$b_D1Sad_Com_Size), 0.025), 2), "-", round( quantile( exp(i1$b_D1Sad_Com_Size), 0.975), 2)),
+                                                     paste( round( quantile( exp(i1$bsp_D1Sad_miHH_Size), 0.025), 2), "-", round( quantile( exp(i1$bsp_D1Sad_miHH_Size), 0.975), 2)),
+                                                     " ",
+                                                     
+                                                     " ",
+                                                     paste( round( quantile( i1$`sd_Region:ComID:UniqueFamID:PID__D1Sad_Intercept`, 0.025), 2), "-", round( quantile( i1$`sd_Region:ComID:UniqueFamID:PID__D1Sad_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i1$`sd_Region:ComID:UniqueFamID__D1Sad_Intercept`, 0.025), 2), "-", round( quantile( i1$`sd_Region:ComID:UniqueFamID__D1Sad_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i1$`sd_Region:ComID__D1Sad_Intercept`, 0.025), 2), "-", round( quantile( i1$`sd_Region:ComID__D1Sad_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i1$sd_Region__D1Sad_Intercept, 0.025), 2), "-", round( quantile( i1$sd_Region__D1Sad_Intercept, 0.975), 2)),
+                                                     paste( round( quantile( i1$sd_Interviewer__D1Sad_Intercept, 0.025), 2), "-", round( quantile( i1$sd_Interviewer__D1Sad_Intercept, 0.975), 2)),
+                                                     
+                                                     "-",
+                                                     paste( round( quantile( i1_icc_residual, 0.025), 2), "-", round( quantile( i1_icc_residual, 0.975), 2)),
+                                                     paste( round( quantile( i1_icc_indi, 0.025), 2), "-", round( quantile( i1_icc_indi, 0.975), 2)),
+                                                     paste( round( quantile( icc_hh_i1, 0.025), 2), "-", round( quantile( icc_hh_i1, 0.975), 2)),
+                                                     paste( round( quantile( icc_com_i1, 0.025), 2), "-", round( quantile( icc_com_i1, 0.975), 2)),
+                                                     paste( round( quantile( i1_icc_reg, 0.025), 2), "-", round( quantile( i1_icc_reg, 0.975), 2)),
+                                                     paste( round( quantile( icc_int_i1, 0.025), 2), "-", round( quantile( icc_int_i1, 0.975), 2))
+                                                   ),
+                                    
+                                    Estimates_Model_2 = c( round( mean(i2$`b_D2Cry_Intercept[1]`), 2), 
+                                                           round( mean(i2$`b_D2Cry_Intercept[2]`), 2), 
+                                                           round( mean(i2$`b_D2Cry_Intercept[3]`), 2), 
+                                                           round( mean(exp(i2$b_D2Cry_Age)), 2), 
+                                                           round( mean(exp(i2$b_D2Cry_Sex1)), 2), 
+                                                           round( mean(exp(i2$bsp_D2Cry_miSCI)), 2),
+                                                           
+                                                           round( mean(exp(i2$bsp_D2Cry_miSFluency)),2), 
+                                                           round( mean(i2$bs_D2Cry_sInterview_Date_1),2), 
+                                                           round( mean(i2$sds_D2Cry_sInterview_Date_1), 2), 
+                                                           round( mean(exp(i2$b_D2Cry_Town_Distance)), 2), 
+                                                           round( mean(exp(i2$b_D2Cry_Com_Size)), 2), 
+                                                           round( mean(exp(i2$bsp_D2Cry_miHH_Size)), 2), 
+                                                           round((((pi)^2)/3), 2),
+                                                           
+                                                           " ",
+                                                           round( mean(i2$`sd_Region:ComID:UniqueFamID:PID__D2Cry_Intercept`), 2), 
+                                                           round( mean(i2$`sd_Region:ComID:UniqueFamID__D2Cry_Intercept`), 2), 
+                                                           round( mean(i2$`sd_Region:ComID__D2Cry_Intercept`), 2), 
+                                                           round( mean(i2$sd_Region__D2Cry_Intercept), 2), 
+                                                           round( mean(i2$sd_Interviewer__D2Cry_Intercept), 2),
+                                                           
+                                                           "-",
+                                                           round( mean(i2_icc_residual), 2),
+                                                           round( mean(i2_icc_indi), 2),
+                                                           round( mean(icc_hh_i2),2), 
+                                                           round( mean(icc_com_i2), 2), 
+                                                           round( mean(i2_icc_reg), 2),
+                                                           round(mean(icc_int_i2), 2)
+                                    ),
+                                    
+                                    CI_Model_2 = c ( paste( round( quantile(i2$`b_D2Cry_Intercept[1]`, 0.025), 2), "-", round( quantile(i2$`b_D2Cry_Intercept[1]`, 0.975), 2)),
+                                                     paste( round( quantile(i2$`b_D2Cry_Intercept[2]`, 0.025), 2), "-", round( quantile(i2$`b_D2Cry_Intercept[2]`, 0.975), 2)),
+                                                     paste( round( quantile(i2$`b_D2Cry_Intercept[3]`, 0.025), 2), "-", round( quantile(i2$`b_D2Cry_Intercept[3]`, 0.975), 2)),
+                                                     paste( round( quantile( exp(i2$b_D2Cry_Age), 0.025), 2), "-", round( quantile( exp(i2$b_D2Cry_Age), 0.975), 2)),
+                                                     paste( round( quantile( exp(i2$b_D2Cry_Sex1), 0.025), 2), "-", round( quantile( exp(i2$b_D2Cry_Sex1), 0.975), 2)),
+                                                     paste( round( quantile( exp(i2$bsp_D2Cry_miSCI), 0.025), 2), "-", round( quantile( exp(i2$bsp_D2Cry_miSCI), 0.975), 2)),
+                                                     
+                                                     paste( round( quantile( exp(i2$bsp_D2Cry_miSFluency), 0.025), 2), "-", round( quantile( exp(i2$bsp_D2Cry_miSFluency), 0.975), 2)),
+                                                     paste( round( quantile( i2$bs_D2Cry_sInterview_Date_1, 0.025), 2), "-", round( quantile( i2$bs_D2Cry_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( i2$sds_D2Cry_sInterview_Date_1, 0.025), 2), "-", round( quantile( i2$sds_D2Cry_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( exp(i2$b_D2Cry_Town_Distance), 0.025), 2), "-", round( quantile( exp(i2$b_D2Cry_Town_Distance), 0.975), 2)),
+                                                     paste( round( quantile( exp(i2$b_D2Cry_Com_Size), 0.025), 2), "-", round( quantile( exp(i2$b_D2Cry_Com_Size), 0.975), 2)),
+                                                     paste( round( quantile( exp(i2$bsp_D2Cry_miHH_Size), 0.025), 2), "-", round( quantile( exp(i2$bsp_D2Cry_miHH_Size), 0.975), 2)),
+                                                     " ",
+                                                     
+                                                     " ",
+                                                     paste( round( quantile( i2$`sd_Region:ComID:UniqueFamID:PID__D2Cry_Intercept`, 0.025), 2), "-", round( quantile( i2$`sd_Region:ComID:UniqueFamID:PID__D2Cry_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i2$`sd_Region:ComID:UniqueFamID__D2Cry_Intercept`, 0.025), 2), "-", round( quantile( i2$`sd_Region:ComID:UniqueFamID__D2Cry_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i2$`sd_Region:ComID__D2Cry_Intercept`, 0.025), 2), "-", round( quantile( i2$`sd_Region:ComID__D2Cry_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i2$sd_Region__D2Cry_Intercept, 0.025), 2), "-", round( quantile( i2$sd_Region__D2Cry_Intercept, 0.975), 2)),
+                                                     paste( round( quantile( i2$sd_Interviewer__D2Cry_Intercept, 0.025), 2), "-", round( quantile( i2$sd_Interviewer__D2Cry_Intercept, 0.975), 2)),
+                                                     
+                                                     "-",
+                                                     paste( round( quantile( i2_icc_residual, 0.025), 2), "-", round( quantile( i2_icc_residual, 0.975), 2)),
+                                                     paste( round( quantile( i2_icc_indi, 0.025), 2), "-", round( quantile( i2_icc_indi, 0.975), 2)),
+                                                     paste( round( quantile( icc_hh_i2, 0.025), 2), "-", round( quantile( icc_hh_i2, 0.975), 2)),
+                                                     paste( round( quantile( icc_com_i2, 0.025), 2), "-", round( quantile( icc_com_i2, 0.975), 2)),
+                                                     paste( round( quantile( i2_icc_reg, 0.025), 2), "-", round( quantile( i2_icc_reg, 0.975), 2)),
+                                                     paste( round( quantile( icc_int_i2, 0.025), 2), "-", round( quantile( icc_int_i2, 0.975), 2))
+                                    ),
+                                    
+                                    Estimates_Model_3 = c( round( mean(i3$`b_D3SelfCritical_Intercept[1]`), 2), 
+                                                           round( mean(i3$`b_D3SelfCritical_Intercept[2]`), 2), 
+                                                           round( mean(i3$`b_D3SelfCritical_Intercept[3]`), 2), 
+                                                           round( mean(exp(i3$b_D3SelfCritical_Age)), 2), 
+                                                           round( mean(exp(i3$b_D3SelfCritical_Sex1)), 2), 
+                                                           round( mean(exp(i3$bsp_D3SelfCritical_miSCI)), 2),
+                                                           
+                                                           round( mean(exp(i3$bsp_D3SelfCritical_miSFluency)), 2), 
+                                                           round( mean(i3$bs_D3SelfCritical_sInterview_Date_1), 2), 
+                                                           round( mean(i3$sds_D3SelfCritical_sInterview_Date_1), 2), 
+                                                           round( mean(exp(i3$b_D3SelfCritical_Town_Distance)), 2), 
+                                                           round( mean(exp(i3$b_D3SelfCritical_Com_Size)), 2), 
+                                                           round( mean(exp(i3$bsp_D3SelfCritical_miHH_Size)), 2), 
+                                                           round((((pi)^2)/3), 2),
+                                                           
+                                                           " ",
+                                                           round( mean(i3$`sd_Region:ComID:UniqueFamID:PID__D3SelfCritical_Intercept`), 2), 
+                                                           round( mean(i3$`sd_Region:ComID:UniqueFamID__D3SelfCritical_Intercept`), 2), 
+                                                           round( mean(i3$`sd_Region:ComID__D3SelfCritical_Intercept`), 2), 
+                                                           round( mean(i3$sd_Region__D3SelfCritical_Intercept), 2), 
+                                                           round( mean(i3$sd_Interviewer__D3SelfCritical_Intercept), 2),
+                                                           
+                                                           "-",
+                                                           round( mean(i3_icc_residual), 2),
+                                                           round( mean(i3_icc_indi), 2),
+                                                           round( mean(icc_hh_i3), 2), 
+                                                           round( mean(icc_com_i3), 2), 
+                                                           round( mean(i3_icc_reg), 2),
+                                                           round(mean(icc_int_i3), 2)
+                                    ),
+                                    
+                                    CI_Model_3 = c ( paste( round( quantile(i3$`b_D3SelfCritical_Intercept[1]`, 0.025), 2), "-", round( quantile(i3$`b_D3SelfCritical_Intercept[1]`, 0.975), 2)),
+                                                     paste( round( quantile(i3$`b_D3SelfCritical_Intercept[2]`, 0.025), 2), "-", round( quantile(i3$`b_D3SelfCritical_Intercept[2]`, 0.975), 2)),
+                                                     paste( round( quantile(i3$`b_D3SelfCritical_Intercept[3]`, 0.025), 2), "-", round( quantile(i3$`b_D3SelfCritical_Intercept[3]`, 0.975), 2)),
+                                                     paste( round( quantile( exp(i3$b_D3SelfCritical_Age), 0.025), 2), "-", round( quantile( exp(i3$b_D3SelfCritical_Age), 0.975), 2)),
+                                                     paste( round( quantile( exp(i3$b_D3SelfCritical_Sex1), 0.025), 2), "-", round( quantile( exp(i3$b_D3SelfCritical_Sex1), 0.975), 2)),
+                                                     paste( round( quantile( exp(i3$bsp_D3SelfCritical_miSCI), 0.025), 2), "-", round( quantile( exp(i3$bsp_D3SelfCritical_miSCI), 0.975), 2)),
+                                                     
+                                                     paste( round( quantile( exp(i3$bsp_D3SelfCritical_miSFluency), 0.025), 2), "-", round( quantile( exp(i3$bsp_D3SelfCritical_miSFluency), 0.975), 2)),
+                                                     paste( round( quantile( i3$bs_D3SelfCritical_sInterview_Date_1, 0.025), 2), "-", round( quantile( i3$bs_D3SelfCritical_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( i3$sds_D3SelfCritical_sInterview_Date_1, 0.025), 2), "-", round( quantile( i3$sds_D3SelfCritical_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( exp(i3$b_D3SelfCritical_Town_Distance), 0.025), 2), "-", round( quantile( exp(i3$b_D3SelfCritical_Town_Distance), 0.975), 2)),
+                                                     paste( round( quantile( exp(i3$b_D3SelfCritical_Com_Size), 0.025), 2), "-", round( quantile( exp(i3$b_D3SelfCritical_Com_Size), 0.975), 2)),
+                                                     paste( round( quantile( exp(i3$bsp_D3SelfCritical_miHH_Size), 0.025), 2), "-", round( quantile( exp(i3$bsp_D3SelfCritical_miHH_Size), 0.975), 2)),
+                                                     " ",
+                                                     
+                                                     " ",
+                                                     paste( round( quantile( i3$`sd_Region:ComID:UniqueFamID:PID__D3SelfCritical_Intercept`, 0.025), 2), "-", round( quantile( i3$`sd_Region:ComID:UniqueFamID:PID__D3SelfCritical_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i3$`sd_Region:ComID:UniqueFamID__D3SelfCritical_Intercept`, 0.025), 2), "-", round( quantile( i3$`sd_Region:ComID:UniqueFamID__D3SelfCritical_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i3$`sd_Region:ComID__D3SelfCritical_Intercept`, 0.025), 2), "-", round( quantile( i3$`sd_Region:ComID__D3SelfCritical_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i3$sd_Region__D3SelfCritical_Intercept, 0.025), 2), "-", round( quantile( i3$sd_Region__D3SelfCritical_Intercept, 0.975), 2)),
+                                                     paste( round( quantile( i3$sd_Interviewer__D3SelfCritical_Intercept, 0.025), 2), "-", round( quantile( i3$sd_Interviewer__D3SelfCritical_Intercept, 0.975), 2)),
+                                                     
+                                                     "-",
+                                                     paste( round( quantile( i3_icc_residual, 0.025), 2), "-", round( quantile( i3_icc_residual, 0.975), 2)),
+                                                     paste( round( quantile( i3_icc_indi, 0.025), 2), "-", round( quantile( i3_icc_indi, 0.975), 2)),
+                                                     paste( round( quantile( icc_hh_i3, 0.025), 2), "-", round( quantile( icc_hh_i3, 0.975), 2)),
+                                                     paste( round( quantile( icc_com_i3, 0.025), 2), "-", round( quantile( icc_com_i3, 0.975), 2)),
+                                                     paste( round( quantile( i3_icc_reg, 0.025), 2), "-", round( quantile( i3_icc_reg, 0.975), 2)),
+                                                     paste( round( quantile( icc_int_i3, 0.025), 2), "-", round( quantile( icc_int_i3, 0.975), 2))
+                                    ),
+                                    
+                                    Estimates_Model_4 = c( round( mean(i4$`b_D4LifeNotValuable_Intercept[1]`), 2), 
+                                                           round( mean(i4$`b_D4LifeNotValuable_Intercept[2]`), 2), 
+                                                           round( mean(i4$`b_D4LifeNotValuable_Intercept[3]`), 2), 
+                                                           round( mean(exp(i4$b_D4LifeNotValuable_Age)), 2), 
+                                                           round( mean(exp(i4$b_D4LifeNotValuable_Sex1)), 2), 
+                                                           round( mean(exp(i4$bsp_D4LifeNotValuable_miSCI)), 2),
+                                                           
+                                                           round( mean(exp(i4$bsp_D4LifeNotValuable_miSFluency)),2), 
+                                                           round( mean(i4$bs_D4LifeNotValuable_sInterview_Date_1),2), 
+                                                           round( mean(i4$sds_D4LifeNotValuable_sInterview_Date_1), 2), 
+                                                           round( mean(exp(i4$b_D4LifeNotValuable_Town_Distance)), 2), 
+                                                           round( mean(exp(i4$b_D4LifeNotValuable_Com_Size)), 2), 
+                                                           round( mean(exp(i4$bsp_D4LifeNotValuable_miHH_Size)), 2), 
+                                                           round((((pi)^2)/3), 2),
+                                                           
+                                                           " ",
+                                                           round( mean(i4$`sd_Region:ComID:UniqueFamID:PID__D4LifeNotValuable_Intercept`), 2), 
+                                                           round( mean(i4$`sd_Region:ComID:UniqueFamID__D4LifeNotValuable_Intercept`), 2), 
+                                                           round( mean(i4$`sd_Region:ComID__D4LifeNotValuable_Intercept`), 2), 
+                                                           round( mean(i4$sd_Region__D4LifeNotValuable_Intercept), 2), 
+                                                           round( mean(i4$sd_Interviewer__D4LifeNotValuable_Intercept), 2),
+                                                           
+                                                           "-",
+                                                           round( mean(i4_icc_residual), 2),
+                                                           round( mean(i4_icc_indi), 2),
+                                                           round( mean(icc_hh_i4),2), 
+                                                           round( mean(icc_com_i4), 2), 
+                                                           round( mean(i4_icc_reg), 2),
+                                                           round(mean(icc_int_i4), 2)
+                                    ),
+                                    
+                                    CI_Model_4 = c ( paste( round( quantile(i4$`b_D4LifeNotValuable_Intercept[1]`, 0.025), 2), "-", round( quantile(i4$`b_D4LifeNotValuable_Intercept[1]`, 0.975), 2)),
+                                                     paste( round( quantile(i4$`b_D4LifeNotValuable_Intercept[2]`, 0.025), 2), "-", round( quantile(i4$`b_D4LifeNotValuable_Intercept[2]`, 0.975), 2)),
+                                                     paste( round( quantile(i4$`b_D4LifeNotValuable_Intercept[3]`, 0.025), 2), "-", round( quantile(i4$`b_D4LifeNotValuable_Intercept[3]`, 0.975), 2)),
+                                                     paste( round( quantile( exp(i4$b_D4LifeNotValuable_Age), 0.025), 2), "-", round( quantile( exp(i4$b_D4LifeNotValuable_Age), 0.975), 2)),
+                                                     paste( round( quantile( exp(i4$b_D4LifeNotValuable_Sex1), 0.025), 2), "-", round( quantile( exp(i4$b_D4LifeNotValuable_Sex1), 0.975), 2)),
+                                                     paste( round( quantile( exp(i4$bsp_D4LifeNotValuable_miSCI), 0.025), 2), "-", round( quantile( exp(i4$bsp_D4LifeNotValuable_miSCI), 0.975), 2)),
+                                                     
+                                                     paste( round( quantile( exp(i4$bsp_D4LifeNotValuable_miSFluency), 0.025), 2), "-", round( quantile( exp(i4$bsp_D4LifeNotValuable_miSFluency), 0.975), 2)),
+                                                     paste( round( quantile( i4$bs_D4LifeNotValuable_sInterview_Date_1, 0.025), 2), "-", round( quantile( i4$bs_D4LifeNotValuable_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( i4$sds_D4LifeNotValuable_sInterview_Date_1, 0.025), 2), "-", round( quantile( i4$sds_D4LifeNotValuable_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( exp(i4$b_D4LifeNotValuable_Town_Distance), 0.025), 2), "-", round( quantile( exp(i4$b_D4LifeNotValuable_Town_Distance), 0.975), 2)),
+                                                     paste( round( quantile( exp(i4$b_D4LifeNotValuable_Com_Size), 0.025), 2), "-", round( quantile( exp(i4$b_D4LifeNotValuable_Com_Size), 0.975), 2)),
+                                                     paste( round( quantile( exp(i4$bsp_D4LifeNotValuable_miHH_Size), 0.025), 2), "-", round( quantile( exp(i4$bsp_D4LifeNotValuable_miHH_Size), 0.975), 2)),
+                                                     " ",
+                                                     
+                                                     " ",
+                                                     paste( round( quantile( i4$`sd_Region:ComID:UniqueFamID:PID__D4LifeNotValuable_Intercept`, 0.025), 2), "-", round( quantile( i4$`sd_Region:ComID:UniqueFamID:PID__D4LifeNotValuable_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i4$`sd_Region:ComID:UniqueFamID__D4LifeNotValuable_Intercept`, 0.025), 2), "-", round( quantile( i4$`sd_Region:ComID:UniqueFamID__D4LifeNotValuable_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i4$`sd_Region:ComID__D4LifeNotValuable_Intercept`, 0.025), 2), "-", round( quantile( i4$`sd_Region:ComID__D4LifeNotValuable_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i4$sd_Region__D4LifeNotValuable_Intercept, 0.025), 2), "-", round( quantile( i4$sd_Region__D4LifeNotValuable_Intercept, 0.975), 2)),
+                                                     paste( round( quantile( i4$sd_Interviewer__D4LifeNotValuable_Intercept, 0.025), 2), "-", round( quantile( i4$sd_Interviewer__D4LifeNotValuable_Intercept, 0.975), 2)),
+                                                     
+                                                     "-",
+                                                     paste( round( quantile( i4_icc_residual, 0.025), 2), "-", round( quantile( i4_icc_residual, 0.975), 2)),
+                                                     paste( round( quantile( i4_icc_indi, 0.025), 2), "-", round( quantile( i4_icc_indi, 0.975), 2)),
+                                                     paste( round( quantile( icc_hh_i4, 0.025), 2), "-", round( quantile( icc_hh_i4, 0.975), 2)),
+                                                     paste( round( quantile( icc_com_i4, 0.025), 2), "-", round( quantile( icc_com_i4, 0.975), 2)),
+                                                     paste( round( quantile( i4_icc_reg, 0.025), 2), "-", round( quantile( i4_icc_reg, 0.975), 2)),
+                                                     paste( round( quantile( icc_int_i4, 0.025), 2), "-", round( quantile( icc_int_i4, 0.975), 2))
+                                    )
+                                    
+                                    )
+                                                         
+
+models_summary_i5_i8 <- data.frame( Predictors = c("Intercept[1]", 
+                                                   "Intercept[2]", 
+                                                   "Intercept[3]", 
+                                                   "Age", 
+                                                   "Sex", 
+                                                   "Social Conflict Index (SCI)", 
+                                                   
+                                                   "Spanish Fluency", 
+                                                   "Interview Date (Spline Fixed Effect)", 
+                                                   "Interview Date (Spline Smooth Term)",
+                                                   "Distance to Town", 
+                                                   "Maximum Community Size", 
+                                                   "Household Size", 
+                                                   "Residual Standard Deviation", 
+                                                   
+                                                   "Between-Cluster Standard Deviation (in log-odds)", 
+                                                   " ", 
+                                                   " ", 
+                                                   " ", 
+                                                   " ", 
+                                                   " ",
+                                                   
+                                                   " ICC", 
+                                                   " ", 
+                                                   " ", 
+                                                   " ", 
+                                                   " ", 
+                                                   " ",
+                                                   " "),
+                                    
+                                    Estimates_Model_5 = c( round( mean(i5$`b_D5Useless_Intercept[1]`), 2), 
+                                                           round( mean(i5$`b_D5Useless_Intercept[2]`), 2), 
+                                                           round( mean(i5$`b_D5Useless_Intercept[3]`), 2), 
+                                                           round( mean(exp(i5$b_D5Useless_Age)), 2), 
+                                                           round( mean(exp(i5$b_D5Useless_Sex1)), 2), 
+                                                           round( mean(exp(i5$bsp_D5Useless_miSCI)), 2),
+                                                           
+                                                           round( mean(exp(i5$bsp_D5Useless_miSFluency)),2), 
+                                                           round( mean(i5$bs_D5Useless_sInterview_Date_1),2), 
+                                                           round( mean(i5$sds_D5Useless_sInterview_Date_1), 2), 
+                                                           round( mean(exp(i5$b_D5Useless_Town_Distance)), 2), 
+                                                           round( mean(exp(i5$b_D5Useless_Com_Size)), 2), 
+                                                           round( mean(exp(i5$bsp_D5Useless_miHH_Size)), 2), 
+                                                           round((((pi)^2)/3), 2),
+                                                           
+                                                           " ",
+                                                           round( mean(i5$`sd_Region:ComID:UniqueFamID:PID__D5Useless_Intercept`), 2), 
+                                                           round( mean(i5$`sd_Region:ComID:UniqueFamID__D5Useless_Intercept`), 2), 
+                                                           round( mean(i5$`sd_Region:ComID__D5Useless_Intercept`), 2), 
+                                                           round( mean(i5$sd_Region__D5Useless_Intercept), 2), 
+                                                           round( mean(i5$sd_Interviewer__D5Useless_Intercept), 2),
+                                                           
+                                                           "-",
+                                                           round( mean(i5_icc_residual), 2),
+                                                           round( mean(i5_icc_indi), 2),
+                                                           round( mean(icc_hh_i5),2), 
+                                                           round( mean(icc_com_i5), 2), 
+                                                           round( mean(i5_icc_reg), 2),
+                                                           round(mean(icc_int_i5), 2)
+                                    ),
+                                    
+                                    CI_Model_5 = c ( paste( round( quantile(i5$`b_D5Useless_Intercept[1]`, 0.025), 2), "-", round( quantile(i5$`b_D5Useless_Intercept[1]`, 0.975), 2)),
+                                                     paste( round( quantile(i5$`b_D5Useless_Intercept[2]`, 0.025), 2), "-", round( quantile(i5$`b_D5Useless_Intercept[2]`, 0.975), 2)),
+                                                     paste( round( quantile(i5$`b_D5Useless_Intercept[3]`, 0.025), 2), "-", round( quantile(i5$`b_D5Useless_Intercept[3]`, 0.975), 2)),
+                                                     paste( round( quantile( exp(i5$b_D5Useless_Age), 0.025), 2), "-", round( quantile( exp(i5$b_D5Useless_Age), 0.975), 2)),
+                                                     paste( round( quantile( exp(i5$b_D5Useless_Sex1), 0.025), 2), "-", round( quantile( exp(i5$b_D5Useless_Sex1), 0.975), 2)),
+                                                     paste( round( quantile( exp(i5$bsp_D5Useless_miSCI), 0.025), 2), "-", round( quantile( exp(i5$bsp_D5Useless_miSCI), 0.975), 2)),
+                                                     
+                                                     paste( round( quantile( exp(i5$bsp_D5Useless_miSFluency), 0.025), 2), "-", round( quantile( exp(i5$bsp_D5Useless_miSFluency), 0.975), 2)),
+                                                     paste( round( quantile( i5$bs_D5Useless_sInterview_Date_1, 0.025), 2), "-", round( quantile( i5$bs_D5Useless_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( i5$sds_D5Useless_sInterview_Date_1, 0.025), 2), "-", round( quantile( i5$sds_D5Useless_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( exp(i5$b_D5Useless_Town_Distance), 0.025), 2), "-", round( quantile( exp(i5$b_D5Useless_Town_Distance), 0.975), 2)),
+                                                     paste( round( quantile( exp(i5$b_D5Useless_Com_Size), 0.025), 2), "-", round( quantile( exp(i5$b_D5Useless_Com_Size), 0.975), 2)),
+                                                     paste( round( quantile( exp(i5$bsp_D5Useless_miHH_Size), 0.025), 2), "-", round( quantile( exp(i5$bsp_D5Useless_miHH_Size), 0.975), 2)),
+                                                     " ",
+                                                     
+                                                     " ",
+                                                     paste( round( quantile( i5$`sd_Region:ComID:UniqueFamID:PID__D5Useless_Intercept`, 0.025), 2), "-", round( quantile( i5$`sd_Region:ComID:UniqueFamID:PID__D5Useless_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i5$`sd_Region:ComID:UniqueFamID__D5Useless_Intercept`, 0.025), 2), "-", round( quantile( i5$`sd_Region:ComID:UniqueFamID__D5Useless_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i5$`sd_Region:ComID__D5Useless_Intercept`, 0.025), 2), "-", round( quantile( i5$`sd_Region:ComID__D5Useless_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i5$sd_Region__D5Useless_Intercept, 0.025), 2), "-", round( quantile( i5$sd_Region__D5Useless_Intercept, 0.975), 2)),
+                                                     paste( round( quantile( i5$sd_Interviewer__D5Useless_Intercept, 0.025), 2), "-", round( quantile( i5$sd_Interviewer__D5Useless_Intercept, 0.975), 2)),
+                                                     
+                                                     "-",
+                                                     paste( round( quantile( i5_icc_residual, 0.025), 2), "-", round( quantile( i5_icc_residual, 0.975), 2)),
+                                                     paste( round( quantile( i5_icc_indi, 0.025), 2), "-", round( quantile( i5_icc_indi, 0.975), 2)),
+                                                     paste( round( quantile( icc_hh_i5, 0.025), 2), "-", round( quantile( icc_hh_i5, 0.975), 2)),
+                                                     paste( round( quantile( icc_com_i5, 0.025), 2), "-", round( quantile( icc_com_i5, 0.975), 2)),
+                                                     paste( round( quantile( i5_icc_reg, 0.025), 2), "-", round( quantile( i5_icc_reg, 0.975), 2)),
+                                                     paste( round( quantile( icc_int_i5, 0.025), 2), "-", round( quantile( icc_int_i5, 0.975), 2))
+                                    ),
+                                    
+                                    Estimates_Model_6 = c( round( mean(i6$`b_D6NoInterest_Intercept[1]`), 2), 
+                                                           round( mean(i6$`b_D6NoInterest_Intercept[2]`), 2), 
+                                                           round( mean(i6$`b_D6NoInterest_Intercept[3]`), 2), 
+                                                           round( mean(exp(i6$b_D6NoInterest_Age)), 2), 
+                                                           round( mean(exp(i6$b_D6NoInterest_Sex1)), 2), 
+                                                           round( mean(exp(i6$bsp_D6NoInterest_miSCI)), 2),
+                                                           
+                                                           round( mean(exp(i6$bsp_D6NoInterest_miSFluency)),2), 
+                                                           round( mean(i6$bs_D6NoInterest_sInterview_Date_1),2), 
+                                                           round( mean(i6$sds_D6NoInterest_sInterview_Date_1), 2), 
+                                                           round( mean(exp(i6$b_D6NoInterest_Town_Distance)), 2), 
+                                                           round( mean(exp(i6$b_D6NoInterest_Com_Size)), 2), 
+                                                           round( mean(exp(i6$bsp_D6NoInterest_miHH_Size)), 2), 
+                                                           round((((pi)^2)/3), 2),
+                                                           
+                                                           " ",
+                                                           round( mean(i6$`sd_Region:ComID:UniqueFamID:PID__D6NoInterest_Intercept`), 2), 
+                                                           round( mean(i6$`sd_Region:ComID:UniqueFamID__D6NoInterest_Intercept`), 2), 
+                                                           round( mean(i6$`sd_Region:ComID__D6NoInterest_Intercept`), 2), 
+                                                           round( mean(i6$sd_Region__D6NoInterest_Intercept), 2), 
+                                                           round( mean(i6$sd_Interviewer__D6NoInterest_Intercept), 2),
+                                                           
+                                                           "-",
+                                                           round( mean(i6_icc_residual), 2),
+                                                           round( mean(i6_icc_indi), 2),
+                                                           round( mean(icc_hh_i6),2), 
+                                                           round( mean(icc_com_i6), 2), 
+                                                           round( mean(i6_icc_reg), 2),
+                                                           round(mean(icc_int_i6), 2)
+                                    ),
+                                    
+                                    CI_Model_6 = c ( paste( round( quantile(i6$`b_D6NoInterest_Intercept[1]`, 0.025), 2), "-", round( quantile(i6$`b_D6NoInterest_Intercept[1]`, 0.975), 2)),
+                                                     paste( round( quantile(i6$`b_D6NoInterest_Intercept[2]`, 0.025), 2), "-", round( quantile(i6$`b_D6NoInterest_Intercept[2]`, 0.975), 2)),
+                                                     paste( round( quantile(i6$`b_D6NoInterest_Intercept[3]`, 0.025), 2), "-", round( quantile(i6$`b_D6NoInterest_Intercept[3]`, 0.975), 2)),
+                                                     paste( round( quantile( exp(i6$b_D6NoInterest_Age), 0.025), 2), "-", round( quantile( exp(i6$b_D6NoInterest_Age), 0.975), 2)),
+                                                     paste( round( quantile( exp(i6$b_D6NoInterest_Sex1), 0.025), 2), "-", round( quantile( exp(i6$b_D6NoInterest_Sex1), 0.975), 2)),
+                                                     paste( round( quantile( exp(i6$bsp_D6NoInterest_miSCI), 0.025), 2), "-", round( quantile( exp(i6$bsp_D6NoInterest_miSCI), 0.975), 2)),
+                                                     
+                                                     paste( round( quantile( exp(i6$bsp_D6NoInterest_miSFluency), 0.025), 2), "-", round( quantile( exp(i6$bsp_D6NoInterest_miSFluency), 0.975), 2)),
+                                                     paste( round( quantile( i6$bs_D6NoInterest_sInterview_Date_1, 0.025), 2), "-", round( quantile( i6$bs_D6NoInterest_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( i6$sds_D6NoInterest_sInterview_Date_1, 0.025), 2), "-", round( quantile( i6$sds_D6NoInterest_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( exp(i6$b_D6NoInterest_Town_Distance), 0.025), 2), "-", round( quantile( exp(i6$b_D6NoInterest_Town_Distance), 0.975), 2)),
+                                                     paste( round( quantile( exp(i6$b_D6NoInterest_Com_Size), 0.025), 2), "-", round( quantile( exp(i6$b_D6NoInterest_Com_Size), 0.975), 2)),
+                                                     paste( round( quantile( exp(i6$bsp_D6NoInterest_miHH_Size), 0.025), 2), "-", round( quantile( exp(i6$bsp_D6NoInterest_miHH_Size), 0.975), 2)),
+                                                     " ",
+                                                     
+                                                     " ",
+                                                     paste( round( quantile( i6$`sd_Region:ComID:UniqueFamID:PID__D6NoInterest_Intercept`, 0.025), 2), "-", round( quantile( i6$`sd_Region:ComID:UniqueFamID:PID__D6NoInterest_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i6$`sd_Region:ComID:UniqueFamID__D6NoInterest_Intercept`, 0.025), 2), "-", round( quantile( i6$`sd_Region:ComID:UniqueFamID__D6NoInterest_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i6$`sd_Region:ComID__D6NoInterest_Intercept`, 0.025), 2), "-", round( quantile( i6$`sd_Region:ComID__D6NoInterest_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i6$sd_Region__D6NoInterest_Intercept, 0.025), 2), "-", round( quantile( i6$sd_Region__D6NoInterest_Intercept, 0.975), 2)),
+                                                     paste( round( quantile( i6$sd_Interviewer__D6NoInterest_Intercept, 0.025), 2), "-", round( quantile( i6$sd_Interviewer__D6NoInterest_Intercept, 0.975), 2)),
+                                                     
+                                                     "-",
+                                                     paste( round( quantile( i6_icc_residual, 0.025), 2), "-", round( quantile( i6_icc_residual, 0.975), 2)),
+                                                     paste( round( quantile( i6_icc_indi, 0.025), 2), "-", round( quantile( i6_icc_indi, 0.975), 2)),
+                                                     paste( round( quantile( icc_hh_i6, 0.025), 2), "-", round( quantile( icc_hh_i6, 0.975), 2)),
+                                                     paste( round( quantile( icc_com_i6, 0.025), 2), "-", round( quantile( icc_com_i6, 0.975), 2)),
+                                                     paste( round( quantile( i6_icc_reg, 0.025), 2), "-", round( quantile( i6_icc_reg, 0.975), 2)),
+                                                     paste( round( quantile( icc_int_i6, 0.025), 2), "-", round( quantile( icc_int_i6, 0.975), 2))
+                                    ),
+                                    
+                                    Estimates_Model_7 = c( round( mean(i7$`b_D7Tired_Intercept[1]`), 2), 
+                                                           round( mean(i7$`b_D7Tired_Intercept[2]`), 2), 
+                                                           round( mean(i7$`b_D7Tired_Intercept[3]`), 2), 
+                                                           round( mean(exp(i7$b_D7Tired_Age)), 2), 
+                                                           round( mean(exp(i7$b_D7Tired_Sex1)), 2), 
+                                                           round( mean(exp(i7$bsp_D7Tired_miSCI)), 2),
+                                                           
+                                                           round( mean(exp(i7$bsp_D7Tired_miSFluency)), 2), 
+                                                           round( mean(i7$bs_D7Tired_sInterview_Date_1), 2), 
+                                                           round( mean(i7$sds_D7Tired_sInterview_Date_1), 2), 
+                                                           round( mean(exp(i7$b_D7Tired_Town_Distance)), 2), 
+                                                           round( mean(exp(i7$b_D7Tired_Com_Size)), 2), 
+                                                           round( mean(exp(i7$bsp_D7Tired_miHH_Size)), 2), 
+                                                           round((((pi)^2)/3), 2),
+                                                           
+                                                           " ",
+                                                           round( mean(i7$`sd_Region:ComID:UniqueFamID:PID__D7Tired_Intercept`), 2), 
+                                                           round( mean(i7$`sd_Region:ComID:UniqueFamID__D7Tired_Intercept`), 2), 
+                                                           round( mean(i7$`sd_Region:ComID__D7Tired_Intercept`), 2), 
+                                                           round( mean(i7$sd_Region__D7Tired_Intercept), 2), 
+                                                           round( mean(i7$sd_Interviewer__D7Tired_Intercept), 2),
+                                                           
+                                                           "-",
+                                                           round( mean(i7_icc_residual), 2),
+                                                           round( mean(i7_icc_indi), 2),
+                                                           round( mean(icc_hh_i7), 2), 
+                                                           round( mean(icc_com_i7), 2), 
+                                                           round( mean(i7_icc_reg), 2),
+                                                           round(mean(icc_int_i7), 2)
+                                    ),
+                                    
+                                    CI_Model_7 = c ( paste( round( quantile(i7$`b_D7Tired_Intercept[1]`, 0.025), 2), "-", round( quantile(i7$`b_D7Tired_Intercept[1]`, 0.975), 2)),
+                                                     paste( round( quantile(i7$`b_D7Tired_Intercept[2]`, 0.025), 2), "-", round( quantile(i7$`b_D7Tired_Intercept[2]`, 0.975), 2)),
+                                                     paste( round( quantile(i7$`b_D7Tired_Intercept[3]`, 0.025), 2), "-", round( quantile(i7$`b_D7Tired_Intercept[3]`, 0.975), 2)),
+                                                     paste( round( quantile( exp(i7$b_D7Tired_Age), 0.025), 2), "-", round( quantile( exp(i7$b_D7Tired_Age), 0.975), 2)),
+                                                     paste( round( quantile( exp(i7$b_D7Tired_Sex1), 0.025), 2), "-", round( quantile( exp(i7$b_D7Tired_Sex1), 0.975), 2)),
+                                                     paste( round( quantile( exp(i7$bsp_D7Tired_miSCI), 0.025), 2), "-", round( quantile( exp(i7$bsp_D7Tired_miSCI), 0.975), 2)),
+                                                     
+                                                     paste( round( quantile( exp(i7$bsp_D7Tired_miSFluency), 0.025), 2), "-", round( quantile( exp(i7$bsp_D7Tired_miSFluency), 0.975), 2)),
+                                                     paste( round( quantile( i7$bs_D7Tired_sInterview_Date_1, 0.025), 2), "-", round( quantile( i7$bs_D7Tired_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( i7$sds_D7Tired_sInterview_Date_1, 0.025), 2), "-", round( quantile( i7$sds_D7Tired_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( exp(i7$b_D7Tired_Town_Distance), 0.025), 2), "-", round( quantile( exp(i7$b_D7Tired_Town_Distance), 0.975), 2)),
+                                                     paste( round( quantile( exp(i7$b_D7Tired_Com_Size), 0.025), 2), "-", round( quantile( exp(i7$b_D7Tired_Com_Size), 0.975), 2)),
+                                                     paste( round( quantile( exp(i7$bsp_D7Tired_miHH_Size), 0.025), 2), "-", round( quantile( exp(i7$bsp_D7Tired_miHH_Size), 0.975), 2)),
+                                                     " ",
+                                                     
+                                                     " ",
+                                                     paste( round( quantile( i7$`sd_Region:ComID:UniqueFamID:PID__D7Tired_Intercept`, 0.025), 2), "-", round( quantile( i7$`sd_Region:ComID:UniqueFamID:PID__D7Tired_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i7$`sd_Region:ComID:UniqueFamID__D7Tired_Intercept`, 0.025), 2), "-", round( quantile( i7$`sd_Region:ComID:UniqueFamID__D7Tired_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i7$`sd_Region:ComID__D7Tired_Intercept`, 0.025), 2), "-", round( quantile( i7$`sd_Region:ComID__D7Tired_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i7$sd_Region__D7Tired_Intercept, 0.025), 2), "-", round( quantile( i7$sd_Region__D7Tired_Intercept, 0.975), 2)),
+                                                     paste( round( quantile( i7$sd_Interviewer__D7Tired_Intercept, 0.025), 2), "-", round( quantile( i7$sd_Interviewer__D7Tired_Intercept, 0.975), 2)),
+                                                     
+                                                     "-",
+                                                     paste( round( quantile( i7_icc_residual, 0.025), 2), "-", round( quantile( i7_icc_residual, 0.975), 2)),
+                                                     paste( round( quantile( i7_icc_indi, 0.025), 2), "-", round( quantile( i7_icc_indi, 0.975), 2)),
+                                                     paste( round( quantile( icc_hh_i7, 0.025), 2), "-", round( quantile( icc_hh_i7, 0.975), 2)),
+                                                     paste( round( quantile( icc_com_i7, 0.025), 2), "-", round( quantile( icc_com_i7, 0.975), 2)),
+                                                     paste( round( quantile( i7_icc_reg, 0.025), 2), "-", round( quantile( i7_icc_reg, 0.975), 2)),
+                                                     paste( round( quantile( icc_int_i7, 0.025), 2), "-", round( quantile( icc_int_i7, 0.975), 2))
+                                    ),
+                                    
+                                    Estimates_Model_8 = c( round( mean(i8$`b_D8CantConcentrate_Intercept[1]`), 2), 
+                                                           round( mean(i8$`b_D8CantConcentrate_Intercept[2]`), 2), 
+                                                           round( mean(i8$`b_D8CantConcentrate_Intercept[3]`), 2), 
+                                                           round( mean(exp(i8$b_D8CantConcentrate_Age)), 2), 
+                                                           round( mean(exp(i8$b_D8CantConcentrate_Sex1)), 2), 
+                                                           round( mean(exp(i8$bsp_D8CantConcentrate_miSCI)), 2),
+                                                           
+                                                           round( mean(exp(i8$bsp_D8CantConcentrate_miSFluency)), 2), 
+                                                           round( mean(i8$bs_D8CantConcentrate_sInterview_Date_1), 2), 
+                                                           round( mean(i8$sds_D8CantConcentrate_sInterview_Date_1), 2), 
+                                                           round( mean(exp(i8$b_D8CantConcentrate_Town_Distance)), 2), 
+                                                           round( mean(exp(i8$b_D8CantConcentrate_Com_Size)), 2), 
+                                                           round( mean(exp(i8$bsp_D8CantConcentrate_miHH_Size)), 2), 
+                                                           round((((pi)^2)/3), 2),
+                                                           
+                                                           " ",
+                                                           round( mean(i8$`sd_Region:ComID:UniqueFamID:PID__D8CantConcentrate_Intercept`), 2), 
+                                                           round( mean(i8$`sd_Region:ComID:UniqueFamID__D8CantConcentrate_Intercept`), 2), 
+                                                           round( mean(i8$`sd_Region:ComID__D8CantConcentrate_Intercept`), 2), 
+                                                           round( mean(i8$sd_Region__D8CantConcentrate_Intercept), 2), 
+                                                           round( mean(i8$sd_Interviewer__D8CantConcentrate_Intercept), 2),
+                                                           
+                                                           "-",
+                                                           round( mean(i8_icc_residual), 2),
+                                                           round( mean(i8_icc_indi), 2),
+                                                           round( mean(icc_hh_i8), 2), 
+                                                           round( mean(icc_com_i8), 2), 
+                                                           round( mean(i8_icc_reg), 2),
+                                                           round(mean(icc_int_i8), 2)
+                                    ),
+                                    
+                                    CI_Model_8 = c ( paste( round( quantile(i8$`b_D8CantConcentrate_Intercept[1]`, 0.025), 2), "-", round( quantile(i8$`b_D8CantConcentrate_Intercept[1]`, 0.975), 2)),
+                                                     paste( round( quantile(i8$`b_D8CantConcentrate_Intercept[2]`, 0.025), 2), "-", round( quantile(i8$`b_D8CantConcentrate_Intercept[2]`, 0.975), 2)),
+                                                     paste( round( quantile(i8$`b_D8CantConcentrate_Intercept[3]`, 0.025), 2), "-", round( quantile(i8$`b_D8CantConcentrate_Intercept[3]`, 0.975), 2)),
+                                                     paste( round( quantile( exp(i8$b_D8CantConcentrate_Age), 0.025), 2), "-", round( quantile( exp(i8$b_D8CantConcentrate_Age), 0.975), 2)),
+                                                     paste( round( quantile( exp(i8$b_D8CantConcentrate_Sex1), 0.025), 2), "-", round( quantile( exp(i8$b_D8CantConcentrate_Sex1), 0.975), 2)),
+                                                     paste( round( quantile( exp(i8$bsp_D8CantConcentrate_miSCI), 0.025), 2), "-", round( quantile( exp(i8$bsp_D8CantConcentrate_miSCI), 0.975), 2)),
+                                                     
+                                                     paste( round( quantile( exp(i8$bsp_D8CantConcentrate_miSFluency), 0.025), 2), "-", round( quantile( exp(i8$bsp_D8CantConcentrate_miSFluency), 0.975), 2)),
+                                                     paste( round( quantile( i8$bs_D8CantConcentrate_sInterview_Date_1, 0.025), 2), "-", round( quantile( i8$bs_D8CantConcentrate_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( i8$sds_D8CantConcentrate_sInterview_Date_1, 0.025), 2), "-", round( quantile( i8$sds_D8CantConcentrate_sInterview_Date_1, 0.975), 2)),
+                                                     paste( round( quantile( exp(i8$b_D8CantConcentrate_Town_Distance), 0.025), 2), "-", round( quantile( exp(i8$b_D8CantConcentrate_Town_Distance), 0.975), 2)),
+                                                     paste( round( quantile( exp(i8$b_D8CantConcentrate_Com_Size), 0.025), 2), "-", round( quantile( exp(i8$b_D8CantConcentrate_Com_Size), 0.975), 2)),
+                                                     paste( round( quantile( exp(i8$bsp_D8CantConcentrate_miHH_Size), 0.025), 2), "-", round( quantile( exp(i8$bsp_D8CantConcentrate_miHH_Size), 0.975), 2)),
+                                                     " ",
+                                                     
+                                                     " ",
+                                                     paste( round( quantile( i8$`sd_Region:ComID:UniqueFamID:PID__D8CantConcentrate_Intercept`, 0.025), 2), "-", round( quantile( i8$`sd_Region:ComID:UniqueFamID:PID__D8CantConcentrate_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i8$`sd_Region:ComID:UniqueFamID__D8CantConcentrate_Intercept`, 0.025), 2), "-", round( quantile( i8$`sd_Region:ComID:UniqueFamID__D8CantConcentrate_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i8$`sd_Region:ComID__D8CantConcentrate_Intercept`, 0.025), 2), "-", round( quantile( i8$`sd_Region:ComID__D8CantConcentrate_Intercept`, 0.975), 2)),
+                                                     paste( round( quantile( i8$sd_Region__D8CantConcentrate_Intercept, 0.025), 2), "-", round( quantile( i8$sd_Region__D8CantConcentrate_Intercept, 0.975), 2)),
+                                                     paste( round( quantile( i8$sd_Interviewer__D8CantConcentrate_Intercept, 0.025), 2), "-", round( quantile( i8$sd_Interviewer__D8CantConcentrate_Intercept, 0.975), 2)),
+                                                     
+                                                     "-",
+                                                     paste( round( quantile( i8_icc_residual, 0.025), 2), "-", round( quantile( i8_icc_residual, 0.975), 2)),
+                                                     paste( round( quantile( i8_icc_indi, 0.025), 2), "-", round( quantile( i8_icc_indi, 0.975), 2)),
+                                                     paste( round( quantile( icc_hh_i8, 0.025), 2), "-", round( quantile( icc_hh_i8, 0.975), 2)),
+                                                     paste( round( quantile( icc_com_i8, 0.025), 2), "-", round( quantile( icc_com_i8, 0.975), 2)),
+                                                     paste( round( quantile( i8_icc_reg, 0.025), 2), "-", round( quantile( i8_icc_reg, 0.975), 2)),
+                                                     paste( round( quantile( icc_int_i8, 0.025), 2), "-", round( quantile( icc_int_i8, 0.975), 2))
+                                    )
+                                    
+)
+
+                                   
+                    
+#################### Generating the summary tables that are used in the manuscript
+##################################################################################
+##################################################################################
+
+## Converting model summary (Item 1 - Item 4) to a flextable format
+i1_i4_mod_summary <- flextable(models_summary_i1_i4)
+
+## Adding alternative colours to distinguish different model outputs
+i1_i4_mod_summary <- bg(i1_i4_mod_summary, j = c(4,5,8,9), bg = "#D3D3D3", part = "body")
+i1_i4_mod_summary <- bg(i1_i4_mod_summary, j = c(2,3,6,7), bg = "beige", part = "body")
+i1_i4_mod_summary <- bold(i1_i4_mod_summary, part = "header")
+i1_i4_mod_summary <- autofit(i1_i4_mod_summary)
+
+## Copy-paste the output on word
+i1_i4_mod_summary
+
+##################################################################
+## Now Converting model summary (Item 5 - Item 8) to a flextable format
+models_summary_i5_i8 <- flextable(models_summary_i5_i8)
+
+## Adding alternative colours to distinguish different model outputs
+models_summary_i5_i8 <- bg(models_summary_i5_i8, j = c(4,5,8,9), bg = "#D3D3D3", part = "body")
+models_summary_i5_i8<- bg(models_summary_i5_i8, j = c(2,3,6,7), bg = "beige", part = "body")
+models_summary_i5_i8 <- bold(models_summary_i5_i8, part = "header")
+models_summary_i5_i8 <- autofit(models_summary_i5_i8)
+
+## Copy-paste the output on word
+models_summary_i5_i8
+
+
+                  
+
+
+
+
+
