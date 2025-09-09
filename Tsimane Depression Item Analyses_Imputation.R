@@ -1973,6 +1973,136 @@ i8_icc_indi <- ((i8$`sd_Region:ComID:UniqueFamID:PID__D8CantConcentrate_Intercep
 i8_icc_reg <- ((i8$`sd_Region:ComID__D8CantConcentrate_Intercept`)^2) / ((i8$sd_Region__D8CantConcentrate_Intercept)^2 + (i8$`sd_Region:ComID__D8CantConcentrate_Intercept`)^2 + (i8$`sd_Region:ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2 + 
                                                                            (i8$`sd_Region:ComID:UniqueFamID:PID__D8CantConcentrate_Intercept`)^2 + (i8$sd_Interviewer__D8CantConcentrate_Intercept)^2  + (((pi)^2)/3))
 
+# For Item 9
+i9_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i9$sd_Region__D9Nervous_Intercept)^2 + 
+    (i9$`sd_Region:ComID__D9Nervous_Intercept`)^2 + 
+    (i9$`sd_Region:ComID:UniqueFamID__D9Nervous_Intercept`)^2 + 
+    (i9$`sd_Region:ComID:UniqueFamID:PID__D9Nervous_Intercept`)^2 + 
+    (i9$sd_Interviewer__D9Nervous_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+i9_icc_indi <- ((i9$`sd_Region:ComID:UniqueFamID:PID__D9Nervous_Intercept`)^2) / ((i9$sd_Region__D9Nervous_Intercept)^2 + (i9$`sd_Region:ComID__D9Nervous_Intercept`)^2 + (i9$`sd_Region:ComID:UniqueFamID__D9Nervous_Intercept`)^2 + 
+                                                                                    (i9$`sd_Region:ComID:UniqueFamID:PID__D9Nervous_Intercept`)^2 + (i9$sd_Interviewer__D9Nervous_Intercept)^2  + (((pi)^2)/3))
+
+i9_icc_reg <- ((i9$`sd_Region:ComID__D9Nervous_Intercept`)^2) / ((i9$sd_Region__D9Nervous_Intercept)^2 + (i9$`sd_Region:ComID__D9Nervous_Intercept`)^2 + (i9$`sd_Region:ComID:UniqueFamID__D9Nervous_Intercept`)^2 + 
+                                                                   (i9$`sd_Region:ComID:UniqueFamID:PID__D9Nervous_Intercept`)^2 + (i9$sd_Interviewer__D9Nervous_Intercept)^2  + (((pi)^2)/3))
+
+# For Item 10
+i10_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i10$sd_Region__D10Paranoid_Intercept)^2 + 
+    (i10$`sd_Region:ComID__D10Paranoid_Intercept`)^2 + 
+    (i10$`sd_Region:ComID:UniqueFamID__D10Paranoid_Intercept`)^2 + 
+    (i10$`sd_Region:ComID:UniqueFamID:PID__D10Paranoid_Intercept`)^2 + 
+    (i10$sd_Interviewer__D10Paranoid_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+i10_icc_indi <- ((i10$`sd_Region:ComID:UniqueFamID:PID__D10Paranoid_Intercept`)^2) / ((i10$sd_Region__D10Paranoid_Intercept)^2 + (i10$`sd_Region:ComID__D10Paranoid_Intercept`)^2 + (i10$`sd_Region:ComID:UniqueFamID__D10Paranoid_Intercept`)^2 + 
+                                                                                        (i10$`sd_Region:ComID:UniqueFamID:PID__D10Paranoid_Intercept`)^2 + (i10$sd_Interviewer__D10Paranoid_Intercept)^2  + (((pi)^2)/3))
+
+i10_icc_reg <- ((i10$`sd_Region:ComID__D10Paranoid_Intercept`)^2) / ((i10$sd_Region__D10Paranoid_Intercept)^2 + (i10$`sd_Region:ComID__D10Paranoid_Intercept`)^2 + (i10$`sd_Region:ComID:UniqueFamID__D10Paranoid_Intercept`)^2 + 
+                                                                       (i10$`sd_Region:ComID:UniqueFamID:PID__D10Paranoid_Intercept`)^2 + (i10$sd_Interviewer__D10Paranoid_Intercept)^2  + (((pi)^2)/3))
+
+# For Item 11
+i11_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i11$sd_Region__D11CantSleep_Intercept)^2 + 
+    (i11$`sd_Region:ComID__D11CantSleep_Intercept`)^2 + 
+    (i11$`sd_Region:ComID:UniqueFamID__D11CantSleep_Intercept`)^2 + 
+    (i11$`sd_Region:ComID:UniqueFamID:PID__D11CantSleep_Intercept`)^2 + 
+    (i11$sd_Interviewer__D11CantSleep_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+i11_icc_indi <- ((i11$`sd_Region:ComID:UniqueFamID:PID__D11CantSleep_Intercept`)^2) / ((i11$sd_Region__D11CantSleep_Intercept)^2 + (i11$`sd_Region:ComID__D11CantSleep_Intercept`)^2 + (i11$`sd_Region:ComID:UniqueFamID__D11CantSleep_Intercept`)^2 + 
+                                                                                         (i11$`sd_Region:ComID:UniqueFamID:PID__D11CantSleep_Intercept`)^2 + (i11$sd_Interviewer__D11CantSleep_Intercept)^2  + (((pi)^2)/3))
+
+i11_icc_reg <- ((i11$`sd_Region:ComID__D11CantSleep_Intercept`)^2) / ((i11$sd_Region__D11CantSleep_Intercept)^2 + (i11$`sd_Region:ComID__D11CantSleep_Intercept`)^2 + (i11$`sd_Region:ComID:UniqueFamID__D11CantSleep_Intercept`)^2 + 
+                                                                        (i11$`sd_Region:ComID:UniqueFamID:PID__D11CantSleep_Intercept`)^2 + (i11$sd_Interviewer__D11CantSleep_Intercept)^2  + (((pi)^2)/3))
+
+# For Item 12
+i12_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i12$sd_Region__D12CantEat_Intercept)^2 + 
+    (i12$`sd_Region:ComID__D12CantEat_Intercept`)^2 + 
+    (i12$`sd_Region:ComID:UniqueFamID__D12CantEat_Intercept`)^2 + 
+    (i12$`sd_Region:ComID:UniqueFamID:PID__D12CantEat_Intercept`)^2 + 
+    (i12$sd_Interviewer__D12CantEat_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+i12_icc_indi <- ((i12$`sd_Region:ComID:UniqueFamID:PID__D12CantEat_Intercept`)^2) / ((i12$sd_Region__D12CantEat_Intercept)^2 + (i12$`sd_Region:ComID__D12CantEat_Intercept`)^2 + (i12$`sd_Region:ComID:UniqueFamID__D12CantEat_Intercept`)^2 + 
+                                                                                       (i12$`sd_Region:ComID:UniqueFamID:PID__D12CantEat_Intercept`)^2 + (i12$sd_Interviewer__D12CantEat_Intercept)^2  + (((pi)^2)/3))
+
+i12_icc_reg <- ((i12$`sd_Region:ComID__D12CantEat_Intercept`)^2) / ((i12$sd_Region__D12CantEat_Intercept)^2 + (i12$`sd_Region:ComID__D12CantEat_Intercept`)^2 + (i12$`sd_Region:ComID:UniqueFamID__D12CantEat_Intercept`)^2 + 
+                                                                      (i12$`sd_Region:ComID:UniqueFamID:PID__D12CantEat_Intercept`)^2 + (i12$sd_Interviewer__D12CantEat_Intercept)^2  + (((pi)^2)/3))
+
+### Now for Item 13 
+i13_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i13$sd_Region__D13CantFuck_Intercept)^2 + 
+    (i13$`sd_Region:ComID__D13CantFuck_Intercept`)^2 + 
+    (i13$`sd_Region:ComID:UniqueFamID__D13CantFuck_Intercept`)^2 + 
+    (i13$`sd_Region:ComID:UniqueFamID:PID__D13CantFuck_Intercept`)^2 + 
+    (i13$sd_Interviewer__D13CantFuck_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+i13_icc_indi <- ((i13$`sd_Region:ComID:UniqueFamID:PID__D13CantFuck_Intercept`)^2) / ((i13$sd_Region__D13CantFuck_Intercept)^2 + (i13$`sd_Region:ComID__D13CantFuck_Intercept`)^2 + (i13$`sd_Region:ComID:UniqueFamID__D13CantFuck_Intercept`)^2 + 
+                                                                                        (i13$`sd_Region:ComID:UniqueFamID:PID__D13CantFuck_Intercept`)^2 + (i13$sd_Interviewer__D13CantFuck_Intercept)^2  + (((pi)^2)/3))
+
+i13_icc_reg <- ((i13$`sd_Region:ComID__D13CantFuck_Intercept`)^2) / ((i13$sd_Region__D13CantFuck_Intercept)^2 + (i13$`sd_Region:ComID__D13CantFuck_Intercept`)^2 + (i13$`sd_Region:ComID:UniqueFamID__D13CantFuck_Intercept`)^2 + 
+                                                                       (i13$`sd_Region:ComID:UniqueFamID:PID__D13CantFuck_Intercept`)^2 + (i13$sd_Interviewer__D13CantFuck_Intercept)^2  + (((pi)^2)/3))
+
+### Now for Item 14 
+i14_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i14$sd_Region__D14Pessimistic_Intercept)^2 + 
+    (i14$`sd_Region:ComID__D14Pessimistic_Intercept`)^2 + 
+    (i14$`sd_Region:ComID:UniqueFamID__D14Pessimistic_Intercept`)^2 + 
+    (i14$`sd_Region:ComID:UniqueFamID:PID__D14Pessimistic_Intercept`)^2 + 
+    (i14$sd_Interviewer__D14Pessimistic_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+i14_icc_indi <- ((i14$`sd_Region:ComID:UniqueFamID:PID__D14Pessimistic_Intercept`)^2) / ((i14$sd_Region__D14Pessimistic_Intercept)^2 + (i14$`sd_Region:ComID__D14Pessimistic_Intercept`)^2 + (i14$`sd_Region:ComID:UniqueFamID__D14Pessimistic_Intercept`)^2 + 
+                                                                                           (i14$`sd_Region:ComID:UniqueFamID:PID__D14Pessimistic_Intercept`)^2 + (i14$sd_Interviewer__D14Pessimistic_Intercept)^2  + (((pi)^2)/3))
+
+i14_icc_reg <- ((i14$`sd_Region:ComID__D14Pessimistic_Intercept`)^2) / ((i14$sd_Region__D14Pessimistic_Intercept)^2 + (i14$`sd_Region:ComID__D14Pessimistic_Intercept`)^2 + (i14$`sd_Region:ComID:UniqueFamID__D14Pessimistic_Intercept`)^2 + 
+                                                                          (i14$`sd_Region:ComID:UniqueFamID:PID__D14Pessimistic_Intercept`)^2 + (i14$sd_Interviewer__D14Pessimistic_Intercept)^2  + (((pi)^2)/3))
+
+### Now for Item 16 
+i16_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i16$sd_Region__D16PunishMe_Intercept)^2 + 
+    (i16$`sd_Region:ComID__D16PunishMe_Intercept`)^2 + 
+    (i16$`sd_Region:ComID:UniqueFamID__D16PunishMe_Intercept`)^2 + 
+    (i16$`sd_Region:ComID:UniqueFamID:PID__D16PunishMe_Intercept`)^2 + 
+    (i16$sd_Interviewer__D16PunishMe_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+i16_icc_indi <- ((i16$`sd_Region:ComID:UniqueFamID:PID__D16PunishMe_Intercept`)^2) / ((i16$sd_Region__D16PunishMe_Intercept)^2 + (i16$`sd_Region:ComID__D16PunishMe_Intercept`)^2 + (i16$`sd_Region:ComID:UniqueFamID__D16PunishMe_Intercept`)^2 + 
+                                                                                        (i16$`sd_Region:ComID:UniqueFamID:PID__D16PunishMe_Intercept`)^2 + (i16$sd_Interviewer__D16PunishMe_Intercept)^2  + (((pi)^2)/3))
+
+i16_icc_reg <- ((i16$`sd_Region:ComID__D16PunishMe_Intercept`)^2) / ((i16$sd_Region__D16PunishMe_Intercept)^2 + (i16$`sd_Region:ComID__D16PunishMe_Intercept`)^2 + (i16$`sd_Region:ComID:UniqueFamID__D16PunishMe_Intercept`)^2 + 
+                                                                       (i16$`sd_Region:ComID:UniqueFamID:PID__D16PunishMe_Intercept`)^2 + (i16$sd_Interviewer__D16PunishMe_Intercept)^2  + (((pi)^2)/3))
+
+### Now for Item 18 
+i18_icc_residual <- ( ((pi)^2)/3) / ( 
+  (i18$sd_Region__D18HeavyThoughts_Intercept)^2 + 
+    (i18$`sd_Region:ComID__D18HeavyThoughts_Intercept`)^2 + 
+    (i18$`sd_Region:ComID:UniqueFamID__D18HeavyThoughts_Intercept`)^2 + 
+    (i18$`sd_Region:ComID:UniqueFamID:PID__D18HeavyThoughts_Intercept`)^2 + 
+    (i18$sd_Interviewer__D18HeavyThoughts_Intercept)^2  +  
+    (((pi)^2)/3)
+)
+
+i18_icc_indi <- ((i18$`sd_Region:ComID:UniqueFamID:PID__D18HeavyThoughts_Intercept`)^2) / ((i18$sd_Region__D18HeavyThoughts_Intercept)^2 + (i18$`sd_Region:ComID__D18HeavyThoughts_Intercept`)^2 + (i18$`sd_Region:ComID:UniqueFamID__D18HeavyThoughts_Intercept`)^2 + 
+                                                                                             (i18$`sd_Region:ComID:UniqueFamID:PID__D18HeavyThoughts_Intercept`)^2 + (i18$sd_Interviewer__D18HeavyThoughts_Intercept)^2  + (((pi)^2)/3))
+
+i18_icc_reg <- ((i18$`sd_Region:ComID__D18HeavyThoughts_Intercept`)^2) / ((i18$sd_Region__D18HeavyThoughts_Intercept)^2 + (i18$`sd_Region:ComID__D18HeavyThoughts_Intercept`)^2 + (i18$`sd_Region:ComID:UniqueFamID__D18HeavyThoughts_Intercept`)^2 + 
+                                                                            (i18$`sd_Region:ComID:UniqueFamID:PID__D18HeavyThoughts_Intercept`)^2 + (i18$sd_Interviewer__D18HeavyThoughts_Intercept)^2  + (((pi)^2)/3))
+
+
+
 
 
 
@@ -2258,7 +2388,8 @@ models_summary_i1_i4 <- data.frame( Predictors = c("Intercept[1]",
                                     
                                     )
                                                          
-
+######## Now making the dataframe (Item 5 - Item 8)
+#########################################################
 models_summary_i5_i8 <- data.frame( Predictors = c("Intercept[1]", 
                                                    "Intercept[2]", 
                                                    "Intercept[3]", 
@@ -2538,6 +2669,555 @@ models_summary_i5_i8 <- data.frame( Predictors = c("Intercept[1]",
                                     )
                                     
 )
+
+######## Now making the dataframe (Item 9 - Item 12)
+#########################################################
+models_summary_i9_i12 <- data.frame( 
+  Predictors = c("Intercept[1]", 
+                 "Intercept[2]", 
+                 "Intercept[3]", 
+                 "Age", 
+                 "Sex", 
+                 "Social Conflict Index (SCI)", 
+                 "Spanish Fluency", 
+                 "Interview Date (Spline Fixed Effect)", 
+                 "Interview Date (Spline Smooth Term)",
+                 "Distance to Town", 
+                 "Maximum Community Size", 
+                 "Household Size", 
+                 "Residual Standard Deviation", 
+                 "Between-Cluster Standard Deviation (in log-odds)", 
+                 " ", 
+                 " ", 
+                 " ", 
+                 " ", 
+                 " ", 
+                 "ICC", 
+                 " ", 
+                 " ", 
+                 " ", 
+                 " ", 
+                 " ", 
+                 " "),
+  
+  Estimates_Model_9 = c( 
+    round( mean(i9$`b_D9Nervous_Intercept[1]`), 2), 
+    round( mean(i9$`b_D9Nervous_Intercept[2]`), 2), 
+    round( mean(i9$`b_D9Nervous_Intercept[3]`), 2), 
+    round( mean(exp(i9$b_D9Nervous_Age)), 2), 
+    round( mean(exp(i9$b_D9Nervous_Sex1)), 2), 
+    round( mean(exp(i9$bsp_D9Nervous_miSCI)), 2),
+    round( mean(exp(i9$bsp_D9Nervous_miSFluency)),2), 
+    round( mean(i9$bs_D9Nervous_sInterview_Date_1),2), 
+    round( mean(i9$sds_D9Nervous_sInterview_Date_1), 2), 
+    round( mean(exp(i9$b_D9Nervous_Town_Distance)), 2), 
+    round( mean(exp(i9$b_D9Nervous_Com_Size)), 2), 
+    round( mean(exp(i9$bsp_D9Nervous_miHH_Size)), 2), 
+    round((((pi)^2)/3), 2),
+    " ",
+    round( mean(i9$`sd_Region:ComID:UniqueFamID:PID__D9Nervous_Intercept`), 2), 
+    round( mean(i9$`sd_Region:ComID:UniqueFamID__D9Nervous_Intercept`), 2), 
+    round( mean(i9$`sd_Region:ComID__D9Nervous_Intercept`), 2), 
+    round( mean(i9$sd_Region__D9Nervous_Intercept), 2), 
+    round( mean(i9$sd_Interviewer__D9Nervous_Intercept), 2),
+    "-",
+    round( mean(i9_icc_residual), 2),
+    round( mean(i9_icc_indi), 2),
+    round( mean(icc_hh_i9),2), 
+    round( mean(icc_com_i9), 2), 
+    round( mean(i9_icc_reg), 2),
+    round(mean(icc_int_i9), 2)
+  ),
+  
+  CI_Model_9 = c( 
+    paste( round( quantile(i9$`b_D9Nervous_Intercept[1]`, 0.025), 2), "-", round( quantile(i9$`b_D9Nervous_Intercept[1]`, 0.975), 2)),
+    paste( round( quantile(i9$`b_D9Nervous_Intercept[2]`, 0.025), 2), "-", round( quantile(i9$`b_D9Nervous_Intercept[2]`, 0.975), 2)),
+    paste( round( quantile(i9$`b_D9Nervous_Intercept[3]`, 0.025), 2), "-", round( quantile(i9$`b_D9Nervous_Intercept[3]`, 0.975), 2)),
+    paste( round( quantile( exp(i9$b_D9Nervous_Age), 0.025), 2), "-", round( quantile( exp(i9$b_D9Nervous_Age), 0.975), 2)),
+    paste( round( quantile( exp(i9$b_D9Nervous_Sex1), 0.025), 2), "-", round( quantile( exp(i9$b_D9Nervous_Sex1), 0.975), 2)),
+    paste( round( quantile( exp(i9$bsp_D9Nervous_miSCI), 0.025), 2), "-", round( quantile( exp(i9$bsp_D9Nervous_miSCI), 0.975), 2)),
+    paste( round( quantile( exp(i9$bsp_D9Nervous_miSFluency), 0.025), 2), "-", round( quantile( exp(i9$bsp_D9Nervous_miSFluency), 0.975), 2)),
+    paste( round( quantile( i9$bs_D9Nervous_sInterview_Date_1, 0.025), 2), "-", round( quantile( i9$bs_D9Nervous_sInterview_Date_1, 0.975), 2)),
+    paste( round( quantile( i9$sds_D9Nervous_sInterview_Date_1, 0.025), 2), "-", round( quantile( i9$sds_D9Nervous_sInterview_Date_1, 0.975), 2)),
+    paste( round( quantile( exp(i9$b_D9Nervous_Town_Distance), 0.025), 2), "-", round( quantile( exp(i9$b_D9Nervous_Town_Distance), 0.975), 2)),
+    paste( round( quantile( exp(i9$b_D9Nervous_Com_Size), 0.025), 2), "-", round( quantile( exp(i9$b_D9Nervous_Com_Size), 0.975), 2)),
+    paste( round( quantile( exp(i9$bsp_D9Nervous_miHH_Size), 0.025), 2), "-", round( quantile( exp(i9$bsp_D9Nervous_miHH_Size), 0.975), 2)),
+    " ",
+    " ",
+    paste( round( quantile( i9$`sd_Region:ComID:UniqueFamID:PID__D9Nervous_Intercept`, 0.025), 2), "-", round( quantile( i9$`sd_Region:ComID:UniqueFamID:PID__D9Nervous_Intercept`, 0.975), 2)),
+    paste( round( quantile( i9$`sd_Region:ComID:UniqueFamID__D9Nervous_Intercept`, 0.025), 2), "-", round( quantile( i9$`sd_Region:ComID:UniqueFamID__D9Nervous_Intercept`, 0.975), 2)),
+    paste( round( quantile( i9$`sd_Region:ComID__D9Nervous_Intercept`, 0.025), 2), "-", round( quantile( i9$`sd_Region:ComID__D9Nervous_Intercept`, 0.975), 2)),
+    paste( round( quantile( i9$sd_Region__D9Nervous_Intercept, 0.025), 2), "-", round( quantile( i9$sd_Region__D9Nervous_Intercept, 0.975), 2)),
+    paste( round( quantile( i9$sd_Interviewer__D9Nervous_Intercept, 0.025), 2), "-", round( quantile( i9$sd_Interviewer__D9Nervous_Intercept, 0.975), 2)),
+    "-",
+    paste( round( quantile( i9_icc_residual, 0.025), 2), "-", round( quantile( i9_icc_residual, 0.975), 2)),
+    paste( round( quantile( i9_icc_indi, 0.025), 2), "-", round( quantile( i9_icc_indi, 0.975), 2)),
+    paste( round( quantile( icc_hh_i9, 0.025), 2), "-", round( quantile( icc_hh_i9, 0.975), 2)),
+    paste( round( quantile( icc_com_i9, 0.025), 2), "-", round( quantile( icc_com_i9, 0.975), 2)),
+    paste( round( quantile( i9_icc_reg, 0.025), 2), "-", round( quantile( i9_icc_reg, 0.975), 2)),
+    paste( round( quantile( icc_int_i9, 0.025), 2), "-", round( quantile( icc_int_i9, 0.975), 2))
+  ),
+  
+  Estimates_Model_10 = c( 
+    round( mean(i10$`b_D10Paranoid_Intercept[1]`), 2), 
+    round( mean(i10$`b_D10Paranoid_Intercept[2]`), 2), 
+    round( mean(i10$`b_D10Paranoid_Intercept[3]`), 2), 
+    round( mean(exp(i10$b_D10Paranoid_Age)), 2), 
+    round( mean(exp(i10$b_D10Paranoid_Sex1)), 2), 
+    round( mean(exp(i10$bsp_D10Paranoid_miSCI)), 2),
+    round( mean(exp(i10$bsp_D10Paranoid_miSFluency)),2), 
+    round( mean(i10$bs_D10Paranoid_sInterview_Date_1),2), 
+    round( mean(i10$sds_D10Paranoid_sInterview_Date_1), 2), 
+    round( mean(exp(i10$b_D10Paranoid_Town_Distance)), 2), 
+    round( mean(exp(i10$b_D10Paranoid_Com_Size)), 2), 
+    round( mean(exp(i10$bsp_D10Paranoid_miHH_Size)), 2), 
+    round((((pi)^2)/3), 2),
+    " ",
+    round( mean(i10$`sd_Region:ComID:UniqueFamID:PID__D10Paranoid_Intercept`), 2), 
+    round( mean(i10$`sd_Region:ComID:UniqueFamID__D10Paranoid_Intercept`), 2), 
+    round( mean(i10$`sd_Region:ComID__D10Paranoid_Intercept`), 2), 
+    round( mean(i10$sd_Region__D10Paranoid_Intercept), 2), 
+    round( mean(i10$sd_Interviewer__D10Paranoid_Intercept), 2),
+    "-",
+    round( mean(i10_icc_residual), 2),
+    round( mean(i10_icc_indi), 2),
+    round( mean(icc_hh_i10),2), 
+    round( mean(icc_com_i10), 2), 
+    round( mean(i10_icc_reg), 2),
+    round(mean(icc_int_i10), 2)
+  ),
+  
+  CI_Model_10 = c( 
+    paste( round( quantile(i10$`b_D10Paranoid_Intercept[1]`, 0.025), 2), "-", round( quantile(i10$`b_D10Paranoid_Intercept[1]`, 0.975), 2)),
+    paste( round( quantile(i10$`b_D10Paranoid_Intercept[2]`, 0.025), 2), "-", round( quantile(i10$`b_D10Paranoid_Intercept[2]`, 0.975), 2)),
+    paste( round( quantile(i10$`b_D10Paranoid_Intercept[3]`, 0.025), 2), "-", round( quantile(i10$`b_D10Paranoid_Intercept[3]`, 0.975), 2)),
+    paste( round( quantile( exp(i10$b_D10Paranoid_Age), 0.025), 2), "-", round( quantile( exp(i10$b_D10Paranoid_Age), 0.975), 2)),
+    paste( round( quantile( exp(i10$b_D10Paranoid_Sex1), 0.025), 2), "-", round( quantile( exp(i10$b_D10Paranoid_Sex1), 0.975), 2)),
+    paste( round( quantile( exp(i10$bsp_D10Paranoid_miSCI), 0.025), 2), "-", round( quantile( exp(i10$bsp_D10Paranoid_miSCI), 0.975), 2)),
+    paste( round( quantile( exp(i10$bsp_D10Paranoid_miSFluency), 0.025), 2), "-", round( quantile( exp(i10$bsp_D10Paranoid_miSFluency), 0.975), 2)),
+    paste( round( quantile( i10$bs_D10Paranoid_sInterview_Date_1, 0.025), 2), "-", round( quantile( i10$bs_D10Paranoid_sInterview_Date_1, 0.975), 2)),
+    paste( round( quantile( i10$sds_D10Paranoid_sInterview_Date_1, 0.025), 2), "-", round( quantile( i10$sds_D10Paranoid_sInterview_Date_1, 0.975), 2)),
+    paste( round( quantile( exp(i10$b_D10Paranoid_Town_Distance), 0.025), 2), "-", round( quantile( exp(i10$b_D10Paranoid_Town_Distance), 0.975), 2)),
+    paste( round( quantile( exp(i10$b_D10Paranoid_Com_Size), 0.025), 2), "-", round( quantile( exp(i10$b_D10Paranoid_Com_Size), 0.975), 2)),
+    paste( round( quantile( exp(i10$bsp_D10Paranoid_miHH_Size), 0.025), 2), "-", round( quantile( exp(i10$bsp_D10Paranoid_miHH_Size), 0.975), 2)),
+    " ",
+    " ",
+    paste( round( quantile( i10$`sd_Region:ComID:UniqueFamID:PID__D10Paranoid_Intercept`, 0.025), 2), "-", round( quantile( i10$`sd_Region:ComID:UniqueFamID:PID__D10Paranoid_Intercept`, 0.975), 2)),
+    paste( round( quantile( i10$`sd_Region:ComID:UniqueFamID__D10Paranoid_Intercept`, 0.025), 2), "-", round( quantile( i10$`sd_Region:ComID:UniqueFamID__D10Paranoid_Intercept`, 0.975), 2)),
+    paste( round( quantile( i10$`sd_Region:ComID__D10Paranoid_Intercept`, 0.025), 2), "-", round( quantile( i10$`sd_Region:ComID__D10Paranoid_Intercept`, 0.975), 2)),
+    paste( round( quantile( i10$sd_Region__D10Paranoid_Intercept, 0.025), 2), "-", round( quantile( i10$sd_Region__D10Paranoid_Intercept, 0.975), 2)),
+    paste( round( quantile( i10$sd_Interviewer__D10Paranoid_Intercept, 0.025), 2), "-", round( quantile( i10$sd_Interviewer__D10Paranoid_Intercept, 0.975), 2)),
+    "-",
+    paste( round( quantile( i10_icc_residual, 0.025), 2), "-", round( quantile( i10_icc_residual, 0.975), 2)),
+    paste( round( quantile( i10_icc_indi, 0.025), 2), "-", round( quantile( i10_icc_indi, 0.975), 2)),
+    paste( round( quantile( icc_hh_i10, 0.025), 2), "-", round( quantile( icc_hh_i10, 0.975), 2)),
+    paste( round( quantile( icc_com_i10, 0.025), 2), "-", round( quantile( icc_com_i10, 0.975), 2)),
+    paste( round( quantile( i10_icc_reg, 0.025), 2), "-", round( quantile( i10_icc_reg, 0.975), 2)),
+    paste( round( quantile( icc_int_i10, 0.025), 2), "-", round( quantile( icc_int_i10, 0.975), 2))
+  ),
+  
+  Estimates_Model_11 = c(
+    round(mean(i11$`b_D11CantSleep_Intercept[1]`), 2),
+    round(mean(i11$`b_D11CantSleep_Intercept[2]`), 2),
+    round(mean(i11$`b_D11CantSleep_Intercept[3]`), 2),
+    round(mean(exp(i11$b_D11CantSleep_Age)), 2),
+    round(mean(exp(i11$b_D11CantSleep_Sex1)), 2),
+    round(mean(exp(i11$bsp_D11CantSleep_miSCI)), 2),
+    round(mean(exp(i11$bsp_D11CantSleep_miSFluency)), 2),
+    round(mean(i11$bs_D11CantSleep_sInterview_Date_1), 2),
+    round(mean(i11$sds_D11CantSleep_sInterview_Date_1), 2),
+    round(mean(exp(i11$b_D11CantSleep_Town_Distance)), 2),
+    round(mean(exp(i11$b_D11CantSleep_Com_Size)), 2),
+    round(mean(exp(i11$bsp_D11CantSleep_miHH_Size)), 2),
+    round((((pi)^2) / 3), 2),
+    " ",
+    round(mean(i11$`sd_Region:ComID:UniqueFamID:PID__D11CantSleep_Intercept`), 2),
+    round(mean(i11$`sd_Region:ComID:UniqueFamID__D11CantSleep_Intercept`), 2),
+    round(mean(i11$`sd_Region:ComID__D11CantSleep_Intercept`), 2),
+    round(mean(i11$sd_Region__D11CantSleep_Intercept), 2),
+    round(mean(i11$sd_Interviewer__D11CantSleep_Intercept), 2),
+    "-",
+    round(mean(i11_icc_residual), 2),
+    round(mean(i11_icc_indi), 2),
+    round(mean(icc_hh_i11), 2),
+    round(mean(icc_com_i11), 2),
+    round(mean(i11_icc_reg), 2),
+    round(mean(icc_int_i11), 2)
+  ),
+  
+  CI_Model_11 = c(
+    paste(round(quantile(i11$`b_D11CantSleep_Intercept[1]`, 0.025), 2), "-", round(quantile(i11$`b_D11CantSleep_Intercept[1]`, 0.975), 2)),
+    paste(round(quantile(i11$`b_D11CantSleep_Intercept[2]`, 0.025), 2), "-", round(quantile(i11$`b_D11CantSleep_Intercept[2]`, 0.975), 2)),
+    paste(round(quantile(i11$`b_D11CantSleep_Intercept[3]`, 0.025), 2), "-", round(quantile(i11$`b_D11CantSleep_Intercept[3]`, 0.975), 2)),
+    paste(round(quantile(exp(i11$b_D11CantSleep_Age), 0.025), 2), "-", round(quantile(exp(i11$b_D11CantSleep_Age), 0.975), 2)),
+    paste(round(quantile(exp(i11$b_D11CantSleep_Sex1), 0.025), 2), "-", round(quantile(exp(i11$b_D11CantSleep_Sex1), 0.975), 2)),
+    paste(round(quantile(exp(i11$bsp_D11CantSleep_miSCI), 0.025), 2), "-", round(quantile(exp(i11$bsp_D11CantSleep_miSCI), 0.975), 2)),
+    paste(round(quantile(exp(i11$bsp_D11CantSleep_miSFluency), 0.025), 2), "-", round(quantile(exp(i11$bsp_D11CantSleep_miSFluency), 0.975), 2)),
+    paste(round(quantile(i11$bs_D11CantSleep_sInterview_Date_1, 0.025), 2), "-", round(quantile(i11$bs_D11CantSleep_sInterview_Date_1, 0.975), 2)),
+    paste(round(quantile(i11$sds_D11CantSleep_sInterview_Date_1, 0.025), 2), "-", round(quantile(i11$sds_D11CantSleep_sInterview_Date_1, 0.975), 2)),
+    paste(round(quantile(exp(i11$b_D11CantSleep_Town_Distance), 0.025), 2), "-", round(quantile(exp(i11$b_D11CantSleep_Town_Distance), 0.975), 2)),
+    paste(round(quantile(exp(i11$b_D11CantSleep_Com_Size), 0.025), 2), "-", round(quantile(exp(i11$b_D11CantSleep_Com_Size), 0.975), 2)),
+    paste(round(quantile(exp(i11$bsp_D11CantSleep_miHH_Size), 0.025), 2), "-", round(quantile(exp(i11$bsp_D11CantSleep_miHH_Size), 0.975), 2)),
+    " ",
+    " ",
+    paste(round(quantile(i11$`sd_Region:ComID:UniqueFamID:PID__D11CantSleep_Intercept`, 0.025), 2), "-", round(quantile(i11$`sd_Region:ComID:UniqueFamID:PID__D11CantSleep_Intercept`, 0.975), 2)),
+    paste(round(quantile(i11$`sd_Region:ComID:UniqueFamID__D11CantSleep_Intercept`, 0.025), 2), "-", round(quantile(i11$`sd_Region:ComID:UniqueFamID__D11CantSleep_Intercept`, 0.975), 2)),
+    paste(round(quantile(i11$`sd_Region:ComID__D11CantSleep_Intercept`, 0.025), 2), "-", round(quantile(i11$`sd_Region:ComID__D11CantSleep_Intercept`, 0.975), 2)),
+    paste(round(quantile(i11$sd_Region__D11CantSleep_Intercept, 0.025), 2), "-", round(quantile(i11$sd_Region__D11CantSleep_Intercept, 0.975), 2)),
+    paste(round(quantile(i11$sd_Interviewer__D11CantSleep_Intercept, 0.025), 2), "-", round(quantile(i11$sd_Interviewer__D11CantSleep_Intercept, 0.975), 2)),
+    "-",
+    paste(round(quantile(i11_icc_residual, 0.025), 2), "-", round(quantile(i11_icc_residual, 0.975), 2)),
+    paste(round(quantile(i11_icc_indi, 0.025), 2), "-", round(quantile(i11_icc_indi, 0.975), 2)),
+    paste(round(quantile(icc_hh_i11, 0.025), 2), "-", round(quantile(icc_hh_i11, 0.975), 2)),
+    paste(round(quantile(icc_com_i11, 0.025), 2), "-", round(quantile(icc_com_i11, 0.975), 2)),
+    paste(round(quantile(i11_icc_reg, 0.025), 2), "-", round(quantile(i11_icc_reg, 0.975), 2)),
+    paste(round(quantile(icc_int_i11, 0.025), 2), "-", round(quantile(icc_int_i11, 0.975), 2))
+  ),
+  
+  Estimates_Model_12 = c(
+    round(mean(i12$`b_D12CantEat_Intercept[1]`), 2),
+    round(mean(i12$`b_D12CantEat_Intercept[2]`), 2),
+    round(mean(i12$`b_D12CantEat_Intercept[3]`), 2),
+    round(mean(exp(i12$b_D12CantEat_Age)), 2),
+    round(mean(exp(i12$b_D12CantEat_Sex1)), 2),
+    round(mean(exp(i12$bsp_D12CantEat_miSCI)), 2),
+    round(mean(exp(i12$bsp_D12CantEat_miSFluency)), 2),
+    round(mean(i12$bs_D12CantEat_sInterview_Date_1), 2),
+    round(mean(i12$sds_D12CantEat_sInterview_Date_1), 2),
+    round(mean(exp(i12$b_D12CantEat_Town_Distance)), 2),
+    round(mean(exp(i12$b_D12CantEat_Com_Size)), 2),
+    round(mean(exp(i12$bsp_D12CantEat_miHH_Size)), 2),
+    round((((pi)^2) / 3), 2),
+    " ",
+    round(mean(i12$`sd_Region:ComID:UniqueFamID:PID__D12CantEat_Intercept`), 2),
+    round(mean(i12$`sd_Region:ComID:UniqueFamID__D12CantEat_Intercept`), 2),
+    round(mean(i12$`sd_Region:ComID__D12CantEat_Intercept`), 2),
+    round(mean(i12$sd_Region__D12CantEat_Intercept), 2),
+    round(mean(i12$sd_Interviewer__D12CantEat_Intercept), 2),
+    "-",
+    round(mean(i12_icc_residual), 2),
+    round(mean(i12_icc_indi), 2),
+    round(mean(icc_hh_i12), 2),
+    round(mean(icc_com_i12), 2),
+    round(mean(i12_icc_reg), 2),
+    round(mean(icc_int_i12), 2)
+  ),
+  
+  CI_Model_12 = c(
+    paste(round(quantile(i12$`b_D12CantEat_Intercept[1]`, 0.025), 2), "-", round(quantile(i12$`b_D12CantEat_Intercept[1]`, 0.975), 2)),
+    paste(round(quantile(i12$`b_D12CantEat_Intercept[2]`, 0.025), 2), "-", round(quantile(i12$`b_D12CantEat_Intercept[2]`, 0.975), 2)),
+    paste(round(quantile(i12$`b_D12CantEat_Intercept[3]`, 0.025), 2), "-", round(quantile(i12$`b_D12CantEat_Intercept[3]`, 0.975), 2)),
+    paste(round(quantile(exp(i12$b_D12CantEat_Age), 0.025), 2), "-", round(quantile(exp(i12$b_D12CantEat_Age), 0.975), 2)),
+    paste(round(quantile(exp(i12$b_D12CantEat_Sex1), 0.025), 2), "-", round(quantile(exp(i12$b_D12CantEat_Sex1), 0.975), 2)),
+    paste(round(quantile(exp(i12$bsp_D12CantEat_miSCI), 0.025), 2), "-", round(quantile(exp(i12$bsp_D12CantEat_miSCI), 0.975), 2)),
+    paste(round(quantile(exp(i12$bsp_D12CantEat_miSFluency), 0.025), 2), "-", round(quantile(exp(i12$bsp_D12CantEat_miSFluency), 0.975), 2)),
+    paste(round(quantile(i12$bs_D12CantEat_sInterview_Date_1, 0.025), 2), "-", round(quantile(i12$bs_D12CantEat_sInterview_Date_1, 0.975), 2)),
+    paste(round(quantile(i12$sds_D12CantEat_sInterview_Date_1, 0.025), 2), "-", round(quantile(i12$sds_D12CantEat_sInterview_Date_1, 0.975), 2)),
+    paste(round(quantile(exp(i12$b_D12CantEat_Town_Distance), 0.025), 2), "-", round(quantile(exp(i12$b_D12CantEat_Town_Distance), 0.975), 2)),
+    paste(round(quantile(exp(i12$b_D12CantEat_Com_Size), 0.025), 2), "-", round(quantile(exp(i12$b_D12CantEat_Com_Size), 0.975), 2)),
+    paste(round(quantile(exp(i12$bsp_D12CantEat_miHH_Size), 0.025), 2), "-", round(quantile(exp(i12$bsp_D12CantEat_miHH_Size), 0.975), 2)),
+    " ",
+    " ",
+    paste(round(quantile(i12$`sd_Region:ComID:UniqueFamID:PID__D12CantEat_Intercept`, 0.025), 2), "-", round(quantile(i12$`sd_Region:ComID:UniqueFamID:PID__D12CantEat_Intercept`, 0.975), 2)),
+    paste(round(quantile(i12$`sd_Region:ComID:UniqueFamID__D12CantEat_Intercept`, 0.025), 2), "-", round(quantile(i12$`sd_Region:ComID:UniqueFamID__D12CantEat_Intercept`, 0.975), 2)),
+    paste(round(quantile(i12$`sd_Region:ComID__D12CantEat_Intercept`, 0.025), 2), "-", round(quantile(i12$`sd_Region:ComID__D12CantEat_Intercept`, 0.975), 2)),
+    paste(round(quantile(i12$sd_Region__D12CantEat_Intercept, 0.025), 2), "-", round(quantile(i12$sd_Region__D12CantEat_Intercept, 0.975), 2)),
+    paste(round(quantile(i12$sd_Interviewer__D12CantEat_Intercept, 0.025), 2), "-", round(quantile(i12$sd_Interviewer__D12CantEat_Intercept, 0.975), 2)),
+    "-",
+    paste(round(quantile(i12_icc_residual, 0.025), 2), "-", round(quantile(i12_icc_residual, 0.975), 2)),
+    paste(round(quantile(i12_icc_indi, 0.025), 2), "-", round(quantile(i12_icc_indi, 0.975), 2)),
+    paste(round(quantile(icc_hh_i12, 0.025), 2), "-", round(quantile(icc_hh_i12, 0.975), 2)),
+    paste(round(quantile(icc_com_i12, 0.025), 2), "-", round(quantile(icc_com_i12, 0.975), 2)),
+    paste(round(quantile(i12_icc_reg, 0.025), 2), "-", round(quantile(i12_icc_reg, 0.975), 2)),
+    paste(round(quantile(icc_int_i12, 0.025), 2), "-", round(quantile(icc_int_i12, 0.975), 2))
+  )
+  )
+
+######## Now making the dataframe (Item 13 - Item 18)
+#########################################################
+models_summary_i13_i18 <- data.frame( Predictors = c("Intercept[1]", 
+                                                     "Intercept[2]", 
+                                                     "Intercept[3]", 
+                                                     "Age", 
+                                                     "Sex", 
+                                                     "Social Conflict Index (SCI)", 
+                                                     
+                                                     "Spanish Fluency", 
+                                                     "Interview Date (Spline Fixed Effect)", 
+                                                     "Interview Date (Spline Smooth Term)",
+                                                     "Distance to Town", 
+                                                     "Maximum Community Size", 
+                                                     "Household Size", 
+                                                     "Residual Standard Deviation", 
+                                                     
+                                                     "Between-Cluster Standard Deviation (in log-odds)", 
+                                                     " ", 
+                                                     " ", 
+                                                     " ", 
+                                                     " ", 
+                                                     " ",
+                                                     
+                                                     " ICC", 
+                                                     " ", 
+                                                     " ", 
+                                                     " ", 
+                                                     " ", 
+                                                     " ",
+                                                     " "),
+                                      
+                                      Estimates_Model_13 = c( round( mean(i13$`b_D13CantFuck_Intercept[1]`), 2), 
+                                                             round( mean(i13$`b_D13CantFuck_Intercept[2]`), 2), 
+                                                             round( mean(i13$`b_D13CantFuck_Intercept[3]`), 2), 
+                                                             round( mean(exp(i13$b_D13CantFuck_Age)), 2), 
+                                                             round( mean(exp(i13$b_D13CantFuck_Sex1)), 2), 
+                                                             round( mean(exp(i13$bsp_D13CantFuck_miSCI)), 2),
+                                                             
+                                                             round( mean(exp(i13$bsp_D13CantFuck_miSFluency)),2), 
+                                                             round( mean(i13$bs_D13CantFuck_sInterview_Date_1),2), 
+                                                             round( mean(i13$sds_D13CantFuck_sInterview_Date_1), 2), 
+                                                             round( mean(exp(i13$b_D13CantFuck_Town_Distance)), 2), 
+                                                             round( mean(exp(i13$b_D13CantFuck_Com_Size)), 2), 
+                                                             round( mean(exp(i13$bsp_D13CantFuck_miHH_Size)), 2), 
+                                                             round((((pi)^2)/3), 2),
+                                                             
+                                                             " ",
+                                                             round( mean(i13$`sd_Region:ComID:UniqueFamID:PID__D13CantFuck_Intercept`), 2), 
+                                                             round( mean(i13$`sd_Region:ComID:UniqueFamID__D13CantFuck_Intercept`), 2), 
+                                                             round( mean(i13$`sd_Region:ComID__D13CantFuck_Intercept`), 2), 
+                                                             round( mean(i13$sd_Region__D13CantFuck_Intercept), 2), 
+                                                             round( mean(i13$sd_Interviewer__D13CantFuck_Intercept), 2),
+                                                             
+                                                             "-",
+                                                             round( mean(i13_icc_residual), 2),
+                                                             round( mean(i13_icc_indi), 2),
+                                                             round( mean(icc_hh_i13),2), 
+                                                             round( mean(icc_com_i13), 2), 
+                                                             round( mean(i13_icc_reg), 2),
+                                                             round(mean(icc_int_i13), 2)
+                                      ),
+                                      
+                                      CI_Model_13 = c ( paste( round( quantile(i13$`b_D13CantFuck_Intercept[1]`, 0.025), 2), "-", round( quantile(i13$`b_D13CantFuck_Intercept[1]`, 0.975), 2)),
+                                                       paste( round( quantile(i13$`b_D13CantFuck_Intercept[2]`, 0.025), 2), "-", round( quantile(i13$`b_D13CantFuck_Intercept[2]`, 0.975), 2)),
+                                                       paste( round( quantile(i13$`b_D13CantFuck_Intercept[3]`, 0.025), 2), "-", round( quantile(i13$`b_D13CantFuck_Intercept[3]`, 0.975), 2)),
+                                                       paste( round( quantile( exp(i13$b_D13CantFuck_Age), 0.025), 2), "-", round( quantile( exp(i13$b_D13CantFuck_Age), 0.975), 2)),
+                                                       paste( round( quantile( exp(i13$b_D13CantFuck_Sex1), 0.025), 2), "-", round( quantile( exp(i13$b_D13CantFuck_Sex1), 0.975), 2)),
+                                                       paste( round( quantile( exp(i13$bsp_D13CantFuck_miSCI), 0.025), 2), "-", round( quantile( exp(i13$bsp_D13CantFuck_miSCI), 0.975), 2)),
+                                                       
+                                                       paste( round( quantile( exp(i13$bsp_D13CantFuck_miSFluency), 0.025), 2), "-", round( quantile( exp(i13$bsp_D13CantFuck_miSFluency), 0.975), 2)),
+                                                       paste( round( quantile( i13$bs_D13CantFuck_sInterview_Date_1, 0.025), 2), "-", round( quantile( i13$bs_D13CantFuck_sInterview_Date_1, 0.975), 2)),
+                                                       paste( round( quantile( i13$sds_D13CantFuck_sInterview_Date_1, 0.025), 2), "-", round( quantile( i13$sds_D13CantFuck_sInterview_Date_1, 0.975), 2)),
+                                                       paste( round( quantile( exp(i13$b_D13CantFuck_Town_Distance), 0.025), 2), "-", round( quantile( exp(i13$b_D13CantFuck_Town_Distance), 0.975), 2)),
+                                                       paste( round( quantile( exp(i13$b_D13CantFuck_Com_Size), 0.025), 2), "-", round( quantile( exp(i13$b_D13CantFuck_Com_Size), 0.975), 2)),
+                                                       paste( round( quantile( exp(i13$bsp_D13CantFuck_miHH_Size), 0.025), 2), "-", round( quantile( exp(i13$bsp_D13CantFuck_miHH_Size), 0.975), 2)),
+                                                       " ",
+                                                       
+                                                       " ",
+                                                       paste( round( quantile( i13$`sd_Region:ComID:UniqueFamID:PID__D13CantFuck_Intercept`, 0.025), 2), "-", round( quantile( i13$`sd_Region:ComID:UniqueFamID:PID__D13CantFuck_Intercept`, 0.975), 2)),
+                                                       paste( round( quantile( i13$`sd_Region:ComID:UniqueFamID__D13CantFuck_Intercept`, 0.025), 2), "-", round( quantile( i13$`sd_Region:ComID:UniqueFamID__D13CantFuck_Intercept`, 0.975), 2)),
+                                                       paste( round( quantile( i13$`sd_Region:ComID__D13CantFuck_Intercept`, 0.025), 2), "-", round( quantile( i13$`sd_Region:ComID__D13CantFuck_Intercept`, 0.975), 2)),
+                                                       paste( round( quantile( i13$sd_Region__D13CantFuck_Intercept, 0.025), 2), "-", round( quantile( i13$sd_Region__D13CantFuck_Intercept, 0.975), 2)),
+                                                       paste( round( quantile( i13$sd_Interviewer__D13CantFuck_Intercept, 0.025), 2), "-", round( quantile( i13$sd_Interviewer__D13CantFuck_Intercept, 0.975), 2)),
+                                                       
+                                                       "-",
+                                                       paste( round( quantile( i13_icc_residual, 0.025), 2), "-", round( quantile( i13_icc_residual, 0.975), 2)),
+                                                       paste( round( quantile( i13_icc_indi, 0.025), 2), "-", round( quantile( i13_icc_indi, 0.975), 2)),
+                                                       paste( round( quantile( icc_hh_i13, 0.025), 2), "-", round( quantile( icc_hh_i13, 0.975), 2)),
+                                                       paste( round( quantile( icc_com_i13, 0.025), 2), "-", round( quantile( icc_com_i13, 0.975), 2)),
+                                                       paste( round( quantile( i13_icc_reg, 0.025), 2), "-", round( quantile( i13_icc_reg, 0.975), 2)),
+                                                       paste( round( quantile( icc_int_i13, 0.025), 2), "-", round( quantile( icc_int_i13, 0.975), 2))
+                                      ),
+                                      
+                                      Estimates_Model_14 = c( round( mean(i14$`b_D14Pessimistic_Intercept[1]`), 2), 
+                                                             round( mean(i14$`b_D14Pessimistic_Intercept[2]`), 2), 
+                                                             round( mean(i14$`b_D14Pessimistic_Intercept[3]`), 2), 
+                                                             round( mean(exp(i14$b_D14Pessimistic_Age)), 2), 
+                                                             round( mean(exp(i14$b_D14Pessimistic_Sex1)), 2), 
+                                                             round( mean(exp(i14$bsp_D14Pessimistic_miSCI)), 2),
+                                                             
+                                                             round( mean(exp(i14$bsp_D14Pessimistic_miSFluency)),2), 
+                                                             round( mean(i14$bs_D14Pessimistic_sInterview_Date_1),2), 
+                                                             round( mean(i14$sds_D14Pessimistic_sInterview_Date_1), 2), 
+                                                             round( mean(exp(i14$b_D14Pessimistic_Town_Distance)), 2), 
+                                                             round( mean(exp(i14$b_D14Pessimistic_Com_Size)), 2), 
+                                                             round( mean(exp(i14$bsp_D14Pessimistic_miHH_Size)), 2), 
+                                                             round((((pi)^2)/3), 2),
+                                                             
+                                                             " ",
+                                                             round( mean(i14$`sd_Region:ComID:UniqueFamID:PID__D14Pessimistic_Intercept`), 2), 
+                                                             round( mean(i14$`sd_Region:ComID:UniqueFamID__D14Pessimistic_Intercept`), 2), 
+                                                             round( mean(i14$`sd_Region:ComID__D14Pessimistic_Intercept`), 2), 
+                                                             round( mean(i14$sd_Region__D14Pessimistic_Intercept), 2), 
+                                                             round( mean(i14$sd_Interviewer__D14Pessimistic_Intercept), 2),
+                                                             
+                                                             "-",
+                                                             round( mean(i14_icc_residual), 2),
+                                                             round( mean(i14_icc_indi), 2),
+                                                             round( mean(icc_hh_i14),2), 
+                                                             round( mean(icc_com_i14), 2), 
+                                                             round( mean(i14_icc_reg), 2),
+                                                             round(mean(icc_int_i14), 2)
+                                      ),
+                                      
+                                      CI_Model_14 = c ( paste( round( quantile(i14$`b_D14Pessimistic_Intercept[1]`, 0.025), 2), "-", round( quantile(i14$`b_D14Pessimistic_Intercept[1]`, 0.975), 2)),
+                                                       paste( round( quantile(i14$`b_D14Pessimistic_Intercept[2]`, 0.025), 2), "-", round( quantile(i14$`b_D14Pessimistic_Intercept[2]`, 0.975), 2)),
+                                                       paste( round( quantile(i14$`b_D14Pessimistic_Intercept[3]`, 0.025), 2), "-", round( quantile(i14$`b_D14Pessimistic_Intercept[3]`, 0.975), 2)),
+                                                       paste( round( quantile( exp(i14$b_D14Pessimistic_Age), 0.025), 2), "-", round( quantile( exp(i14$b_D14Pessimistic_Age), 0.975), 2)),
+                                                       paste( round( quantile( exp(i14$b_D14Pessimistic_Sex1), 0.025), 2), "-", round( quantile( exp(i14$b_D14Pessimistic_Sex1), 0.975), 2)),
+                                                       paste( round( quantile( exp(i14$bsp_D14Pessimistic_miSCI), 0.025), 2), "-", round( quantile( exp(i14$bsp_D14Pessimistic_miSCI), 0.975), 2)),
+                                                       
+                                                       paste( round( quantile( exp(i14$bsp_D14Pessimistic_miSFluency), 0.025), 2), "-", round( quantile( exp(i14$bsp_D14Pessimistic_miSFluency), 0.975), 2)),
+                                                       paste( round( quantile( i14$bs_D14Pessimistic_sInterview_Date_1, 0.025), 2), "-", round( quantile( i14$bs_D14Pessimistic_sInterview_Date_1, 0.975), 2)),
+                                                       paste( round( quantile( i14$sds_D14Pessimistic_sInterview_Date_1, 0.025), 2), "-", round( quantile( i14$sds_D14Pessimistic_sInterview_Date_1, 0.975), 2)),
+                                                       paste( round( quantile( exp(i14$b_D14Pessimistic_Town_Distance), 0.025), 2), "-", round( quantile( exp(i14$b_D14Pessimistic_Town_Distance), 0.975), 2)),
+                                                       paste( round( quantile( exp(i14$b_D14Pessimistic_Com_Size), 0.025), 2), "-", round( quantile( exp(i14$b_D14Pessimistic_Com_Size), 0.975), 2)),
+                                                       paste( round( quantile( exp(i14$bsp_D14Pessimistic_miHH_Size), 0.025), 2), "-", round( quantile( exp(i14$bsp_D14Pessimistic_miHH_Size), 0.975), 2)),
+                                                       " ",
+                                                       
+                                                       " ",
+                                                       paste( round( quantile( i14$`sd_Region:ComID:UniqueFamID:PID__D14Pessimistic_Intercept`, 0.025), 2), "-", round( quantile( i14$`sd_Region:ComID:UniqueFamID:PID__D14Pessimistic_Intercept`, 0.975), 2)),
+                                                       paste( round( quantile( i14$`sd_Region:ComID:UniqueFamID__D14Pessimistic_Intercept`, 0.025), 2), "-", round( quantile( i14$`sd_Region:ComID:UniqueFamID__D14Pessimistic_Intercept`, 0.975), 2)),
+                                                       paste( round( quantile( i14$`sd_Region:ComID__D14Pessimistic_Intercept`, 0.025), 2), "-", round( quantile( i14$`sd_Region:ComID__D14Pessimistic_Intercept`, 0.975), 2)),
+                                                       paste( round( quantile( i14$sd_Region__D14Pessimistic_Intercept, 0.025), 2), "-", round( quantile( i14$sd_Region__D14Pessimistic_Intercept, 0.975), 2)),
+                                                       paste( round( quantile( i14$sd_Interviewer__D14Pessimistic_Intercept, 0.025), 2), "-", round( quantile( i14$sd_Interviewer__D14Pessimistic_Intercept, 0.975), 2)),
+                                                       
+                                                       "-",
+                                                       paste( round( quantile( i14_icc_residual, 0.025), 2), "-", round( quantile( i14_icc_residual, 0.975), 2)),
+                                                       paste( round( quantile( i14_icc_indi, 0.025), 2), "-", round( quantile( i14_icc_indi, 0.975), 2)),
+                                                       paste( round( quantile( icc_hh_i14, 0.025), 2), "-", round( quantile( icc_hh_i14, 0.975), 2)),
+                                                       paste( round( quantile( icc_com_i14, 0.025), 2), "-", round( quantile( icc_com_i14, 0.975), 2)),
+                                                       paste( round( quantile( i14_icc_reg, 0.025), 2), "-", round( quantile( i14_icc_reg, 0.975), 2)),
+                                                       paste( round( quantile( icc_int_i14, 0.025), 2), "-", round( quantile( icc_int_i14, 0.975), 2))
+                                      ),
+                                      
+                                      Estimates_Model_16 = c( round( mean(i16$`b_D16PunishMe_Intercept[1]`), 2), 
+                                                             round( mean(i16$`b_D16PunishMe_Intercept[2]`), 2), 
+                                                             round( mean(i16$`b_D16PunishMe_Intercept[3]`), 2), 
+                                                             round( mean(exp(i16$b_D16PunishMe_Age)), 2), 
+                                                             round( mean(exp(i16$b_D16PunishMe_Sex1)), 2), 
+                                                             round( mean(exp(i16$bsp_D16PunishMe_miSCI)), 2),
+                                                             
+                                                             round( mean(exp(i16$bsp_D16PunishMe_miSFluency)), 2), 
+                                                             round( mean(i16$bs_D16PunishMe_sInterview_Date_1), 2), 
+                                                             round( mean(i16$sds_D16PunishMe_sInterview_Date_1), 2), 
+                                                             round( mean(exp(i16$b_D16PunishMe_Town_Distance)), 2), 
+                                                             round( mean(exp(i16$b_D16PunishMe_Com_Size)), 2), 
+                                                             round( mean(exp(i16$bsp_D16PunishMe_miHH_Size)), 2), 
+                                                             round((((pi)^2)/3), 2),
+                                                             
+                                                             " ",
+                                                             round( mean(i16$`sd_Region:ComID:UniqueFamID:PID__D16PunishMe_Intercept`), 2), 
+                                                             round( mean(i16$`sd_Region:ComID:UniqueFamID__D16PunishMe_Intercept`), 2), 
+                                                             round( mean(i16$`sd_Region:ComID__D16PunishMe_Intercept`), 2), 
+                                                             round( mean(i16$sd_Region__D16PunishMe_Intercept), 2), 
+                                                             round( mean(i16$sd_Interviewer__D16PunishMe_Intercept), 2),
+                                                             
+                                                             "-",
+                                                             round( mean(i16_icc_residual), 2),
+                                                             round( mean(i16_icc_indi), 2),
+                                                             round( mean(icc_hh_i16), 2), 
+                                                             round( mean(icc_com_i16), 2), 
+                                                             round( mean(i16_icc_reg), 2),
+                                                             round(mean(icc_int_i16), 2)
+                                      ),
+                                      
+                                      CI_Model_16 = c ( paste( round( quantile(i16$`b_D16PunishMe_Intercept[1]`, 0.025), 2), "-", round( quantile(i16$`b_D16PunishMe_Intercept[1]`, 0.975), 2)),
+                                                       paste( round( quantile(i16$`b_D16PunishMe_Intercept[2]`, 0.025), 2), "-", round( quantile(i16$`b_D16PunishMe_Intercept[2]`, 0.975), 2)),
+                                                       paste( round( quantile(i16$`b_D16PunishMe_Intercept[3]`, 0.025), 2), "-", round( quantile(i16$`b_D16PunishMe_Intercept[3]`, 0.975), 2)),
+                                                       paste( round( quantile( exp(i16$b_D16PunishMe_Age), 0.025), 2), "-", round( quantile( exp(i16$b_D16PunishMe_Age), 0.975), 2)),
+                                                       paste( round( quantile( exp(i16$b_D16PunishMe_Sex1), 0.025), 2), "-", round( quantile( exp(i16$b_D16PunishMe_Sex1), 0.975), 2)),
+                                                       paste( round( quantile( exp(i16$bsp_D16PunishMe_miSCI), 0.025), 2), "-", round( quantile( exp(i16$bsp_D16PunishMe_miSCI), 0.975), 2)),
+                                                       
+                                                       paste( round( quantile( exp(i16$bsp_D16PunishMe_miSFluency), 0.025), 2), "-", round( quantile( exp(i16$bsp_D16PunishMe_miSFluency), 0.975), 2)),
+                                                       paste( round( quantile( i16$bs_D16PunishMe_sInterview_Date_1, 0.025), 2), "-", round( quantile( i16$bs_D16PunishMe_sInterview_Date_1, 0.975), 2)),
+                                                       paste( round( quantile( i16$sds_D16PunishMe_sInterview_Date_1, 0.025), 2), "-", round( quantile( i16$sds_D16PunishMe_sInterview_Date_1, 0.975), 2)),
+                                                       paste( round( quantile( exp(i16$b_D16PunishMe_Town_Distance), 0.025), 2), "-", round( quantile( exp(i16$b_D16PunishMe_Town_Distance), 0.975), 2)),
+                                                       paste( round( quantile( exp(i16$b_D16PunishMe_Com_Size), 0.025), 2), "-", round( quantile( exp(i16$b_D16PunishMe_Com_Size), 0.975), 2)),
+                                                       paste( round( quantile( exp(i16$bsp_D16PunishMe_miHH_Size), 0.025), 2), "-", round( quantile( exp(i16$bsp_D16PunishMe_miHH_Size), 0.975), 2)),
+                                                       " ",
+                                                       
+                                                       " ",
+                                                       paste( round( quantile( i16$`sd_Region:ComID:UniqueFamID:PID__D16PunishMe_Intercept`, 0.025), 2), "-", round( quantile( i16$`sd_Region:ComID:UniqueFamID:PID__D16PunishMe_Intercept`, 0.975), 2)),
+                                                       paste( round( quantile( i16$`sd_Region:ComID:UniqueFamID__D16PunishMe_Intercept`, 0.025), 2), "-", round( quantile( i16$`sd_Region:ComID:UniqueFamID__D16PunishMe_Intercept`, 0.975), 2)),
+                                                       paste( round( quantile( i16$`sd_Region:ComID__D16PunishMe_Intercept`, 0.025), 2), "-", round( quantile( i16$`sd_Region:ComID__D16PunishMe_Intercept`, 0.975), 2)),
+                                                       paste( round( quantile( i16$sd_Region__D16PunishMe_Intercept, 0.025), 2), "-", round( quantile( i16$sd_Region__D16PunishMe_Intercept, 0.975), 2)),
+                                                       paste( round( quantile( i16$sd_Interviewer__D16PunishMe_Intercept, 0.025), 2), "-", round( quantile( i16$sd_Interviewer__D16PunishMe_Intercept, 0.975), 2)),
+                                                       
+                                                       "-",
+                                                       paste( round( quantile( i16_icc_residual, 0.025), 2), "-", round( quantile( i16_icc_residual, 0.975), 2)),
+                                                       paste( round( quantile( i16_icc_indi, 0.025), 2), "-", round( quantile( i16_icc_indi, 0.975), 2)),
+                                                       paste( round( quantile( icc_hh_i16, 0.025), 2), "-", round( quantile( icc_hh_i16, 0.975), 2)),
+                                                       paste( round( quantile( icc_com_i16, 0.025), 2), "-", round( quantile( icc_com_i16, 0.975), 2)),
+                                                       paste( round( quantile( i16_icc_reg, 0.025), 2), "-", round( quantile( i16_icc_reg, 0.975), 2)),
+                                                       paste( round( quantile( icc_int_i16, 0.025), 2), "-", round( quantile( icc_int_i16, 0.975), 2))
+                                      ),
+                                      
+                                      Estimates_Model_18 = c( round( mean(i18$`b_D18HeavyThoughts_Intercept[1]`), 2), 
+                                                             round( mean(i18$`b_D18HeavyThoughts_Intercept[2]`), 2), 
+                                                             round( mean(i18$`b_D18HeavyThoughts_Intercept[3]`), 2), 
+                                                             round( mean(exp(i18$b_D18HeavyThoughts_Age)), 2), 
+                                                             round( mean(exp(i18$b_D18HeavyThoughts_Sex1)), 2), 
+                                                             round( mean(exp(i18$bsp_D18HeavyThoughts_miSCI)), 2),
+                                                             
+                                                             round( mean(exp(i18$bsp_D18HeavyThoughts_miSFluency)),2), 
+                                                             round( mean(i18$bs_D18HeavyThoughts_sInterview_Date_1),2), 
+                                                             round( mean(i18$sds_D18HeavyThoughts_sInterview_Date_1), 2), 
+                                                             round( mean(exp(i18$b_D18HeavyThoughts_Town_Distance)), 2), 
+                                                             round( mean(exp(i18$b_D18HeavyThoughts_Com_Size)), 2), 
+                                                             round( mean(exp(i18$bsp_D18HeavyThoughts_miHH_Size)), 2), 
+                                                             round((((pi)^2)/3), 2),
+                                                             
+                                                             " ",
+                                                             round( mean(i18$`sd_Region:ComID:UniqueFamID:PID__D18HeavyThoughts_Intercept`), 2), 
+                                                             round( mean(i18$`sd_Region:ComID:UniqueFamID__D18HeavyThoughts_Intercept`), 2), 
+                                                             round( mean(i18$`sd_Region:ComID__D18HeavyThoughts_Intercept`), 2), 
+                                                             round( mean(i18$sd_Region__D18HeavyThoughts_Intercept), 2), 
+                                                             round( mean(i18$sd_Interviewer__D18HeavyThoughts_Intercept), 2),
+                                                             
+                                                             "-",
+                                                             round( mean(i18_icc_residual), 2),
+                                                             round( mean(i18_icc_indi), 2),
+                                                             round( mean(icc_hh_i18),2), 
+                                                             round( mean(icc_com_i18), 2), 
+                                                             round( mean(i18_icc_reg), 2),
+                                                             round(mean(icc_int_i18), 2)
+                                      ),
+                                      
+                                      CI_Model_18 = c ( paste( round( quantile(i18$`b_D18HeavyThoughts_Intercept[1]`, 0.025), 2), "-", round( quantile(i18$`b_D18HeavyThoughts_Intercept[1]`, 0.975), 2)),
+                                                       paste( round( quantile(i18$`b_D18HeavyThoughts_Intercept[2]`, 0.025), 2), "-", round( quantile(i18$`b_D18HeavyThoughts_Intercept[2]`, 0.975), 2)),
+                                                       paste( round( quantile(i18$`b_D18HeavyThoughts_Intercept[3]`, 0.025), 2), "-", round( quantile(i18$`b_D18HeavyThoughts_Intercept[3]`, 0.975), 2)),
+                                                       paste( round( quantile( exp(i18$b_D18HeavyThoughts_Age), 0.025), 2), "-", round( quantile( exp(i18$b_D18HeavyThoughts_Age), 0.975), 2)),
+                                                       paste( round( quantile( exp(i18$b_D18HeavyThoughts_Sex1), 0.025), 2), "-", round( quantile( exp(i18$b_D18HeavyThoughts_Sex1), 0.975), 2)),
+                                                       paste( round( quantile( exp(i18$bsp_D18HeavyThoughts_miSCI), 0.025), 2), "-", round( quantile( exp(i18$bsp_D18HeavyThoughts_miSCI), 0.975), 2)),
+                                                       
+                                                       paste( round( quantile( exp(i18$bsp_D18HeavyThoughts_miSFluency), 0.025), 2), "-", round( quantile( exp(i18$bsp_D18HeavyThoughts_miSFluency), 0.975), 2)),
+                                                       paste( round( quantile( i18$bs_D18HeavyThoughts_sInterview_Date_1, 0.025), 2), "-", round( quantile( i18$bs_D18HeavyThoughts_sInterview_Date_1, 0.975), 2)),
+                                                       paste( round( quantile( i18$sds_D18HeavyThoughts_sInterview_Date_1, 0.025), 2), "-", round( quantile( i18$sds_D18HeavyThoughts_sInterview_Date_1, 0.975), 2)),
+                                                       paste( round( quantile( exp(i18$b_D18HeavyThoughts_Town_Distance), 0.025), 2), "-", round( quantile( exp(i18$b_D18HeavyThoughts_Town_Distance), 0.975), 2)),
+                                                       paste( round( quantile( exp(i18$b_D18HeavyThoughts_Com_Size), 0.025), 2), "-", round( quantile( exp(i18$b_D18HeavyThoughts_Com_Size), 0.975), 2)),
+                                                       paste( round( quantile( exp(i18$bsp_D18HeavyThoughts_miHH_Size), 0.025), 2), "-", round( quantile( exp(i18$bsp_D18HeavyThoughts_miHH_Size), 0.975), 2)),
+                                                       " ",
+                                                       
+                                                       " ",
+                                                       paste( round( quantile( i18$`sd_Region:ComID:UniqueFamID:PID__D18HeavyThoughts_Intercept`, 0.025), 2), "-", round( quantile( i18$`sd_Region:ComID:UniqueFamID:PID__D18HeavyThoughts_Intercept`, 0.975), 2)),
+                                                       paste( round( quantile( i18$`sd_Region:ComID:UniqueFamID__D18HeavyThoughts_Intercept`, 0.025), 2), "-", round( quantile( i18$`sd_Region:ComID:UniqueFamID__D18HeavyThoughts_Intercept`, 0.975), 2)),
+                                                       paste( round( quantile( i18$`sd_Region:ComID__D18HeavyThoughts_Intercept`, 0.025), 2), "-", round( quantile( i18$`sd_Region:ComID__D18HeavyThoughts_Intercept`, 0.975), 2)),
+                                                       paste( round( quantile( i18$sd_Region__D18HeavyThoughts_Intercept, 0.025), 2), "-", round( quantile( i18$sd_Region__D18HeavyThoughts_Intercept, 0.975), 2)),
+                                                       paste( round( quantile( i18$sd_Interviewer__D18HeavyThoughts_Intercept, 0.025), 2), "-", round( quantile( i18$sd_Interviewer__D18HeavyThoughts_Intercept, 0.975), 2)),
+                                                       
+                                                       "-",
+                                                       paste( round( quantile( i18_icc_residual, 0.025), 2), "-", round( quantile( i18_icc_residual, 0.975), 2)),
+                                                       paste( round( quantile( i18_icc_indi, 0.025), 2), "-", round( quantile( i18_icc_indi, 0.975), 2)),
+                                                       paste( round( quantile( icc_hh_i18, 0.025), 2), "-", round( quantile( icc_hh_i18, 0.975), 2)),
+                                                       paste( round( quantile( icc_com_i18, 0.025), 2), "-", round( quantile( icc_com_i18, 0.975), 2)),
+                                                       paste( round( quantile( i18_icc_reg, 0.025), 2), "-", round( quantile( i18_icc_reg, 0.975), 2)),
+                                                       paste( round( quantile( icc_int_i18, 0.025), 2), "-", round( quantile( icc_int_i18, 0.975), 2))
+                                      )
+                                      
+                                      )
+
+
+
+
 
 
 ####### Summarising outputs for imputation models that were run during model fitting
@@ -2893,6 +3573,32 @@ models_summary_i5_i8 <- autofit(models_summary_i5_i8)
 
 ## Copy-paste the output on word
 models_summary_i5_i8
+
+##################################################################
+## Now Converting model summary (Item 9 - Item 12) to a flextable format
+i9_i12_mod_summary  <- flextable(models_summary_i9_i12)
+
+## Adding alternative colours to distinguish different model outputs
+i9_i12_mod_summary <- bg(i9_i12_mod_summary, j = c(4,5,8,9), bg = "#D3D3D3", part = "body")
+i9_i12_mod_summary<- bg(i9_i12_mod_summary, j = c(2,3,6,7), bg = "beige", part = "body")
+i9_i12_mod_summary <- bold(i9_i12_mod_summary, part = "header")
+i9_i12_mod_summary <- autofit(i9_i12_mod_summary)
+
+## Copy-paste the output on word
+i9_i12_mod_summary
+
+##################################################################
+## Now Converting model summary (Item 13 - Item 18) to a flextable format
+i13_i18_mod_summary  <- flextable(models_summary_i13_i18)
+
+## Adding alternative colours to distinguish different model outputs
+i13_i18_mod_summary <- bg(i13_i18_mod_summary, j = c(4,5,8,9), bg = "#D3D3D3", part = "body")
+i13_i18_mod_summary<- bg(i13_i18_mod_summary, j = c(2,3,6,7), bg = "beige", part = "body")
+i13_i18_mod_summary <- bold(i13_i18_mod_summary, part = "header")
+i13_i18_mod_summary <- autofit(i13_i18_mod_summary)
+
+## Copy-paste the output on word
+i13_i18_mod_summary
 
 
 ##################################################################
