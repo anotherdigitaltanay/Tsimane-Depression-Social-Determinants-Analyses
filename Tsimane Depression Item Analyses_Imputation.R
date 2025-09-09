@@ -3537,7 +3537,327 @@ imputed_mod_summary_i5_i8 <- data.frame(Missing_Variables = c("Social Conflict I
                                         ))
 
                                     
-                                   
+
+######## Now doing this for Items 9 - 12
+imputed_mod_summary_i9_i12 <- data.frame(Missing_Variables = c("Social Conflict Index", 
+                                                               "-", 
+                                                               "-", 
+                                                               "-",
+                                                               
+                                                               "Spanish Fluency", 
+                                                               "-", 
+                                                               "-", 
+                                                               "-",
+                                                               
+                                                               "Household Size", 
+                                                               "-", 
+                                                               "-", 
+                                                               "-", 
+                                                               "-"),
+                                         
+                                         Predictors = c("Intercept", 
+                                                        "Age", 
+                                                        "Male", 
+                                                        "Residual Variance", 
+                                                        
+                                                        "Intercept", 
+                                                        "Age", 
+                                                        "Sex", 
+                                                        "Residual Variance", 
+                                                        
+                                                        "Intercept", 
+                                                        "Age", 
+                                                        "Sex", 
+                                                        "Community Size", 
+                                                        "Residual Variance"),
+                                         
+                                         Estimates_Model_9 = c(round(mean(i9$b_SCI_Intercept), 2), 
+                                                               round(mean(i9$b_SCI_Age), 2), 
+                                                               round(mean(i9$b_SCI_Sex1), 2), 
+                                                               round(mean((i9$sigma_SCI)^2), 2),
+                                                               
+                                                               round(mean(i9$b_SFluency_Intercept), 2), 
+                                                               round(mean(i9$b_SFluency_Age), 2), 
+                                                               round(mean(i9$b_SFluency_Sex1), 2), 
+                                                               round(mean((i9$sigma_SFluency)^2), 2),
+                                                               
+                                                               round(mean(i9$b_HHSize_Intercept), 2), 
+                                                               round(mean(i9$b_HHSize_Age), 2), 
+                                                               round(mean(i9$b_HHSize_Sex1), 2), 
+                                                               round(mean(i9$b_HHSize_Com_Size), 2), 
+                                                               round(mean((i9$sigma_HHSize)^2), 2)
+                                         ),
+                                         CI_Model_9 = c(paste(round(quantile(i9$b_SCI_Intercept, 0.025), 2), "-", round(quantile(i9$b_SCI_Intercept, 0.975), 2)), 
+                                                        paste(round(quantile(i9$b_SCI_Age, 0.025), 2), "-", round(quantile(i9$b_SCI_Age, 0.975), 2)),
+                                                        paste(round(quantile(i9$b_SCI_Sex1, 0.025), 2), "-", round(quantile(i9$b_SCI_Sex1, 0.975), 2)),
+                                                        paste(round(quantile((i9$sigma_SCI)^2, 0.025), 2), "-", round(quantile((i9$sigma_SCI)^2, 0.975), 2)),
+                                                        paste(round(quantile(i9$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(i9$b_SFluency_Intercept, 0.975), 2)),
+                                                        paste(round(quantile(i9$b_SFluency_Age, 0.025), 2), "-", round(quantile(i9$b_SFluency_Age, 0.975), 2)),
+                                                        paste(round(quantile(i9$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(i9$b_SFluency_Sex1, 0.975), 2)),
+                                                        paste(round(quantile((i9$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((i9$sigma_SFluency)^2, 0.975), 2)),
+                                                        paste(round(quantile(i9$b_HHSize_Intercept, 0.025), 2), "-", round(quantile(i9$b_HHSize_Intercept, 0.975), 2)),
+                                                        paste(round(quantile(i9$b_HHSize_Age, 0.025), 2), "-", round(quantile(i9$b_HHSize_Age, 0.975), 2)),
+                                                        paste(round(quantile(i9$b_HHSize_Sex1, 0.025), 2), "-", round(quantile(i9$b_HHSize_Sex1, 0.975), 2)),
+                                                        paste(round(quantile(i9$b_HHSize_Com_Size, 0.025), 2), "-", round(quantile(i9$b_HHSize_Com_Size, 0.975), 2)),
+                                                        paste(round(quantile((i9$sigma_HHSize)^2, 0.025), 2), "-", round(quantile((i9$sigma_HHSize)^2, 0.975), 2))
+                                         ),
+                                         
+                                         Estimates_Model_10 = c(round(mean(i10$b_SCI_Intercept), 2), 
+                                                                round(mean(i10$b_SCI_Age), 2), 
+                                                                round(mean(i10$b_SCI_Sex1), 2), 
+                                                                round(mean((i10$sigma_SCI)^2), 2),
+                                                                
+                                                                round(mean(i10$b_SFluency_Intercept), 2), 
+                                                                round(mean(i10$b_SFluency_Age), 2), 
+                                                                round(mean(i10$b_SFluency_Sex1), 2), 
+                                                                round(mean((i10$sigma_SFluency)^2), 2),
+                                                                
+                                                                round(mean(i10$b_HHSize_Intercept), 2), 
+                                                                round(mean(i10$b_HHSize_Age), 2), 
+                                                                round(mean(i10$b_HHSize_Sex1), 2), 
+                                                                round(mean(i10$b_HHSize_Com_Size), 2), 
+                                                                round(mean((i10$sigma_HHSize)^2), 2)
+                                         ),
+                                         CI_Model_10 = c(paste(round(quantile(i10$b_SCI_Intercept, 0.025), 2), "-", round(quantile(i10$b_SCI_Intercept, 0.975), 2)), 
+                                                         paste(round(quantile(i10$b_SCI_Age, 0.025), 2), "-", round(quantile(i10$b_SCI_Age, 0.975), 2)),
+                                                         paste(round(quantile(i10$b_SCI_Sex1, 0.025), 2), "-", round(quantile(i10$b_SCI_Sex1, 0.975), 2)),
+                                                         paste(round(quantile((i10$sigma_SCI)^2, 0.025), 2), "-", round(quantile((i10$sigma_SCI)^2, 0.975), 2)),
+                                                         paste(round(quantile(i10$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(i10$b_SFluency_Intercept, 0.975), 2)),
+                                                         paste(round(quantile(i10$b_SFluency_Age, 0.025), 2), "-", round(quantile(i10$b_SFluency_Age, 0.975), 2)),
+                                                         paste(round(quantile(i10$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(i10$b_SFluency_Sex1, 0.975), 2)),
+                                                         paste(round(quantile((i10$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((i10$sigma_SFluency)^2, 0.975), 2)),
+                                                         paste(round(quantile(i10$b_HHSize_Intercept, 0.025), 2), "-", round(quantile(i10$b_HHSize_Intercept, 0.975), 2)),
+                                                         paste(round(quantile(i10$b_HHSize_Age, 0.025), 2), "-", round(quantile(i10$b_HHSize_Age, 0.975), 2)),
+                                                         paste(round(quantile(i10$b_HHSize_Sex1, 0.025), 2), "-", round(quantile(i10$b_HHSize_Sex1, 0.975), 2)),
+                                                         paste(round(quantile(i10$b_HHSize_Com_Size, 0.025), 2), "-", round(quantile(i10$b_HHSize_Com_Size, 0.975), 2)),
+                                                         paste(round(quantile((i10$sigma_HHSize)^2, 0.025), 2), "-", round(quantile((i10$sigma_HHSize)^2, 0.975), 2))
+                                         ),
+                                         
+                                         Estimates_Model_11 = c(round(mean(i11$b_SCI_Intercept), 2), 
+                                                                round(mean(i11$b_SCI_Age), 2), 
+                                                                round(mean(i11$b_SCI_Sex1), 2), 
+                                                                round(mean((i11$sigma_SCI)^2), 2),
+                                                                
+                                                                round(mean(i11$b_SFluency_Intercept), 2), 
+                                                                round(mean(i11$b_SFluency_Age), 2), 
+                                                                round(mean(i11$b_SFluency_Sex1), 2), 
+                                                                round(mean((i11$sigma_SFluency)^2), 2),
+                                                                
+                                                                round(mean(i11$b_HHSize_Intercept), 2), 
+                                                                round(mean(i11$b_HHSize_Age), 2), 
+                                                                round(mean(i11$b_HHSize_Sex1), 2), 
+                                                                round(mean(i11$b_HHSize_Com_Size), 2), 
+                                                                round(mean((i11$sigma_HHSize)^2), 2)
+                                         ),
+                                         CI_Model_11 = c(paste(round(quantile(i11$b_SCI_Intercept, 0.025), 2), "-", round(quantile(i11$b_SCI_Intercept, 0.975), 2)), 
+                                                         paste(round(quantile(i11$b_SCI_Age, 0.025), 2), "-", round(quantile(i11$b_SCI_Age, 0.975), 2)),
+                                                         paste(round(quantile(i11$b_SCI_Sex1, 0.025), 2), "-", round(quantile(i11$b_SCI_Sex1, 0.975), 2)),
+                                                         paste(round(quantile((i11$sigma_SCI)^2, 0.025), 2), "-", round(quantile((i11$sigma_SCI)^2, 0.975), 2)),
+                                                         paste(round(quantile(i11$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(i11$b_SFluency_Intercept, 0.975), 2)),
+                                                         paste(round(quantile(i11$b_SFluency_Age, 0.025), 2), "-", round(quantile(i11$b_SFluency_Age, 0.975), 2)),
+                                                         paste(round(quantile(i11$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(i11$b_SFluency_Sex1, 0.975), 2)),
+                                                         paste(round(quantile((i11$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((i11$sigma_SFluency)^2, 0.975), 2)),
+                                                         paste(round(quantile(i11$b_HHSize_Intercept, 0.025), 2), "-", round(quantile(i11$b_HHSize_Intercept, 0.975), 2)),
+                                                         paste(round(quantile(i11$b_HHSize_Age, 0.025), 2), "-", round(quantile(i11$b_HHSize_Age, 0.975), 2)),
+                                                         paste(round(quantile(i11$b_HHSize_Sex1, 0.025), 2), "-", round(quantile(i11$b_HHSize_Sex1, 0.975), 2)),
+                                                         paste(round(quantile(i11$b_HHSize_Com_Size, 0.025), 2), "-", round(quantile(i11$b_HHSize_Com_Size, 0.975), 2)),
+                                                         paste(round(quantile((i11$sigma_HHSize)^2, 0.025), 2), "-", round(quantile((i11$sigma_HHSize)^2, 0.975), 2))
+                                         ),
+                                         
+                                         Estimates_Model_12 = c(round(mean(i12$b_SCI_Intercept), 2), 
+                                                                round(mean(i12$b_SCI_Age), 2), 
+                                                                round(mean(i12$b_SCI_Sex1), 2), 
+                                                                round(mean((i12$sigma_SCI)^2), 2),
+                                                                
+                                                                round(mean(i12$b_SFluency_Intercept), 2), 
+                                                                round(mean(i12$b_SFluency_Age), 2), 
+                                                                round(mean(i12$b_SFluency_Sex1), 2), 
+                                                                round(mean((i12$sigma_SFluency)^2), 2),
+                                                                
+                                                                round(mean(i12$b_HHSize_Intercept), 2), 
+                                                                round(mean(i12$b_HHSize_Age), 2), 
+                                                                round(mean(i12$b_HHSize_Sex1), 2), 
+                                                                round(mean(i12$b_HHSize_Com_Size), 2), 
+                                                                round(mean((i12$sigma_HHSize)^2), 2)
+                                         ),
+                                         CI_Model_12 = c(paste(round(quantile(i12$b_SCI_Intercept, 0.025), 2), "-", round(quantile(i12$b_SCI_Intercept, 0.975), 2)), 
+                                                         paste(round(quantile(i12$b_SCI_Age, 0.025), 2), "-", round(quantile(i12$b_SCI_Age, 0.975), 2)),
+                                                         paste(round(quantile(i12$b_SCI_Sex1, 0.025), 2), "-", round(quantile(i12$b_SCI_Sex1, 0.975), 2)),
+                                                         paste(round(quantile((i12$sigma_SCI)^2, 0.025), 2), "-", round(quantile((i12$sigma_SCI)^2, 0.975), 2)),
+                                                         paste(round(quantile(i12$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(i12$b_SFluency_Intercept, 0.975), 2)),
+                                                         paste(round(quantile(i12$b_SFluency_Age, 0.025), 2), "-", round(quantile(i12$b_SFluency_Age, 0.975), 2)),
+                                                         paste(round(quantile(i12$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(i12$b_SFluency_Sex1, 0.975), 2)),
+                                                         paste(round(quantile((i12$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((i12$sigma_SFluency)^2, 0.975), 2)),
+                                                         paste(round(quantile(i12$b_HHSize_Intercept, 0.025), 2), "-", round(quantile(i12$b_HHSize_Intercept, 0.975), 2)),
+                                                         paste(round(quantile(i12$b_HHSize_Age, 0.025), 2), "-", round(quantile(i12$b_HHSize_Age, 0.975), 2)),
+                                                         paste(round(quantile(i12$b_HHSize_Sex1, 0.025), 2), "-", round(quantile(i12$b_HHSize_Sex1, 0.975), 2)),
+                                                         paste(round(quantile(i12$b_HHSize_Com_Size, 0.025), 2), "-", round(quantile(i12$b_HHSize_Com_Size, 0.975), 2)),
+                                                         paste(round(quantile((i12$sigma_HHSize)^2, 0.025), 2), "-", round(quantile((i12$sigma_HHSize)^2, 0.975), 2))
+                                         )
+                                         
+                                         
+)
+
+
+
+# Creating data frame for imputed model outputs (Items 13 - 18)
+imputed_mod_summary_i13_i18 <- data.frame(Missing_Variables = c("Social Conflict Index", 
+                                                              "-", 
+                                                              "-", 
+                                                              "-",
+                                                              
+                                                              "Spanish Fluency", 
+                                                              "-", 
+                                                              "-", 
+                                                              "-",
+                                                              
+                                                              "Household Size", 
+                                                              "-", 
+                                                              "-", 
+                                                              "-", 
+                                                              "-"),
+                                        
+                                        Predictors = c("Intercept", 
+                                                       "Age", 
+                                                       "Male", 
+                                                       "Residual Variance", 
+                                                       
+                                                       "Intercept", 
+                                                       "Age", 
+                                                       "Sex", 
+                                                       "Residual Variance", 
+                                                       
+                                                       "Intercept", 
+                                                       "Age", 
+                                                       "Sex", 
+                                                       "Community Size", 
+                                                       "Residual Variance"),
+                                        
+                                        Estimates_Model_13 = c(round(mean(i13$b_SCI_Intercept), 2), 
+                                                              round(mean(i13$b_SCI_Age), 2), 
+                                                              round(mean(i13$b_SCI_Sex1), 2), 
+                                                              round(mean((i13$sigma_SCI)^2), 2),
+                                                              
+                                                              round(mean(i13$b_SFluency_Intercept), 2), 
+                                                              round(mean(i13$b_SFluency_Age), 2), 
+                                                              round(mean(i13$b_SFluency_Sex1), 2), 
+                                                              round(mean((i13$sigma_SFluency)^2), 2),
+                                                              
+                                                              round(mean(i13$b_HHSize_Intercept), 2), 
+                                                              round(mean(i13$b_HHSize_Age), 2), 
+                                                              round(mean(i13$b_HHSize_Sex1), 2), 
+                                                              round(mean(i13$b_HHSize_Com_Size), 2), 
+                                                              round(mean((i13$sigma_HHSize)^2), 2)
+                                        ),
+                                        CI_Model_13 = c(paste(round(quantile(i13$b_SCI_Intercept, 0.025), 2), "-", round(quantile(i13$b_SCI_Intercept, 0.975), 2)), 
+                                                       paste(round(quantile(i13$b_SCI_Age, 0.025), 2), "-", round(quantile(i13$b_SCI_Age, 0.975), 2)),
+                                                       paste(round(quantile(i13$b_SCI_Sex1, 0.025), 2), "-", round(quantile(i13$b_SCI_Sex1, 0.975), 2)),
+                                                       paste(round(quantile((i13$sigma_SCI)^2, 0.025), 2), "-", round(quantile((i13$sigma_SCI)^2, 0.975), 2)),
+                                                       paste(round(quantile(i13$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(i13$b_SFluency_Intercept, 0.975), 2)),
+                                                       paste(round(quantile(i13$b_SFluency_Age, 0.025), 2), "-", round(quantile(i13$b_SFluency_Age, 0.975), 2)),
+                                                       paste(round(quantile(i13$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(i13$b_SFluency_Sex1, 0.975), 2)),
+                                                       paste(round(quantile((i13$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((i13$sigma_SFluency)^2, 0.975), 2)),
+                                                       paste(round(quantile(i13$b_HHSize_Intercept, 0.025), 2), "-", round(quantile(i13$b_HHSize_Intercept, 0.975), 2)),
+                                                       paste(round(quantile(i13$b_HHSize_Age, 0.025), 2), "-", round(quantile(i13$b_HHSize_Age, 0.975), 2)),
+                                                       paste(round(quantile(i13$b_HHSize_Sex1, 0.025), 2), "-", round(quantile(i13$b_HHSize_Sex1, 0.975), 2)),
+                                                       paste(round(quantile(i13$b_HHSize_Com_Size, 0.025), 2), "-", round(quantile(i13$b_HHSize_Com_Size, 0.975), 2)),
+                                                       paste(round(quantile((i13$sigma_HHSize)^2, 0.025), 2), "-", round(quantile((i13$sigma_HHSize)^2, 0.975), 2))
+                                        ),
+                                        
+                                        Estimates_Model_14 = c(round(mean(i14$b_SCI_Intercept), 2), 
+                                                              round(mean(i14$b_SCI_Age), 2), 
+                                                              round(mean(i14$b_SCI_Sex1), 2), 
+                                                              round(mean((i14$sigma_SCI)^2), 2),
+                                                              
+                                                              round(mean(i14$b_SFluency_Intercept), 2), 
+                                                              round(mean(i14$b_SFluency_Age), 2), 
+                                                              round(mean(i14$b_SFluency_Sex1), 2), 
+                                                              round(mean((i14$sigma_SFluency)^2), 2),
+                                                              
+                                                              round(mean(i14$b_HHSize_Intercept), 2), 
+                                                              round(mean(i14$b_HHSize_Age), 2), 
+                                                              round(mean(i14$b_HHSize_Sex1), 2), 
+                                                              round(mean(i14$b_HHSize_Com_Size), 2), 
+                                                              round(mean((i14$sigma_HHSize)^2), 2)
+                                        ),
+                                        CI_Model_14 = c(paste(round(quantile(i14$b_SCI_Intercept, 0.025), 2), "-", round(quantile(i14$b_SCI_Intercept, 0.975), 2)), 
+                                                       paste(round(quantile(i14$b_SCI_Age, 0.025), 2), "-", round(quantile(i14$b_SCI_Age, 0.975), 2)),
+                                                       paste(round(quantile(i14$b_SCI_Sex1, 0.025), 2), "-", round(quantile(i14$b_SCI_Sex1, 0.975), 2)),
+                                                       paste(round(quantile((i14$sigma_SCI)^2, 0.025), 2), "-", round(quantile((i14$sigma_SCI)^2, 0.975), 2)),
+                                                       paste(round(quantile(i14$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(i14$b_SFluency_Intercept, 0.975), 2)),
+                                                       paste(round(quantile(i14$b_SFluency_Age, 0.025), 2), "-", round(quantile(i14$b_SFluency_Age, 0.975), 2)),
+                                                       paste(round(quantile(i14$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(i14$b_SFluency_Sex1, 0.975), 2)),
+                                                       paste(round(quantile((i14$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((i14$sigma_SFluency)^2, 0.975), 2)),
+                                                       paste(round(quantile(i14$b_HHSize_Intercept, 0.025), 2), "-", round(quantile(i14$b_HHSize_Intercept, 0.975), 2)),
+                                                       paste(round(quantile(i14$b_HHSize_Age, 0.025), 2), "-", round(quantile(i14$b_HHSize_Age, 0.975), 2)),
+                                                       paste(round(quantile(i14$b_HHSize_Sex1, 0.025), 2), "-", round(quantile(i14$b_HHSize_Sex1, 0.975), 2)),
+                                                       paste(round(quantile(i14$b_HHSize_Com_Size, 0.025), 2), "-", round(quantile(i14$b_HHSize_Com_Size, 0.975), 2)),
+                                                       paste(round(quantile((i14$sigma_HHSize)^2, 0.025), 2), "-", round(quantile((i14$sigma_HHSize)^2, 0.975), 2))
+                                        ),
+                                        
+                                        Estimates_Model_16 = c(round(mean(i16$b_SCI_Intercept), 2), 
+                                                              round(mean(i16$b_SCI_Age), 2), 
+                                                              round(mean(i16$b_SCI_Sex1), 2), 
+                                                              round(mean((i16$sigma_SCI)^2), 2),
+                                                              
+                                                              round(mean(i16$b_SFluency_Intercept), 2), 
+                                                              round(mean(i16$b_SFluency_Age), 2), 
+                                                              round(mean(i16$b_SFluency_Sex1), 2), 
+                                                              round(mean((i16$sigma_SFluency)^2), 2),
+                                                              
+                                                              round(mean(i16$b_HHSize_Intercept), 2), 
+                                                              round(mean(i16$b_HHSize_Age), 2), 
+                                                              round(mean(i16$b_HHSize_Sex1), 2), 
+                                                              round(mean(i16$b_HHSize_Com_Size), 2), 
+                                                              round(mean((i16$sigma_HHSize)^2), 2)
+                                        ),
+                                        CI_Model_16 = c(paste(round(quantile(i16$b_SCI_Intercept, 0.025), 2), "-", round(quantile(i16$b_SCI_Intercept, 0.975), 2)), 
+                                                       paste(round(quantile(i16$b_SCI_Age, 0.025), 2), "-", round(quantile(i16$b_SCI_Age, 0.975), 2)),
+                                                       paste(round(quantile(i16$b_SCI_Sex1, 0.025), 2), "-", round(quantile(i16$b_SCI_Sex1, 0.975), 2)),
+                                                       paste(round(quantile((i16$sigma_SCI)^2, 0.025), 2), "-", round(quantile((i16$sigma_SCI)^2, 0.975), 2)),
+                                                       paste(round(quantile(i16$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(i16$b_SFluency_Intercept, 0.975), 2)),
+                                                       paste(round(quantile(i16$b_SFluency_Age, 0.025), 2), "-", round(quantile(i16$b_SFluency_Age, 0.975), 2)),
+                                                       paste(round(quantile(i16$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(i16$b_SFluency_Sex1, 0.975), 2)),
+                                                       paste(round(quantile((i16$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((i16$sigma_SFluency)^2, 0.975), 2)),
+                                                       paste(round(quantile(i16$b_HHSize_Intercept, 0.025), 2), "-", round(quantile(i16$b_HHSize_Intercept, 0.975), 2)),
+                                                       paste(round(quantile(i16$b_HHSize_Age, 0.025), 2), "-", round(quantile(i16$b_HHSize_Age, 0.975), 2)),
+                                                       paste(round(quantile(i16$b_HHSize_Sex1, 0.025), 2), "-", round(quantile(i16$b_HHSize_Sex1, 0.975), 2)),
+                                                       paste(round(quantile(i16$b_HHSize_Com_Size, 0.025), 2), "-", round(quantile(i16$b_HHSize_Com_Size, 0.975), 2)),
+                                                       paste(round(quantile((i16$sigma_HHSize)^2, 0.025), 2), "-", round(quantile((i16$sigma_HHSize)^2, 0.975), 2))
+                                        ),
+                                        
+                                        Estimates_Model_18 = c(round(mean(i18$b_SCI_Intercept), 2), 
+                                                              round(mean(i18$b_SCI_Age), 2), 
+                                                              round(mean(i18$b_SCI_Sex1), 2), 
+                                                              round(mean((i18$sigma_SCI)^2), 2),
+                                                              
+                                                              round(mean(i18$b_SFluency_Intercept), 2), 
+                                                              round(mean(i18$b_SFluency_Age), 2), 
+                                                              round(mean(i18$b_SFluency_Sex1), 2), 
+                                                              round(mean((i18$sigma_SFluency)^2), 2),
+                                                              
+                                                              round(mean(i18$b_HHSize_Intercept), 2), 
+                                                              round(mean(i18$b_HHSize_Age), 2), 
+                                                              round(mean(i18$b_HHSize_Sex1), 2), 
+                                                              round(mean(i18$b_HHSize_Com_Size), 2), 
+                                                              round(mean((i18$sigma_HHSize)^2), 2)
+                                        ),
+                                        CI_Model_18 = c(paste(round(quantile(i18$b_SCI_Intercept, 0.025), 2), "-", round(quantile(i18$b_SCI_Intercept, 0.975), 2)), 
+                                                       paste(round(quantile(i18$b_SCI_Age, 0.025), 2), "-", round(quantile(i18$b_SCI_Age, 0.975), 2)),
+                                                       paste(round(quantile(i18$b_SCI_Sex1, 0.025), 2), "-", round(quantile(i18$b_SCI_Sex1, 0.975), 2)),
+                                                       paste(round(quantile((i18$sigma_SCI)^2, 0.025), 2), "-", round(quantile((i18$sigma_SCI)^2, 0.975), 2)),
+                                                       paste(round(quantile(i18$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(i18$b_SFluency_Intercept, 0.975), 2)),
+                                                       paste(round(quantile(i18$b_SFluency_Age, 0.025), 2), "-", round(quantile(i18$b_SFluency_Age, 0.975), 2)),
+                                                       paste(round(quantile(i18$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(i18$b_SFluency_Sex1, 0.975), 2)),
+                                                       paste(round(quantile((i18$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((i18$sigma_SFluency)^2, 0.975), 2)),
+                                                       paste(round(quantile(i18$b_HHSize_Intercept, 0.025), 2), "-", round(quantile(i18$b_HHSize_Intercept, 0.975), 2)),
+                                                       paste(round(quantile(i18$b_HHSize_Age, 0.025), 2), "-", round(quantile(i18$b_HHSize_Age, 0.975), 2)),
+                                                       paste(round(quantile(i18$b_HHSize_Sex1, 0.025), 2), "-", round(quantile(i18$b_HHSize_Sex1, 0.975), 2)),
+                                                       paste(round(quantile(i18$b_HHSize_Com_Size, 0.025), 2), "-", round(quantile(i18$b_HHSize_Com_Size, 0.975), 2)),
+                                                       paste(round(quantile((i18$sigma_HHSize)^2, 0.025), 2), "-", round(quantile((i18$sigma_HHSize)^2, 0.975), 2))
+                                        )
+)
+
                     
 
 
@@ -3630,6 +3950,31 @@ imp_i5_i8_mod_summary <- autofit(imp_i5_i8_mod_summary)
 ## Copy-paste the output on word
 imp_i5_i8_mod_summary
 
+#################################################################
+## Converting model summary (Item 9 - Item 12) to a flextable format
+imp_i9_i12_mod_summary <- flextable(imputed_mod_summary_i9_i12)
+
+## Adding alternative colours to distinguish different model outputs
+imp_i9_i12_mod_summary <- bg(imp_i9_i12_mod_summary, j = c(4,5,8,9), bg = "#D3D3D3", part = "body")
+imp_i9_i12_mod_summary <- bg(imp_i9_i12_mod_summary, j = c(2,3,6,7), bg = "beige", part = "body")
+imp_i9_i12_mod_summary <- bold(imp_i9_i12_mod_summary, part = "header")
+imp_i9_i12_mod_summary <- autofit(imp_i9_i12_mod_summary)
+
+## Copy-paste the output on word
+imp_i9_i12_mod_summary
+
+#################################################################
+## Converting model summary (Item 13 - Item 18) to a flextable format
+imp_i13_i18_mod_summary <- flextable(imputed_mod_summary_i13_i18)
+
+## Adding alternative colours to distinguish different model outputs
+imp_i13_i18_mod_summary <- bg(imp_i13_i18_mod_summary, j = c(4,5,8,9), bg = "#D3D3D3", part = "body")
+imp_i13_i18_mod_summary <- bg(imp_i13_i18_mod_summary, j = c(2,3,6,7), bg = "beige", part = "body")
+imp_i13_i18_mod_summary <- bold(imp_i13_i18_mod_summary, part = "header")
+imp_i13_i18_mod_summary <- autofit(imp_i13_i18_mod_summary)
+
+## Copy-paste the output on word
+imp_i13_i18_mod_summary
 
 
 
