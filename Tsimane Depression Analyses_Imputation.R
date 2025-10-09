@@ -26,7 +26,7 @@ library(labelled)
 library(mice)
 
 ## Setting seed for reproducibility
-set.seed(7777)
+set.seed(777723)
 
 
 # Running this so that one can see upto 10000 rows of printed results
@@ -257,9 +257,6 @@ depression_data_v2 <- depression_data_v2 %>%
 depression_data_v2 %>% count(UniqueFamID)
 depression_data_v2 %>% count(PID_FAMID)
 
-## Computing correlation between age and disability score that can be reported in discussion section of main manuscript
-## Vital to talk about the age effect found further in our models
-cor(depression_data_v2$Age, depression_data_v2$DisabilityScore, use = "complete.obs")
 
 ## Converting this to a csv file that will be used for the complete case analyses as this will save time from additional cleaning
 ## IMP: CHANGE DIRECTORY AS PER YOUR COMPUTER
@@ -301,16 +298,191 @@ dep_data$HH_Size <- standardize(dep_data$HH_Size)
 str(dep_data)
 
 
-
-########### Running model 1 to attempt a close-replication of previous individual-level analysis of depression ##################
+########### Prior Predictive Simulations #########################################################################################
 #################################################################################################################################
 
-## Specifying the model formula
-mod1_formula <- bf(D ~ 1 + Age + Sex + mi(SCI) + mi(SFluency) + (1 | PID)) +
+## Before running the final models, we need to first see the implications of our priors
+## On our base model where we try quantifying variation at different social levels, we will try to see the difference between two prior choices i.e. normal (0, 0.5) v/s normal (0, 1)
+## This will inform the prior we use for this and subsequent models
+
+## Specifying the model
+mod1_formula <- bf(D ~ 1 + Age + Sex + mi(SCI) + mi(SFluency) + s(Interview_Date) + (1 |Interviewer) + (1 | Region/ComID/UniqueFamID) + (1 | PID)) +
   bf(SCI | mi() ~ 1 + Age + Sex) + bf(SFluency | mi() ~ 1 + Age + Sex) + set_rescor(FALSE)
 
 
-## Running the model
+####### Running with narrow prior (0, 0.5) 
+#######
+
+mod1_prior1 <- brm(mod1_formula, 
+            data   = dep_data,
+            family = gaussian,
+            prior = c(prior(normal(0, 0.5), class="Intercept", resp = D),
+                      prior(normal(0, 0.5), class="Intercept", resp = SCI),
+                      prior(normal(0, 0.5), class="Intercept", resp = SFluency),
+                      prior(normal(0, 0.5), class ="b", resp = D),
+                      prior(student_t(3, 0, 1), class = "sds", coef = s(Interview_Date), resp = D),
+                      prior(normal(0, 0.5), class ="b", resp = SCI),
+                      prior(normal(0, 0.5), class ="b", resp = SFluency),
+                      prior(exponential(1), class = sd, resp = D)
+            ),
+            warmup = 1000, 
+            iter   = 6000, 
+            chains = 4, 
+            cores  = 8,
+            sample_prior = "only",
+            control = list(adapt_delta = 0.99),
+            seed = 9933) 
+
+## Save Model output (to easily load the model output later)
+saveRDS(mod1_prior1, "prior1_sumscore_model1.RDS")
+
+## Load the model
+mod1_prior1 <- readRDS("prior1_sumscore_model1.RDS")
+
+
+####### Running with prior (0, 1) 
+#######
+mod1_prior2 <- brm(mod1_formula, 
+            data   = dep_data,
+            family = gaussian,
+            prior = c(prior(normal(0, 1), class="Intercept", resp = D),
+                      prior(normal(0, 1), class="Intercept", resp = SCI),
+                      prior(normal(0, 1), class="Intercept", resp = SFluency),
+                      prior(normal(0, 1), class ="b", resp = D),
+                      prior(student_t(3, 0, 1), class = "sds", coef = s(Interview_Date), resp = D),
+                      prior(normal(0, 1), class ="b", resp = SCI),
+                      prior(normal(0, 1), class ="b", resp = SFluency),
+                      prior(exponential(1), class = sd, resp = D)
+            ),
+            warmup = 1000, 
+            iter   = 6000, 
+            chains = 4, 
+            cores  = 8,
+            sample_prior = "only",
+            control = list(adapt_delta = 0.99, max_treedepth = 12), 
+            seed = 9935) 
+
+## Save Model output (to easily load the model output later)
+saveRDS(mod1_prior2, "prior2_sumscore_model1.RDS")
+
+## Load the model
+mod1_prior2 <- readRDS("prior2_sumscore_model1.RDS")
+
+### Now we conduct our prior predictive checks
+pp_check(mod1_prior1, resp = "D", type = "stat") 
+pp_check(mod1_prior2, resp = "D", type = "stat") 
+
+## Visualising the slopes implied by the different priors
+conditional_effects(mod1_prior1)
+conditional_effects(mod1_prior2)
+
+###### Inferences regarding priors 
+
+# 1. Note that the minimum possible score on the depression score is 16 (a person answering 1 i.e. less frequently to all items). This is roughly a bit beyond 2 standard deviations. 
+# 2. We observe that with normal(0,1), most of the predictors generate depression values between -4 and 4 standard deviations. 
+# 3. This is okay on the positive side (+4 standard deviations), but on the negative side, -4 standard deviations on depression sum-scores is impossible 
+# 1 std deviation on depression sum-score ~ 7.5. Therefore -4 standard deviations from the mean will be ~3.7 depression sumscore
+# On the other hand, the normal (0, 0.5) prior does a much better job at producing more plausible predictions at the negative end
+# Hence, we choose to run with the (0, 0.5) prior for this model
+str(dep_data$D)
+
+
+######################### Checking prior implications for model 2 investigating social determinants
+
+## Specifying the model
+mod2_formula <- bf(D ~ 1 + Age + Sex + mi(SCI) + mi(SFluency) + s(Interview_Date) + Town_Distance + Com_Size + mi(HH_Size) + (1 |Interviewer) + (1 | Region/ComID/UniqueFamID) + (1 | PID)) +
+  bf(SCI | mi() ~ 1 + Age + Sex) + bf(SFluency | mi() ~ 1 + Age + Sex) + bf(HH_Size | mi() ~ 1 + Age + Sex + Com_Size) +  set_rescor(FALSE)
+
+
+####### Running with narrow prior (0, 0.5) 
+#######
+
+mod2_prior1 <- brm(mod2_formula, 
+                   data   = dep_data,
+                   family = gaussian,
+                   prior = c(prior(normal(0, 0.5), class="Intercept", resp = D),
+                             prior(normal(0, 0.5), class="Intercept", resp = SCI),
+                             prior(normal(0, 0.5), class="Intercept", resp = SFluency),
+                             prior(normal(0, 0.5), class="Intercept", resp = HHSize),
+                             prior(normal(0, 0.5), class ="b", resp = D),
+                             prior(student_t(3, 0, 1), class = "sds", coef = s(Interview_Date), resp = D),
+                             prior(normal(0, 0.5), class ="b", resp = SCI),
+                             prior(normal(0, 0.5), class ="b", resp = SFluency),
+                             prior(normal(0, 0.5), class ="b", resp = HHSize),
+                             prior(exponential(1), class = sd, resp = D)
+                   ),
+                   warmup = 1000, 
+                   iter   = 6000, 
+                   chains = 4, 
+                   cores  = 8,
+                   sample_prior = "only",
+                   control = list(adapt_delta = 0.99, max_treedepth = 12),
+                   seed = 9937) 
+
+
+## Save Model output (to easily load the model output later)
+saveRDS(mod2_prior1, "prior1_sumscore_model2.RDS")
+
+## Load the model
+mod2_prior1 <- readRDS("prior1_sumscore_model2.RDS")
+
+
+####### Running with prior (0, 1) 
+#######
+
+mod2_prior2 <- brm(mod2_formula, 
+                   data   = dep_data,
+                   family = gaussian,
+                   prior = c(prior(normal(0, 1), class="Intercept", resp = D),
+                             prior(normal(0, 1), class="Intercept", resp = SCI),
+                             prior(normal(0, 1), class="Intercept", resp = SFluency),
+                             prior(normal(0, 1), class="Intercept", resp = HHSize),
+                             prior(normal(0, 1), class ="b", resp = D),
+                             prior(student_t(3, 0, 1), class = "sds", coef = s(Interview_Date), resp = D),
+                             prior(normal(0, 1), class ="b", resp = SCI),
+                             prior(normal(0, 1), class ="b", resp = SFluency),
+                             prior(normal(0, 1), class ="b", resp = HHSize),
+                             prior(exponential(1), class = sd, resp = D)
+                   ),
+                   warmup = 1000, 
+                   iter   = 6000, 
+                   chains = 4, 
+                   cores  = 8,
+                   sample_prior = "only",
+                   control = list(adapt_delta = 0.99, max_treedepth = 12),
+                   seed = 9938) 
+
+
+## Save Model output (to easily load the model output later)
+saveRDS(mod2_prior2, "prior2_sumscore_model2.RDS")
+
+## Load the model
+mod2_prior2 <- readRDS("prior2_sumscore_model2.RDS")
+
+
+### Now we conduct our prior predictive checks
+pp_check(mod2_prior1, resp = "D", type = "stat") 
+pp_check(mod2_prior2, resp = "D", type = "stat") 
+
+## Visualising the slopes implied by the different priors
+conditional_effects(mod2_prior1)
+conditional_effects(mod2_prior2)
+
+###### Inferences regarding priors
+
+# Prior (0, 0.5) again performs way better than broader pior (0,1) and mosty respects measurement boundaries
+
+
+
+
+
+########### Now, we run the actual models #########################################################################################
+#######################################################################################################################################################
+
+
+########### Model 1: Quantifying variation at different levels #########################################################################################
+#######################################################################################################################################################
+
 mod1 <- brm(mod1_formula, 
             data   = dep_data,
             family = gaussian,
@@ -318,419 +490,104 @@ mod1 <- brm(mod1_formula,
                       prior(normal(0, 0.5), class="Intercept", resp = SCI),
                       prior(normal(0, 0.5), class="Intercept", resp = SFluency),
                       prior(normal(0, 0.5), class ="b", resp = D),
+                      prior(student_t(3, 0, 1), class = "sds", coef = s(Interview_Date), resp = D),
                       prior(normal(0, 0.5), class ="b", resp = SCI),
                       prior(normal(0, 0.5), class ="b", resp = SFluency),
                       prior(exponential(1), class = sd, resp = D)
-                      ),
+            ),
             warmup = 1000, 
-            iter   = 10000, 
+            iter   = 6000, 
             chains = 4, 
             cores  = 8,
-            control = list(adapt_delta = 0.99),
-            seed = 991) 
+            control = list(adapt_delta = 0.99, max_treedepth = 12),
+            seed = 99343) 
 
 ## Save Model output (to easily load the model output later)
-saveRDS(mod1, "model1.RDS")
+saveRDS(mod1, "sumscore_model1.RDS")
 
-## Load model -- ONLY EXECUTE THIS LINE IF LOADING MODEL 
-## NO NEED TO RUN IT AFTER EXECUTING THE ABOVE LINES OF CODE
-mod1 <- readRDS("model1.RDS")
-
-## Looking at model summary
-summary(mod1)
-
-## Inspecting the trace plots to see if there is something unusual with the chains
-## Looks good
-plot(mod1)
-
-#posterior predictive check
-pp_check(mod1, resp = 'D', ndraws = 100)
-
-## Drawing the posterior distributions from model 1
-T1 <- as_draws_df(mod1)
-
-
-### Calculating ICCs for residual variance & individual differences
-
-## Residual Variance
-icc_residual <- ((T1$sigma_D)^2) / ((T1$sigma_D)^2 + (T1$sd_PID__D_Intercept)^2) 
-dens(icc_residual, col=2, lwd=4 , xlab="ICC (Residual) of Model 1")
-
-## Individual Level Variance
-icc_individual <-  ((T1$sd_PID__D_Intercept)^2) / ((T1$sigma_D)^2 + (T1$sd_PID__D_Intercept)^2)
-dens(icc_individual, col=2, lwd=4 , xlab="ICC (Individual) of Model 1")
-
-# Combine ICC vectors into a dataframe to allow for easy plotting of the two density plots in the same figure
-icc_data <- data.frame(
-  value = c(icc_residual, icc_individual),
-  group = rep(c("Residual", "Individual"), each = length(icc_residual))
-)
-
-# Convert group variable to factor with specified levels (IMP for color coding in the plots)
-icc_data$group <- factor(icc_data$group, levels = c("Residual", "Individual"))
-
-# Final Plot for model 1
-plot1 <- ggplot(icc_data, aes(x = value, color = group)) +
-  geom_density(size = 1.0) +
-  labs(title = " (a) Model 1",
-       x = "ICC",
-       y = "Density",
-       color = "ICC Type") +
-  theme_minimal()  +
-  coord_cartesian(ylim = c(0, 25)) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
-  scale_color_manual(values = c("Residual" = "Green", "Individual" = "Blue")) +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
-
-####################### Plotting model co-efficients
-
-## Renaming Co-efficient Names for easy interpretability (in figure)
-T1 <- T1 %>%
-  rename("Intercept" = "b_D_Intercept",
-         "Age" = "b_D_Age",
-         "Male" = "b_D_Sex1",
-         "SCI" = "bsp_D_miSCI",
-         "SFluency" = "bsp_D_miSFluency")
-
-
-mod1_density_plots <- mcmc_areas(
-  T1 %>% select(Intercept, Age, Male, SCI, SFluency),
-  prob = 0.90,         ## 90% density intervals
-  prob_outer = 0.95,   ## 95% credible intervals
-  point_est = "mean"
-) 
-
-
-mod1_density_plots <- mod1_density_plots + 
-  scale_x_continuous(limits = c(-0.5, 0.5), breaks = seq(-0.5, 0.5, by = 0.1)) +
-  labs(title = "(a) Model 1") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 16),
-    axis.text.y = element_text(family = "Helvetica", size = 18))
+## Load the model
+mod1 <- readRDS("sumscore_model1.RDS")
 
 
 
 
-########### Running model 2 to quantify variation at higher levels (family, community, region) ##################
-#################################################################################################################################
+####### Given that we see minimal variation at the PID and region level, let's make drop these grouping factors to make it less complex
+#######
 
-## Specifying the model formula
-mod2_formula <- bf(D ~ 1 + Age + Sex + mi(SCI) + mi(SFluency) + (1 | Region/ComID/UniqueFamID/PID)) +
+## Specifying the slightly altered model
+mod1_formula_v2 <- bf(D ~ 1 + Age + Sex + mi(SCI) + mi(SFluency) + s(Interview_Date) + (1 |Interviewer) + (1 | ComID/UniqueFamID)) +
   bf(SCI | mi() ~ 1 + Age + Sex) + bf(SFluency | mi() ~ 1 + Age + Sex) + set_rescor(FALSE)
 
-## Running the model
+## Running this new model
+mod1_v2 <- brm(mod1_formula_v2, 
+            data   = dep_data,
+            family = gaussian,
+            prior = c(prior(normal(0, 0.5), class="Intercept", resp = D),
+                      prior(normal(0, 0.5), class="Intercept", resp = SCI),
+                      prior(normal(0, 0.5), class="Intercept", resp = SFluency),
+                      prior(normal(0, 0.5), class ="b", resp = D),
+                      prior(student_t(3, 0, 1), class = "sds", coef = s(Interview_Date), resp = D),
+                      prior(normal(0, 0.5), class ="b", resp = SCI),
+                      prior(normal(0, 0.5), class ="b", resp = SFluency),
+                      prior(exponential(1), class = sd, resp = D)
+            ),
+            warmup = 1000, 
+            iter   = 6000, 
+            chains = 4, 
+            cores  = 8,
+            control = list(adapt_delta = 0.99, max_treedepth = 12),
+            seed = 99353) 
+
+
+## Save Model output (to easily load the model output later)
+saveRDS(mod1_v2, "sumscore_model1_version2.RDS")
+
+## Load the model
+mod1_v2 <- readRDS("sumscore_model1_version2.RDS")
+
+
+
+########### Running model 2 to see if higher level variables explain higher level variation ##################
+#################################################################################################################################
+
+## Specifying the model
 mod2 <- brm(mod2_formula, 
-            data   = dep_data,
-            family = gaussian,
-            prior = c(prior(normal(0, 0.5), class="Intercept", resp = D),
-                      prior(normal(0, 0.5), class="Intercept", resp = SCI),
-                      prior(normal(0, 0.5), class="Intercept", resp = SFluency),
-                      prior(normal(0, 0.5), class ="b", resp = D),
-                      prior(normal(0, 0.5), class ="b", resp = SCI),
-                      prior(normal(0, 0.5), class ="b", resp = SFluency),
-                      prior(exponential(1), class = sd, resp = D)
-            ),
-            warmup = 1000, 
-            iter   = 10000, 
-            chains = 4, 
-            cores  = 8,
-            control = list(adapt_delta = 0.99),
-            seed = 992) 
+                   data   = dep_data,
+                   family = gaussian,
+                   prior = c(prior(normal(0, 0.5), class="Intercept", resp = D),
+                             prior(normal(0, 0.5), class="Intercept", resp = SCI),
+                             prior(normal(0, 0.5), class="Intercept", resp = SFluency),
+                             prior(normal(0, 0.5), class="Intercept", resp = HHSize),
+                             prior(normal(0, 0.5), class ="b", resp = D),
+                             prior(student_t(3, 0, 1), class = "sds", coef = s(Interview_Date), resp = D),
+                             prior(normal(0, 0.5), class ="b", resp = SCI),
+                             prior(normal(0, 0.5), class ="b", resp = SFluency),
+                             prior(normal(0, 0.5), class ="b", resp = HHSize),
+                             prior(exponential(1), class = sd, resp = D)
+                   ),
+                   warmup = 1000, 
+                   iter   = 6000, 
+                   chains = 4, 
+                   cores  = 8,
+                   control = list(adapt_delta = 0.99, max_treedepth = 12),
+                   seed = 99372) 
 
 ## Save Model output (to easily load the model output later)
-saveRDS(mod2, "model2.RDS")
+saveRDS(mod2, "sumscore_model2.RDS")
 
-## Load model -- ONLY EXECUTE THIS LINE IF LOADING MODEL 
-## NO NEED TO RUN IT AFTER EXECUTING THE ABOVE LINES OF CODE
-mod2 <- readRDS("model2.RDS")
+## Load the model
+mod2 <- readRDS("sumscore_model2.RDS")
 
-## Looking at model summary
-summary(mod2)
 
-## Inspecting the trace plots to see if there is something unusual with the chains
-## Looks good
-plot(mod2)
+####### Given that we see minimal variation at the PID and region level, let's make drop these grouping factors to make it less complex
+#######
 
-# Posterior Predictive Check
-pp_check(mod2, resp = 'D', ndraws = 100)
+## Specifying the slightly altered model
+mod2_formula_v2 <- bf(D ~ 1 + Age + Sex + mi(SCI) + mi(SFluency) + s(Interview_Date) + Town_Distance + Com_Size + mi(HH_Size) + (1 |Interviewer) + (1 | ComID/UniqueFamID)) +
+  bf(SCI | mi() ~ 1 + Age + Sex) + bf(SFluency | mi() ~ 1 + Age + Sex) + bf(HH_Size | mi() ~ 1 + Age + Sex + Com_Size) +  set_rescor(FALSE)
 
-## Drawing the posterior distributions from model 2
-T2 <- as_draws_df(mod2)
-
-## Calculating ICCs for residual, individual, family, community & region levels
-icc_residual_2 <- ((T2$sigma_D)^2) / ((T2$sigma_D)^2 + (T2$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T2$`sd_Region:ComID__D_Intercept`)^2 + (T2$sd_Region__D_Intercept)^2)
-dens(icc_residual_2, col=2, lwd=4 , xlab="ICC (Residual) of Model 2")
-
-icc_individual_2 <- ((T2$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2) / ((T2$sigma_D)^2 + (T2$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T2$`sd_Region:ComID__D_Intercept`)^2 + (T2$sd_Region__D_Intercept)^2)
-dens(icc_individual_2, col=2, lwd=4 , xlab="ICC (Individual) of Model 2")
-
-icc_family_2 <-  ((T2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2) / ((T2$sigma_D)^2 + (T2$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T2$`sd_Region:ComID__D_Intercept`)^2 + (T2$sd_Region__D_Intercept)^2)
-dens(icc_family_2, col=2, lwd=4 , xlab="ICC (Family) of Model 2")
-
-icc_community_2 <-  ((T2$`sd_Region:ComID__D_Intercept`)^2) / ((T2$sigma_D)^2 + (T2$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T2$`sd_Region:ComID__D_Intercept`)^2 + (T2$sd_Region__D_Intercept)^2)
-dens(icc_community_2, col=2, lwd=4 , xlab="ICC (Community) of Model 2")
-
-icc_region_2 <-  ((T2$sd_Region__D_Intercept)^2) / ((T2$sigma_D)^2 + (T2$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T2$`sd_Region:ComID__D_Intercept`)^2 + (T2$sd_Region__D_Intercept)^2)
-dens(icc_region_2, col=2, lwd=4 , xlab="ICC (Region) of Model 2")
-
-
-# Combine ICC vectors into a dataframe to allow for easy plotting of the five density plots in the same figure
-icc_data_2 <- data.frame(
-  value = c(icc_residual_2, icc_individual_2, icc_family_2, icc_community_2, icc_region_2),
-  group = rep(c("Residual", "Individual", "Household", "Community", "Region"), each = length(icc_residual_2))
-)
-
-# Convert group variable to factor with specified levels (IMP for color coding in the plots)
-icc_data_2$group <- factor(icc_data_2$group, levels = c("Residual", "Individual", "Household", "Community", "Region"))
-
-# Final Plot for model 2
-plot2 <- ggplot(icc_data_2, aes(x = value, color = group)) +
-  geom_density(size = 1.0) +
-  labs(title = "(b) Model 2",
-       x = "ICC",
-       y = "Density",
-       color = "ICC Type") +
-  theme_minimal() +
-  coord_cartesian(ylim = c(0, 25)) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
-  scale_color_manual(values = c("Residual" = "Green", "Individual" = "Blue", "Household" = "orange", "Community" = "red", "Region" = "darkgray")) +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
-
-
-
-####################### Plotting model co-efficients
-
-## Renaming Co-efficient Names for easy interpretability (in figure)
-T2 <- T2 %>%
-  rename("Intercept" = "b_D_Intercept",
-         "Age" = "b_D_Age",
-         "Male" = "b_D_Sex1",
-         "SCI" = "bsp_D_miSCI",
-         "SFluency" = "bsp_D_miSFluency")
-
-
-mod2_density_plots <- mcmc_areas(
-  T2 %>% select(Intercept, Age, Male, SCI, SFluency),
-  prob = 0.90,         ## 90% density intervals
-  prob_outer = 0.95,   ## 95% credible intervals
-  point_est = "mean"
-)
-
-mod2_density_plots <- mod2_density_plots +
-  scale_x_continuous(limits = c(-0.5, 0.5), breaks = seq(-0.5, 0.5, by = 0.1)) +
-  labs(title = "(b) Model 2") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 16),
-    axis.text.y = element_text(family = "Helvetica", size = 18))
-
-
-
-
-
-########### Running model 3 to adjust for Interviewer and Time Effects ##################
-#################################################################################################################################
-
-## Specifying the model
-mod3_formula <- bf(D ~ 1 + Age + Sex + mi(SCI) + mi(SFluency) + s(Interview_Date) + (1 |Interviewer) + (1 | Region/ComID/UniqueFamID/PID)) +
-  bf(SCI | mi() ~ 1 + Age + Sex) + bf(SFluency | mi() ~ 1 + Age + Sex) + set_rescor(FALSE)
-
-## Running the model
-mod3 <- brm(mod3_formula, 
-            data   = dep_data,
-            family = gaussian,
-            prior = c(prior(normal(0, 0.5), class="Intercept", resp = D),
-                      prior(normal(0, 0.5), class="Intercept", resp = SCI),
-                      prior(normal(0, 0.5), class="Intercept", resp = SFluency),
-                      prior(normal(0, 0.5), class ="b", resp = D),
-                      prior(normal(0, 0.5), class ="b", resp = SCI),
-                      prior(normal(0, 0.5), class ="b", resp = SFluency),
-                      prior(exponential(1), class = sd, resp = D)
-            ),
-            warmup = 1000, 
-            iter   = 10000, 
-            chains = 4, 
-            cores  = 8,
-            control = list(adapt_delta = 0.99, max_treedepth = 15),
-            seed = 993) 
-
-## Save Model output (to easily load the model output later)
-saveRDS(mod3, "model3.RDS")
-
-## Load model -- ONLY EXECUTE THIS LINE IF LOADING MODEL 
-## NO NEED TO RUN IT AFTER EXECUTING THE ABOVE LINES OF CODE
-mod3 <- readRDS("model3.RDS")
-
-## Looking at model summary
-summary(mod3)
-
-## Inspecting the trace plots to see if there is something unusual with the chains
-## Looks good
-plot(mod3)
-
-# Posterior Predictive Check
-pp_check(mod3, resp = 'D', ndraws = 100)
-
-## Drawing the posterior distributions from model 3
-T3 <- as_draws_df(mod3)
-
-## Calculating ICCs for residual, individual, family, community & region levels
-icc_residual_3 <- ((T3$sigma_D)^2) / ((T3$sigma_D)^2 + (T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T3$`sd_Region:ComID__D_Intercept`)^2 + (T3$sd_Region__D_Intercept)^2 + (T3$sd_Interviewer__D_Intercept)^2)
-dens(icc_residual_3, col=2, lwd=4 , xlab="ICC (Residual) of Model 3")
-
-icc_individual_3 <- ((T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2) / ((T3$sigma_D)^2 + (T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T3$`sd_Region:ComID__D_Intercept`)^2 + (T3$sd_Region__D_Intercept)^2 + (T3$sd_Interviewer__D_Intercept)^2)
-dens(icc_individual_3, col=2, lwd=4 , xlab="ICC (Individual) of Model 3")
-
-icc_family_3 <- ((T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2) / ((T3$sigma_D)^2 + (T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T3$`sd_Region:ComID__D_Intercept`)^2 + (T3$sd_Region__D_Intercept)^2 + (T3$sd_Interviewer__D_Intercept)^2)
-dens(icc_family_3, col=2, lwd=4 , xlab="ICC (Family) of Model 3")
-
-icc_community_3 <- ((T3$`sd_Region:ComID__D_Intercept`)^2) / ((T3$sigma_D)^2 + (T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T3$`sd_Region:ComID__D_Intercept`)^2 + (T3$sd_Region__D_Intercept)^2 + (T3$sd_Interviewer__D_Intercept)^2)
-dens(icc_community_3, col=2, lwd=4 , xlab="ICC (Community) of Model 3")
-
-icc_region_3 <- ((T3$sd_Region__D_Intercept)^2) / ((T3$sigma_D)^2 + (T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T3$`sd_Region:ComID__D_Intercept`)^2 + (T3$sd_Region__D_Intercept)^2 + (T3$sd_Interviewer__D_Intercept)^2)
-dens(icc_region_3, col=2, lwd=4 , xlab="ICC (Region) of Model 3")
-
-icc_interviewer_3 <- ((T3$sd_Interviewer__D_Intercept)^2) / ((T3$sigma_D)^2 + (T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T3$`sd_Region:ComID__D_Intercept`)^2 + (T3$sd_Region__D_Intercept)^2 + (T3$sd_Interviewer__D_Intercept)^2)
-dens(icc_interviewer_3, col=2, lwd=4 , xlab="ICC (Interviewer) of Model 3")
-
-
-# Combine ICC vectors into a dataframe to allow for easy plotting of the five density plots in the same figure
-icc_data_3 <- data.frame(
-  value = c(icc_residual_3, icc_individual_3, icc_family_3, icc_community_3, icc_region_3, icc_interviewer_3),
-  group = rep(c("Residual", "Individual", "Household", "Community", "Region", "Interviewer"), each = length(icc_residual_3))
-)
-
-# Convert group variable to factor with specified levels (IMP for color coding in the plots)
-icc_data_3$group <- factor(icc_data_3$group, levels = c("Residual", "Individual", "Household", "Community", "Region", "Interviewer"))
-
-
-# Final Plot for model 3
-plot3 <- ggplot(icc_data_3, aes(x = value, color = group)) +
-  geom_density(size = 1.0) +
-  labs(title = "(c) Model 3",
-       x = "ICC",
-       y = "Density",
-       color = "ICC Type") +
-  theme_minimal() +
-  coord_cartesian(ylim = c(0, 25)) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
-  scale_color_manual(values = c("Residual" = "Green", "Individual" = "Blue", "Household" = "orange", "Community" = "red", "Region" = "darkgray", "Interviewer" = "darkcyan")) +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
-
-
-####################### Plotting model co-efficients
-
-## Renaming Co-efficient Names for easy interpretability (in figure)
-T3 <- T3 %>%
-  rename("Intercept" = "b_D_Intercept",
-         "Age" = "b_D_Age",
-         "Male" = "b_D_Sex1",
-         "SCI" = "bsp_D_miSCI",
-         "SFluency" = "bsp_D_miSFluency"
-  )
-
-
-mod3_density_plots <- mcmc_areas(
-  T3 %>% select(Intercept, Age, Male, SCI, SFluency),
-  prob = 0.90,         ## 90% density intervals
-  prob_outer = 0.95,   ## 95% credible intervals
-  point_est = "mean"
-)
-
-mod3_density_plots <- mod3_density_plots +
-  scale_x_continuous(limits = c(-0.5, 0.5), breaks = seq(-0.5, 0.5, by = 0.1)) +
-  labs(title = "(c) Model 3") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 16),
-    axis.text.y = element_text(family = "Helvetica", size = 18))
-
-
-########### Plotting Effect of Interview Date
-
-## Draw conditional effects plot
-spline_plot_mod3 <- conditional_effects(mod3, "Interview_Date") 
-
-## Get the data conditional effects used to generate this plot
-time_effect_data_mod3 <- spline_plot_mod3$D.D_Interview_Date
-
-# Step 2: Reverse the standardization in this dataset to make the graph more readable (i.e. Original Interview Date instead of standardised interview date)
-# The original Interview_Date was transformed as follows:
-# Interview_Date_numeric = as.numeric(Interview_Date)
-# Interview_Date_standardized = (Interview_Date_numeric - mean(Interview_Date_numeric)) / sd(Interview_Date_numeric)
-
-# To reverse it, use the mean and sd of Interview_Date from the original dataset where interview dates weren't transformed:
-## Note we use depression_data_v2 instead of dep_data. This is because dep_data has a standardised version of interview dates, which the former dataset doesn't
-mean_interview_date <- mean(as.numeric(depression_data_v2$InterviewDate))
-sd_interview_date <- sd(as.numeric(depression_data_v2$InterviewDate))
-
-## Reversing the standardisatiob and converting it to date format
-time_effect_data_mod3$Interview_Date <- (time_effect_data_mod3$Interview_Date * sd_interview_date) + mean_interview_date
-time_effect_data_mod3$Interview_Date <- as.POSIXct(time_effect_data_mod3$Interview_Date, origin = "1970-01-01")
-
-# Step 3: Update the plot
-time_effect_mod3_plot <- ggplot(time_effect_data_mod3, aes(x = Interview_Date, y = estimate__)) +
-  geom_line() +
-  geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.1) +
-  geom_point(data = time_effect_data_mod3[time_effect_data_mod3$points__, ], aes(x = Interview_Date, y = estimate__)) +
-  labs(x = "Interview Date", y = "Standardized Depression Score") +
-  theme_minimal()
-
-######################### Plotting Interviewer Intercepts
-
-## Extract the random effects parameters fist
-x <- ranef(mod3)
-
-## Let's focus on just the interviewer intercepts
-interviewer_estimates <- as.data.frame(x$Interviewer, row.names = NULL)
-
-## Adding the interviewer names as they aren't being read as a column currently
-interviewer_estimates <- data.frame(Interviewer = rownames(interviewer_estimates), interviewer_estimates)
-
-## Generate the plot
-ggplot(interviewer_estimates, aes(x = Interviewer, y = Estimate.D_Intercept)) +
-  geom_point() + 
-  geom_errorbar(aes(ymin = Q2.5.D_Intercept, ymax = Q97.5.D_Intercept)) +
-  labs(x = "Interviewer", y = "Depression Score")
-
-
-
-
-########### Running model 4 to see if higher level variables explain higher level variation ##################
-#################################################################################################################################
-
-## Specifying the model
-mod4_formula <- bf(D ~ 1 + Age + Sex + mi(SCI) + mi(SFluency) + s(Interview_Date) + Town_Distance + Com_Size + mi(HH_Size) + (1 |Interviewer) + (1 | Region/ComID/UniqueFamID/PID)) +
-  bf(SCI | mi() ~ 1 + Age + Sex) + bf(SFluency | mi() ~ 1 + Age + Sex) + bf(HH_Size | mi() ~ 1 + Age + Sex + Com_Size) + set_rescor(FALSE)
-
-
-## Running the model
-mod4 <- brm(mod4_formula, 
+## Running this altered model
+mod2_v2 <- brm(mod2_formula_v2, 
             data   = dep_data,
             family = gaussian,
             prior = c(prior(normal(0, 0.5), class="Intercept", resp = D),
@@ -738,91 +595,49 @@ mod4 <- brm(mod4_formula,
                       prior(normal(0, 0.5), class="Intercept", resp = SFluency),
                       prior(normal(0, 0.5), class="Intercept", resp = HHSize),
                       prior(normal(0, 0.5), class ="b", resp = D),
+                      prior(student_t(3, 0, 1), class = "sds", coef = s(Interview_Date), resp = D),
                       prior(normal(0, 0.5), class ="b", resp = SCI),
                       prior(normal(0, 0.5), class ="b", resp = SFluency),
-                      prior(normal(0, 0.5), class ="b", resp = HHSize), 
+                      prior(normal(0, 0.5), class ="b", resp = HHSize),
                       prior(exponential(1), class = sd, resp = D)
             ),
             warmup = 1000, 
-            iter   = 10000, 
+            iter   = 6000, 
             chains = 4, 
             cores  = 8,
-            control = list(adapt_delta = 0.99, max_treedepth = 15),
-            seed = 994) 
+            control = list(adapt_delta = 0.99, max_treedepth = 12),
+            seed = 993725) 
+
+## Save Model output (to easily load the model output later)
+saveRDS(mod2_v2, "sumscore_model2_version2.RDS")
+
+## Load the model
+mod2_v2 <- readRDS("sumscore_model2_version2.RDS")
 
 
-## Save Model output (for others to easily load the model output later)
-saveRDS(mod4, "model4.RDS")
 
-## Load model
-mod4 <- readRDS("model4.RDS")
+########### Let's plot the effects of the models reported in the main text (i.e.one's without PID & Region) ###########################################
+#######################################################################################################################################################
+#######################################################################################################################################################
 
+## Look at summmaries first
+summary(mod1_v2)
+summary(mod2_v2)
 
-## Model summary
-summary(mod4)
+## Drawing the posteriors from these models
+T1 <- as_draws_df(mod1_v2)
+T2 <- as_draws_df(mod2_v2)
 
-## Inspecting the trace plots to see if there is something unusual with the chains
-## Looks good
-plot(mod4)
-
-# Posterior Predictive Check
-pp_check(mod4, resp = 'D', ndraws = 100)
-
-## Drawing the posterior distributions from model 3
-T4 <- as_draws_df(mod4)
-
-## Calculating ICCs for residual, individual, family, community & region levels
-icc_residual_4 <-  ((T4$sigma_D)^2) / ((T4$sigma_D)^2 + (T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T4$`sd_Region:ComID__D_Intercept`)^2 + (T4$sd_Region__D_Intercept)^2  + (T4$sd_Interviewer__D_Intercept)^2)
-dens(icc_residual_4, col=2, lwd=4 , xlab="ICC (Residual) of Model 4")
-
-icc_individual_4 <-  ((T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2) / ((T4$sigma_D)^2 + (T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T4$`sd_Region:ComID__D_Intercept`)^2 + (T4$sd_Region__D_Intercept)^2  + (T4$sd_Interviewer__D_Intercept)^2)
-dens(icc_individual_4, col=2, lwd=4 , xlab="ICC (Individual) of Model 4")
-
-icc_family_4 <- ((T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2) / ((T4$sigma_D)^2 + (T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T4$`sd_Region:ComID__D_Intercept`)^2 + (T4$sd_Region__D_Intercept)^2  + (T4$sd_Interviewer__D_Intercept)^2)
-dens(icc_family_4, col=2, lwd=4 , xlab="ICC (Family) of Model 4")
-
-icc_community_4 <- ((T4$`sd_Region:ComID__D_Intercept`)^2) / ((T4$sigma_D)^2 + (T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T4$`sd_Region:ComID__D_Intercept`)^2 + (T4$sd_Region__D_Intercept)^2  + (T4$sd_Interviewer__D_Intercept)^2)
-dens(icc_community_4, col=2, lwd=4 , xlab="ICC (Community) of Model 4")
-
-icc_region_4 <-  ((T4$sd_Region__D_Intercept)^2) / ((T4$sigma_D)^2 + (T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T4$`sd_Region:ComID__D_Intercept`)^2 + (T4$sd_Region__D_Intercept)^2  + (T4$sd_Interviewer__D_Intercept)^2)
-dens(icc_region_4, col=2, lwd=4 , xlab="ICC (Region) of Model 4")
-
-icc_interviewer_4 <- ((T4$sd_Interviewer__D_Intercept)^2) / ((T4$sigma_D)^2 + (T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2 + (T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + (T4$`sd_Region:ComID__D_Intercept`)^2 + (T4$sd_Region__D_Intercept)^2  + (T4$sd_Interviewer__D_Intercept)^2)
-dens(icc_interviewer_4, col=2, lwd=4 , xlab="ICC (Interviewer) of Model 4")
-
-# Combine ICC vectors into a dataframe to allow for easy plotting of the six density plots in the same figure
-icc_data_4 <- data.frame(
-  value = c(icc_residual_4, icc_individual_4, icc_family_4, icc_community_4, icc_region_4, icc_interviewer_4),
-  group = rep(c("Residual", "Individual", "Household", "Community", "Region", "Interviewer"), each = length(icc_residual_4))
+## Renaming co-efficients for better readability on actual graphs
+T1 <- T1 %>% 
+  rename("Intercept" = "b_D_Intercept",
+       "Age" = "b_D_Age",
+       "Male" = "b_D_Sex1",
+       "SCI" = "bsp_D_miSCI",
+       "SFluency" = "bsp_D_miSFluency"
 )
 
-# Convert group variable to factor with specified levels (IMP for color coding in the plots)
-icc_data_4$group <- factor(icc_data_4$group, levels = c("Residual", "Individual", "Household", "Community", "Region", "Interviewer"))
-
-
-# Final Plot for model 4
-plot4 <- ggplot(icc_data_4, aes(x = value, color = group)) +
-  geom_density(size = 1.0) +
-  labs(title = "(d) Model 4",
-       x = "ICC",
-       y = "Density",
-       color = "ICC Type") +
-  theme_minimal() +
-  coord_cartesian(ylim = c(0, 25)) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
-  scale_color_manual(values = c("Residual" = "Green", "Individual" = "Blue", "Household" = "orange", "Community" = "red", "Region" = "darkgray", "Interviewer" = "darkcyan")) +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
-
-
-## Renaming Co-efficient Names for easy interpretability (in figure)
-T4 <- T4 %>%
+T2 <- T2 %>%
   rename("Intercept" = "b_D_Intercept",
          "Age" = "b_D_Age",
          "Male" = "b_D_Sex1",
@@ -833,407 +648,971 @@ T4 <- T4 %>%
          "H_Size" = "bsp_D_miHH_Size"
   )
 
+## Now select these renamed parameters from the whole posterior draw
+T1_params <- c("Intercept", "Age", "Male", "SCI", "SFluency")
+T2_params <- c("Intercept", "Age", "Male", "SCI", "SFluency", "Town_Distance", "C_Size", "H_Size")
 
-mod4_density_plots <- mcmc_areas(
-  T4 %>% select(Intercept, Age, Male, SCI, SFluency, Town_Distance, C_Size, H_Size),
-  prob = 0.90,         ## 90% density intervals
-  prob_outer = 0.95,   ## 95% credible intervals
+
+######################################### Create density plot for Model 1 now
+mod1_density_plots <- mcmc_areas(
+  T1 %>% select(all_of(T1_params)),
+  prob = 0.95,         
+  prob_outer = 0.95,   
   point_est = "mean"
 )
 
-mod4_density_plots <- mod4_density_plots +
-  scale_x_continuous(limits = c(-0.5, 0.5), breaks = seq(-0.5, 0.5, by = 0.1)) +
-  labs(title = "(d) Model 4") +
+# Make it a bit more tidy
+mod1_density_plots <- mod1_density_plots +
+  scale_x_continuous(limits = c(-0.5, 0.7), breaks = seq(-0.5, 0.7, by = 0.1)) +
+  labs(title = "(a) Model 1") +
   geom_line(color = "black", size = 1) +
   theme(
     plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 13),
-    axis.text.y = element_text(family = "Helvetica", size = 18))
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20))
 
+# Calculate how much of the posterior is above 0
 
-########### Plotting Effect of Interview Date
+# First we reverse the order of the variables as the mcmc_areas() reverses the order while plotting 
+T1_params_rev <- rev(T1_params)
 
-## Draw conditional effects plot
-spline_plot_mod4 <- conditional_effects(mod4, "Interview_Date") 
-
-## Get the data conditional effects used to generate this plot
-time_effect_data_mod4 <- spline_plot_mod4$D.D_Interview_Date
-
-# Step 2: Reverse the standardization in this dataset to make the graph more readable (i.e. Original Interview Date instead of standardised interview date)
-## Mean and SD already calculated above
-
-## Reversing the standardisation and converting it to date format
-time_effect_data_mod4$Interview_Date <- (time_effect_data_mod4$Interview_Date * sd_interview_date) + mean_interview_date
-time_effect_data_mod4$Interview_Date <- as.POSIXct(time_effect_data_mod3$Interview_Date, origin = "1970-01-01")
-
-# Step 3: Update the plot
-time_effect_mod4_plot <- ggplot(time_effect_data_mod4, aes(x = Interview_Date, y = estimate__)) +
-  geom_line() +
-  geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.1) +
-  geom_point(data = time_effect_data_mod4[time_effect_data_mod4$points__, ], aes(x = Interview_Date, y = estimate__)) +
-  labs(x = "Interview Date", y = "Standardized Depression Score") +
-  theme_minimal()
-
-
-
-############### Plots and Tables presented in the manuscript
-##############################################################
-
-################ Combined ICC Plot for all 4 models
-
-## Combine plots from all four models
-combined_icc_plot <- (plot1 | plot2) / (plot3 | plot4)
-
-# Print the combined plot
-print(combined_icc_plot)
-
-
-################ Combined Model Co-efficients Plot for all 4 models
-
-combined_density_plot <- mod1_density_plots + mod2_density_plots + mod3_density_plots + mod4_density_plots
-print(combined_density_plot)
-
-
-
-################### Tables
-
-######## Summarizing all the predictors used in our analyses
-#########################################################
-
-######## Calculating number of males in our dataset
-## First, we retain only one observation per individual (since there are repeated observations from certain individuals which might inflate the prevalence of males/females)
-unique_individuals <- depression_data_v2 %>% 
-  distinct(PID_FAMID, .keep_all = TRUE)
-
-## Now calculate the percentage
-percentage_males <- round((sum(unique_individuals$Male)/nrow(unique_individuals))*100, 2)
-
-
-######## Calculating mean, sd, median, lower and upper quintile of town distance and community size in our dataset
-## Retaining one observation per community
-unique_communities <- depression_data_v2 %>% 
-  distinct(ComID, .keep_all = TRUE)
-
-## Calculating summary stats for town distance
-mean_distance <- round(mean(unique_communities$route_distance_town), 2)
-sd_distance <- round(sd(unique_communities$route_distance_town), 2)
-median_distance <- median(unique_communities$route_distance_town)
-lower_quin_distance <- quantile(unique_communities$route_distance_town, 0.25)
-upper_quin_distance <- quantile(unique_communities$route_distance_town, 0.75)
-
-## Calculating summary stats for community size
-mean_csize <- round(mean(unique_communities$max_community_size), 2)
-sd_csize <- round(sd(unique_communities$max_community_size), 2)
-median_csize <- median(unique_communities$max_community_size)
-lower_quin_csize <- quantile(unique_communities$max_community_size, 0.25)
-upper_quin_csize <- quantile(unique_communities$max_community_size, 0.75)
-
-
-
-######## Calculating Interview Date Data separately as well
-## Doing it in the lines below as the summarise function later on leads to strange numeric outputs, presumably because dplyr & summarise are making some internal transformations on the date format)
-mean_date <- as.character(mean(depression_data_v2$InterviewDate))
-
-## We only need the date (not the time for the summary stats, so removing time in the line below)
-mean_date_only <- substr(mean_date, 1, 10)
-median_date <- as.character(median(depression_data_v2$InterviewDate))
-min_date <- as.character(min(depression_data_v2$InterviewDate))
-max_date <- as.character(max(depression_data_v2$InterviewDate))
-lower_quin_date <- as.character(quantile(depression_data_v2$InterviewDate, 0.25))
-upper_quin_date <- as.character(quantile(depression_data_v2$InterviewDate, 0.75))
-
-
-## Now summarising all predictors in a summary table
-summary_stats <- depression_data_v2 %>%
-  summarise(
-    Variable = c("Depression Sum Score (possible range: 16 - 64)", "Age (in years)", "Sex (% of Males in the sample)", 
-                 "Social Conflict Index (possible range: 0 - 6)", "Spanish Fluency (possible range: 0 - 2)",
-                 "Route Distance of Community to Town (in kms)", "Maximum Community Size recorded during fieldwork",
-                 "Household Size", "Depression Interview Date"),
-    Summary_Statistics_Calculated_Over = c("Entire Sample: 2665", "Entire Sample: 2665", "Unique Individuals: 1876", "Entire Sample: 2665", "Entire Sample: 2665",
-                                           "Unique Communities: 68", "Unique Communities: 68", "Entire Sample: 2665", "Entire Sample: 2665"),
-    Mean = c(round(mean(DepressionScoreM2), 2), round(mean(Age), 2), paste(percentage_males, "% of Males"), round(mean(SocialConflictIndex, na.rm = TRUE), 2), 
-             round(mean(SpanishFluency, na.rm = TRUE), 2), mean_distance, mean_csize, round(mean(household_size, na.rm = TRUE), 2), mean_date_only),
-    SD = c(round(sd(DepressionScoreM2), 2), round(sd(Age), 2), "-", round(sd(SocialConflictIndex, na.rm = TRUE), 2), round(sd(SpanishFluency, na.rm = TRUE), 2),
-           sd_distance, sd_csize, round(sd(household_size, na.rm = TRUE), 2), "-"),
-    Median = c(median(DepressionScoreM2), round(median(Age), 2), "-", median(SocialConflictIndex, na.rm = TRUE), median(SpanishFluency, na.rm = TRUE),
-               median_distance, median_csize, median(household_size, na.rm = TRUE), median_date),
-    Min = c(min(DepressionScoreM2), round(min(Age), 2), "-", min(SocialConflictIndex, na.rm = TRUE), min(SpanishFluency, na.rm = TRUE),
-            min(route_distance_town), min(max_community_size), min(household_size, na.rm = TRUE), min_date),
-    Max = c(max(DepressionScoreM2), round(max(Age), 2), "-", max(SocialConflictIndex, na.rm = TRUE), max(SpanishFluency, na.rm = TRUE),
-            max(route_distance_town), max(max_community_size), max(household_size, na.rm = TRUE), max_date), 
-    Q1 = c(quantile(DepressionScoreM2, 0.25), round(quantile(Age, 0.25), 2), "-", quantile(SocialConflictIndex, 0.25, na.rm = TRUE), 
-           quantile(SpanishFluency, 0.25, na.rm = TRUE), round(lower_quin_distance, 2), round(lower_quin_csize, 2),
-           quantile(household_size, 0.25, na.rm = TRUE), lower_quin_date),
-    Q3 = c(quantile(DepressionScoreM2, 0.75), round(quantile(Age, 0.75), 2), "-", quantile(SocialConflictIndex, 0.75, na.rm = TRUE),
-           quantile(SpanishFluency, 0.75, na.rm = TRUE), round(upper_quin_distance, 2), round(upper_quin_csize, 2),
-           quantile(household_size, 0.75, na.rm = TRUE), upper_quin_date),
-    Missingness = c("-", "-", "-", sum(is.na(SocialConflictIndex)), sum(is.na(SpanishFluency)), "-", "-", sum(is.na(household_size)), "-"))
-
-
-
-######## Summarizing all the model outputs in one table
-#########################################################
-
-## We use the draws from each model (T1, T2, T3, T4) to summarise estimates of each model in a dataframe
-## The dataframe is then converted to a flextable
-
-# Conditional R2 for all models which are manually added to the dataframe
-mod1_R2 <- bayes_R2(mod1)
-mod2_R2 <- bayes_R2(mod2)
-mod3_R3 <- bayes_R2(mod3)
-mod4_R4 <- bayes_R2(mod4)
-
-
-## Generating the data frame now
-models_summary <- data.frame(Predictors = c("Intercept", "Age", "Sex", "Social Conflict Index (SCI)", 
-                                            "Spanish Fluency", "Interview Date (Spline Fixed Effect)", "Interview Date (Spline Smooth Term)",
-                                            "Distance to Town", "Maximum Community Size", "Household Size", 
-                                            "Residual Variance", 
-                                            "Between-Cluster Variance", " ", " ", " ", " ", "ICC", " ", " ", " ", " ", " ", "Conditional R2"), 
-                             Estimates_Model_1 = c( round(mean(T1$Intercept),2), round(mean(T1$Age),2), round(mean(T1$Male),2), 
-                                                    round(mean(T1$SCI),2), round(mean(T1$SFluency),2), "-", "-", 
-                                                    "-", "-", "-", round(mean((T1$sigma_D)^2), 2), 
-                                                    paste(round(mean((T1$sd_PID__D_Intercept)^2), 2), " (PID)"),  "-", "-", "-", "-", paste(round(mean(icc_residual), 2), " (Residual)"), paste(round(mean(icc_individual), 2), "(Individual)"),
-                                                    "-", "-", "-", "-", round(mod1_R2["R2D", "Estimate"], 2)),
-                             CI_Model_1 = c( paste(round(quantile(T1$Intercept, 0.025), 2), "-", round(quantile(T1$Intercept, 0.975), 2)), paste(round(quantile(T1$Age, 0.025), 2), "-", round(quantile(T1$Age, 0.975), 2)),
-                                             paste(round(quantile(T1$Male, 0.025), 2), "-", round(quantile(T1$Male, 0.975), 2)), paste(round(quantile(T1$SCI, 0.025), 2), "-", round(quantile(T1$SCI, 0.975), 2)),
-                                             paste(round(quantile(T1$SFluency, 0.025), 2), "-", round(quantile(T1$SFluency, 0.975), 2)), "-", "-",
-                                             "-", "-", "-",
-                                             paste(round(quantile((T1$sigma_D)^2, 0.025), 2), "-", round(quantile((T1$sigma_D)^2, 0.975), 2)), 
-                                             paste(round(quantile((T1$sd_PID__D_Intercept)^2, 0.025), 2), "-", round(quantile((T1$sd_PID__D_Intercept)^2, 0.975), 2)), "-", "-", "-", "-",
-                                             paste(round(quantile(icc_residual, 0.025), 2), "-", round(quantile(icc_residual, 0.975), 2)), 
-                                             paste(round(quantile(icc_individual, 0.025), 2), "-", round(quantile(icc_individual, 0.975), 2)), "-", "-", "-", "-", paste(round(mod1_R2["R2D", "Q2.5"], 2), "-", round(mod1_R2["R2D", "Q97.5"], 2))),
-                             
-                             
-                             Estimates_Model_2 = c( round(mean(T2$Intercept),2), round(mean(T2$Age),2), round(mean(T2$Male),2), round(mean(T2$SCI),2), round(mean(T2$SFluency),2),
-                                                    "-", "-",
-                                                    "-", "-", "-", round(mean((T2$sigma_D)^2), 2), 
-                                                    paste(round(mean((T2$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2), 2), " (PID)"), paste(round(mean((T2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2), 2), " (FamID)"),
-                                                    paste(round(mean((T2$`sd_Region:ComID__D_Intercept`)^2), 2), " (ComID)"), paste(round(mean((T2$sd_Region__D_Intercept)^2), 2), " (RegionID)"), "-",
-                                                    paste(round(mean(icc_residual_2), 2), " (Residual)"), paste(round(mean(icc_individual_2), 2), "(Individual)"),
-                                                    paste(round(mean(icc_family_2), 2), "(Household)"), paste(round(mean(icc_community_2), 2), "(Community)"),
-                                                    paste(round(mean(icc_region_2), 2), "(Region)"), "-", round(mod2_R2["R2D", "Estimate"], 2)), 
-                             CI_Model_2 = c( paste(round(quantile(T2$Intercept, 0.025), 2), "-", round(quantile(T2$Intercept, 0.975), 2)), paste(round(quantile(T2$Age, 0.025), 2), "-", round(quantile(T2$Age, 0.975), 2)),
-                                             paste(round(quantile(T2$Male, 0.025), 2), "-", round(quantile(T2$Male, 0.975), 2)), paste(round(quantile(T2$SCI, 0.025), 2), "-", round(quantile(T2$SCI, 0.975), 2)), 
-                                             paste(round(quantile(T2$SFluency, 0.025), 2), "-", round(quantile(T2$SFluency, 0.975), 2)), "-", "-",
-                                             "-", "-", "-",
-                                             paste(round(quantile((T2$sigma_D)^2, 0.025), 2), "-", round(quantile((T2$sigma_D)^2, 0.975), 2)), 
-                                             paste(round(quantile((T2$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T2$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2, 0.975), 2)), 
-                                             paste(round(quantile((T2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2, 0.975), 2)),
-                                             paste(round(quantile((T2$`sd_Region:ComID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T2$`sd_Region:ComID__D_Intercept`)^2, 0.975), 2)),
-                                             paste(round(quantile((T2$sd_Region__D_Intercept)^2, 0.025), 2), "-", round(quantile((T2$sd_Region__D_Intercept)^2, 0.975), 2)), "-",
-                                             paste(round(quantile(icc_residual_2, 0.025), 2), "-", round(quantile(icc_residual_2, 0.975), 2)), 
-                                             paste(round(quantile(icc_individual_2, 0.025), 2), "-", round(quantile(icc_individual_2, 0.975), 2)), 
-                                             paste(round(quantile(icc_family_2, 0.025), 2), "-", round(quantile(icc_family_2, 0.975), 2)),
-                                             paste(round(quantile(icc_community_2, 0.025), 2), "-", round(quantile(icc_community_2, 0.975), 2)),
-                                             paste(round(quantile(icc_region_2, 0.025), 2), "-", round(quantile(icc_region_2, 0.975), 2)), "-", paste( round(mod2_R2["R2D", "Q2.5"],2), "-", round(mod2_R2["R2D", "Q97.5"],2) )),
-                            
-                              Estimates_Model_3 = c( round(mean(T3$Intercept),2), round(mean(T3$Age),2), round(mean(T3$Male),2), round(mean(T3$SCI),2), 
-                                                     round(mean(T3$SFluency),2), round(mean(T3$bs_D_sInterview_Date_1),2), round(mean(T3$sds_D_sInterview_Date_1),2),
-                                                     "-", "-", "-", round(mean((T3$sigma_D)^2), 2), 
-                                                    paste(round(mean((T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2), 2), " (PID)"), paste(round(mean((T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2), 2), " (FamID)"),
-                                                    paste(round(mean((T3$`sd_Region:ComID__D_Intercept`)^2), 2), " (ComID)"), paste(round(mean((T3$sd_Region__D_Intercept)^2), 2), " (RegionID)"), 
-                                                    paste(round(mean((T3$sd_Interviewer__D_Intercept)^2), 2), " (InterviewerID)"),
-                                                    paste(round(mean(icc_residual_3), 2), " (Residual)"), paste(round(mean(icc_individual_3), 2), "(Individual)"),
-                                                    paste(round(mean(icc_family_3), 2), "(Household)"), paste(round(mean(icc_community_3), 2), "(Community)"),
-                                                    paste(round(mean(icc_region_3), 2), "(Region)"), paste(round(mean(icc_interviewer_3), 2), "(Interviewer)"), 
-                                                    round(mod3_R3["R2D", "Estimate"], 2)), 
-                             CI_Model_3 = c( paste(round(quantile(T3$Intercept, 0.025), 2), "-", round(quantile(T3$Intercept, 0.975), 2)), paste(round(quantile(T3$Age, 0.025), 2), "-", round(quantile(T3$Age, 0.975), 2)),
-                                             paste(round(quantile(T3$Male, 0.025), 2), "-", round(quantile(T3$Male, 0.975), 2)), paste(round(quantile(T3$SCI, 0.025), 2), "-", round(quantile(T3$SCI, 0.975), 2)), 
-                                             paste(round(quantile(T3$SFluency, 0.025), 2), "-", round(quantile(T3$SFluency, 0.975), 2)), 
-                                             paste(round(quantile(T3$bs_D_sInterview_Date_1, 0.025), 2), "-", round(quantile(T3$bs_D_sInterview_Date_1, 0.975), 2)), 
-                                             paste(round(quantile(T3$sds_D_sInterview_Date_1, 0.025), 2), "-", round(quantile(T3$sds_D_sInterview_Date_1, 0.975), 2)),
-                                             "-",
-                                              "-", "-",
-                                             paste(round(quantile((T3$sigma_D)^2, 0.025), 2), "-", round(quantile((T3$sigma_D)^2, 0.975), 2)), 
-                                             paste(round(quantile((T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2, 0.975), 2)), 
-                                             paste(round(quantile((T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2, 0.975), 2)),
-                                             paste(round(quantile((T3$`sd_Region:ComID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T3$`sd_Region:ComID__D_Intercept`)^2, 0.975), 2)),
-                                             paste(round(quantile((T3$sd_Region__D_Intercept)^2, 0.025), 2), "-", round(quantile((T3$sd_Region__D_Intercept)^2, 0.975), 2)), 
-                                             paste(round(quantile((T3$sd_Interviewer__D_Intercept)^2, 0.025), 2), "-", round(quantile((T3$sd_Interviewer__D_Intercept)^2, 0.975), 2)),
-                                             paste(round(quantile(icc_residual_3, 0.025), 2), "-", round(quantile(icc_residual_3, 0.975), 2)), 
-                                             paste(round(quantile(icc_individual_3, 0.025), 2), "-", round(quantile(icc_individual_3, 0.975), 2)), 
-                                             paste(round(quantile(icc_family_3, 0.025), 2), "-", round(quantile(icc_family_3, 0.975), 2)),
-                                             paste(round(quantile(icc_community_3, 0.025), 2), "-", round(quantile(icc_community_3, 0.975), 2)),
-                                             paste(round(quantile(icc_region_3, 0.025), 2), "-", round(quantile(icc_region_3, 0.975), 2)), 
-                                             paste(round(quantile(icc_interviewer_3, 0.025), 2), "-", round(quantile(icc_interviewer_3, 0.975), 2)),
-                                             paste( round(mod3_R3["R2D", "Q2.5"], 2), "-", round(mod3_R3["R2D", "Q97.5"], 2)  )),
-                             
-                             Estimates_Model_4 = c( round(mean(T4$Intercept),2), round(mean(T4$Age),2), round(mean(T4$Male),2), round(mean(T4$SCI),2), 
-                                                    round(mean(T4$SFluency),2), round(mean(T4$bs_D_sInterview_Date_1),2), round(mean(T4$sds_D_sInterview_Date_1),2),
-                                                    round(mean(T4$Town_Distance),2), round(mean(T4$C_Size),2), round(mean(T4$H_Size),2),
-                                                    round(mean((T4$sigma_D)^2), 2), 
-                                                    paste(round(mean((T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2), 2), " (PID)"), paste(round(mean((T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2), 2), " (FamID)"),
-                                                    paste(round(mean((T4$`sd_Region:ComID__D_Intercept`)^2), 2), " (ComID)"), paste(round(mean((T4$sd_Region__D_Intercept)^2), 2), " (RegionID)"),
-                                                    paste(round(mean((T4$sd_Interviewer__D_Intercept)^2), 2), " (InterviewerID)"),
-                                                    paste(round(mean(icc_residual_4), 2), " (Residual)"), paste(round(mean(icc_individual_4), 2), "(Individual)"),
-                                                    paste(round(mean(icc_family_4), 2), "(Household)"), paste(round(mean(icc_community_4), 2), "(Community)"),
-                                                    paste(round(mean(icc_region_4), 2), "(Region)"), paste(round(mean(icc_interviewer_4), 2), "(Interviewer)"), round(mod4_R4["R2D", "Estimate"], 2) ),
-                             CI_Model_4 = c( paste(round(quantile(T4$Intercept, 0.025), 2), "-", round(quantile(T4$Intercept, 0.975), 2)), paste(round(quantile(T4$Age, 0.025), 2), "-", round(quantile(T4$Age, 0.975), 2)),
-                                             paste(round(quantile(T4$Male, 0.025), 2), "-", round(quantile(T4$Male, 0.975), 2)), paste(round(quantile(T4$SCI, 0.025), 2), "-", round(quantile(T4$SCI, 0.975), 2)), 
-                                             paste(round(quantile(T4$SFluency, 0.025), 2), "-", round(quantile(T4$SFluency, 0.975), 2)),
-                                             paste(round(quantile(T4$bs_D_sInterview_Date_1, 0.025), 2), "-", round(quantile(T4$bs_D_sInterview_Date_1, 0.975), 2)),
-                                             paste(round(quantile(T4$sds_D_sInterview_Date_1, 0.025), 2), "-", round(quantile(T4$sds_D_sInterview_Date_1, 0.975), 2)),
-                                             paste(round(quantile(T4$Town_Distance, 0.025), 2), "-", round(quantile(T4$Town_Distance, 0.975), 2)),
-                                             paste(round(quantile(T4$C_Size, 0.025), 2), "-", round(quantile(T4$C_Size, 0.975), 2)),
-                                             paste(round(quantile(T4$H_Size, 0.025), 2), "-", round(quantile(T4$H_Size, 0.975), 2)),
-                                             
-                                             paste(round(quantile((T4$sigma_D)^2, 0.025), 2), "-", round(quantile((T4$sigma_D)^2, 0.975), 2)), 
-                                             paste(round(quantile((T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2, 0.975), 2)), 
-                                             paste(round(quantile((T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2, 0.975), 2)),
-                                             paste(round(quantile((T4$`sd_Region:ComID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T4$`sd_Region:ComID__D_Intercept`)^2, 0.975), 2)),
-                                             paste(round(quantile((T4$sd_Region__D_Intercept)^2, 0.025), 2), "-", round(quantile((T4$sd_Region__D_Intercept)^2, 0.975), 2)),
-                                             paste(round(quantile((T4$sd_Interviewer__D_Intercept)^2, 0.025), 2), "-", round(quantile((T4$sd_Interviewer__D_Intercept)^2, 0.975), 2)),
-                                             paste(round(quantile(icc_residual_4, 0.025), 2), "-", round(quantile(icc_residual_4, 0.975), 2)), 
-                                             paste(round(quantile(icc_individual_4, 0.025), 2), "-", round(quantile(icc_individual_4, 0.975), 2)), 
-                                             paste(round(quantile(icc_family_4, 0.025), 2), "-", round(quantile(icc_family_4, 0.975), 2)),
-                                             paste(round(quantile(icc_community_4, 0.025), 2), "-", round(quantile(icc_community_4, 0.975), 2)),
-                                             paste(round(quantile(icc_region_4, 0.025), 2), "-", round(quantile(icc_region_4, 0.975), 2)), 
-                                             paste(round(quantile(icc_interviewer_4, 0.025), 2), "-", round(quantile(icc_interviewer_4, 0.975), 2)), paste( round(mod4_R4["R2D", "Q2.5"],2) , "-", round(mod4_R4["R2D", "Q97.5"],2)  ))
-                             
+# Now, we quickly calculate the P>0
+text_labels <- tibble(
+  parameter = factor(T1_params_rev),  
+  label = paste0("P(>0) = ", round(colMeans(T1[T1_params_rev] > 0), 2)),
+  y = seq_along(T1_params)  # sequential y-position from bottom (Intercept) to top (H_Size)
 )
 
 
-####### Summarising outputs for imputation models that were run during model fitting
-
-## Creating data frame for imputed model outputs
-imputed_model_summary <- data.frame(Missing_Variables = c("Social Conflict Index", "-", "-", "-",
-                                                          "Spanish Fluency", "-", "-", "-",
-                                                          "Household Size", "-", "-", "-", "-"),
-                                    Predictors = c("Intercept", "Age", "Male", "Residual Variance", 
-                                                   "Intercept", "Age", "Sex", "Residual Variance", 
-                                                   "Intercept", "Age", "Sex", "Community Size", "Residual Variance"),
-                                    
-                                    Estimates_Model_1 = c(round(mean(T1$b_SCI_Intercept), 2), 
-                                                          round(mean(T1$b_SCI_Age), 2), 
-                                                          round(mean(T1$b_SCI_Sex1), 2), 
-                                                          round(mean((T1$sigma_SCI)^2), 2),
-                                                          round(mean(T1$b_SFluency_Intercept), 2), 
-                                                          round(mean(T1$b_SFluency_Age), 2), 
-                                                          round(mean(T1$b_SFluency_Sex1), 2), 
-                                                          round(mean((T1$sigma_SFluency)^2), 2),
-                                                          "-", "-", "-", "-", "-"),
-                                    CI_Model_1 = c(paste(round(quantile(T1$b_SCI_Intercept, 0.025), 2), "-", round(quantile(T1$b_SCI_Intercept, 0.975), 2)), 
-                                                   paste(round(quantile(T1$b_SCI_Age, 0.025), 2), "-", round(quantile(T1$b_SCI_Age, 0.975), 2)),
-                                                   paste(round(quantile(T1$b_SCI_Sex1, 0.025), 2), "-", round(quantile(T1$b_SCI_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T1$sigma_SCI)^2, 0.025), 2), "-", round(quantile((T1$sigma_SCI)^2, 0.975), 2)),
-                                                   paste(round(quantile(T1$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(T1$b_SFluency_Intercept, 0.975), 2)),
-                                                   paste(round(quantile(T1$b_SFluency_Age, 0.025), 2), "-", round(quantile(T1$b_SFluency_Age, 0.975), 2)),
-                                                   paste(round(quantile(T1$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(T1$b_SFluency_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T1$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((T1$sigma_SFluency)^2, 0.975), 2)),
-                                                   "-", "-", "-", "-", "-"),
-                                     
-                                    Estimates_Model_2 = c(round(mean(T2$b_SCI_Intercept), 2), 
-                                                          round(mean(T2$b_SCI_Age), 2), 
-                                                          round(mean(T2$b_SCI_Sex1), 2), 
-                                                          round(mean((T2$sigma_SCI)^2), 2),
-                                                          round(mean(T2$b_SFluency_Intercept), 2), 
-                                                          round(mean(T2$b_SFluency_Age), 2), 
-                                                          round(mean(T2$b_SFluency_Sex1), 2), 
-                                                          round(mean((T2$sigma_SFluency)^2), 2),
-                                                          "-", "-", "-", "-", "-"),
-                                    CI_Model_2 = c(paste(round(quantile(T2$b_SCI_Intercept, 0.025), 2), "-", round(quantile(T2$b_SCI_Intercept, 0.975), 2)), 
-                                                   paste(round(quantile(T2$b_SCI_Age, 0.025), 2), "-", round(quantile(T2$b_SCI_Age, 0.975), 2)),
-                                                   paste(round(quantile(T2$b_SCI_Sex1, 0.025), 2), "-", round(quantile(T2$b_SCI_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T2$sigma_SCI)^2, 0.025), 2), "-", round(quantile((T2$sigma_SCI)^2, 0.975), 2)),
-                                                   paste(round(quantile(T2$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(T2$b_SFluency_Intercept, 0.975), 2)),
-                                                   paste(round(quantile(T2$b_SFluency_Age, 0.025), 2), "-", round(quantile(T2$b_SFluency_Age, 0.975), 2)),
-                                                   paste(round(quantile(T2$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(T2$b_SFluency_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T2$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((T2$sigma_SFluency)^2, 0.975), 2)),
-                                                   "-", "-", "-", "-", "-"),
-                                    
-                                    Estimates_Model_3 = c(round(mean(T3$b_SCI_Intercept), 2), 
-                                                          round(mean(T3$b_SCI_Age), 2), 
-                                                          round(mean(T3$b_SCI_Sex1), 2), 
-                                                          round(mean((T3$sigma_SCI)^2), 2),
-                                                          round(mean(T3$b_SFluency_Intercept), 2),
-                                                          round(mean(T3$b_SFluency_Age), 2), 
-                                                          round(mean(T3$b_SFluency_Sex1), 2), 
-                                                          round(mean((T3$sigma_SFluency)^2), 2),
-                                                          "-", "-", "-", "-", "-"),
-                                    CI_Model_3 = c(paste(round(quantile(T3$b_SCI_Intercept, 0.025), 2), "-", round(quantile(T3$b_SCI_Intercept, 0.975), 2)), 
-                                                   paste(round(quantile(T3$b_SCI_Age, 0.025), 2), "-", round(quantile(T3$b_SCI_Age, 0.975), 2)),
-                                                   paste(round(quantile(T3$b_SCI_Sex1, 0.025), 2), "-", round(quantile(T3$b_SCI_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T3$sigma_SCI)^2, 0.025), 2), "-", round(quantile((T3$sigma_SCI)^2, 0.975), 2)),
-                                                   paste(round(quantile(T3$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(T3$b_SFluency_Intercept, 0.975), 2)),
-                                                   paste(round(quantile(T3$b_SFluency_Age, 0.025), 2), "-", round(quantile(T3$b_SFluency_Age, 0.975), 2)),
-                                                   paste(round(quantile(T3$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(T3$b_SFluency_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T3$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((T3$sigma_SFluency)^2, 0.975), 2)),
-                                                   "-", "-", "-", "-", "-"),
-                                    
-                                    Estimates_Model_4 = c(round(mean(T4$b_SCI_Intercept), 2), 
-                                                          round(mean(T4$b_SCI_Age), 2), 
-                                                          round(mean(T4$b_SCI_Sex1), 2), 
-                                                          round(mean((T4$sigma_SCI)^2), 2),
-                                                          round(mean(T4$b_SFluency_Intercept), 2), 
-                                                          round(mean(T4$b_SFluency_Age), 2), 
-                                                          round(mean(T4$b_SFluency_Sex1), 2), 
-                                                          round(mean((T4$sigma_SFluency)^2), 2),
-                                                          round(mean(T4$b_HHSize_Intercept), 2), 
-                                                          round(mean(T4$b_HHSize_Age), 2), 
-                                                          round(mean(T4$b_HHSize_Sex1), 2), 
-                                                          round(mean(T4$b_HHSize_Com_Size), 2), 
-                                                          round(mean((T4$sigma_HHSize)^2), 2)
-                                                          ),
-                                    CI_Model_4 = c(paste(round(quantile(T4$b_SCI_Intercept, 0.025), 2), "-", round(quantile(T4$b_SCI_Intercept, 0.975), 2)), 
-                                                   paste(round(quantile(T4$b_SCI_Age, 0.025), 2), "-", round(quantile(T4$b_SCI_Age, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_SCI_Sex1, 0.025), 2), "-", round(quantile(T4$b_SCI_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T4$sigma_SCI)^2, 0.025), 2), "-", round(quantile((T4$sigma_SCI)^2, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(T4$b_SFluency_Intercept, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_SFluency_Age, 0.025), 2), "-", round(quantile(T4$b_SFluency_Age, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(T4$b_SFluency_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T4$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((T4$sigma_SFluency)^2, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_HHSize_Intercept, 0.025), 2), "-", round(quantile(T4$b_HHSize_Intercept, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_HHSize_Age, 0.025), 2), "-", round(quantile(T4$b_HHSize_Age, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_HHSize_Sex1, 0.025), 2), "-", round(quantile(T4$b_HHSize_Sex1, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_HHSize_Com_Size, 0.025), 2), "-", round(quantile(T4$b_HHSize_Com_Size, 0.975), 2)),
-                                                   paste(round(quantile((T4$sigma_HHSize)^2, 0.025), 2), "-", round(quantile((T4$sigma_HHSize)^2, 0.975), 2)) 
-                                                   ))
-                                    
-                                  
-                                  
-
-#################### Generating the summary tables that are used in the manuscript
-##################################################################################
-##################################################################################
-
-################### First the descriptive summary table for all the predictors
-summary_stats_ft <- flextable(summary_stats)
-
-# Bold the column headers, apply a grey backdrop to the first column and autofit the table
-summary_stats_ft <- bold(summary_stats_ft, part = "header")
-summary_stats_ft <- bg(summary_stats_ft, j = 1, bg = "#D3D3D3", part = "body")
-summary_stats_ft <- autofit(summary_stats_ft)
-
-## Can copy the table directly from here on to word
-summary_stats_ft
+# Add text layer to plot
+mod1_density_plots <- mod1_density_plots +
+  geom_text(data = text_labels,
+            aes(x = 0.5, y = y, label = label),
+            hjust = 0,
+            family = "Helvetica",
+            fontface = "italic",
+            color = "red",
+            size = 8)
 
 
-################## Now the model summary output
+######################################### Create density plot for Model 2 now
+mod2_density_plots <- mcmc_areas(
+  T2 %>% select(all_of(T2_params)),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
 
-## Converting to a flextable format
-models_summary_ft <- flextable(models_summary)
+# Make it a bit more tidy
+mod2_density_plots <- mod2_density_plots +
+  scale_x_continuous(limits = c(-0.5, 0.7), breaks = seq(-0.5, 0.7, by = 0.1)) +
+  labs(title = "(b) Model 2") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20))
 
-## Adding alternative colours to distinguish different model outputs
-models_summary_ft <- bg(models_summary_ft, j = c(4,5,8,9), bg = "#D3D3D3", part = "body")
-models_summary_ft <- bg(models_summary_ft, j = c(2,3,6,7), bg = "beige", part = "body")
-models_summary_ft <- bold(models_summary_ft, part = "header")
-models_summary_ft <- autofit(models_summary_ft)
+# Calculate how much of the posterior is above 0
 
-## Copy-paste the output on word
-models_summary_ft
+# First we reverse the order of the variables as the mcmc_areas() reverses the order while plotting 
+T2_params_rev <- rev(T2_params)
+
+# Now, we quickly calculate the P>0
+text_labels <- tibble(
+  parameter = factor(T2_params_rev),  
+  label = paste0("P(>0) = ", round(colMeans(T2[T2_params_rev] > 0), 2)),
+  y = seq_along(T2_params)  # sequential y-position from bottom (Intercept) to top (H_Size)
+)
 
 
-################## Now the imputed models output
-imp_model_summary_ft <- flextable(imputed_model_summary)
+# Add text layer to plot
+mod2_density_plots <- mod2_density_plots +
+  geom_text(data = text_labels,
+            aes(x = 0.5, y = y, label = label),
+            hjust = 0,
+            family = "Helvetica",
+            fontface = "italic",
+            color = "red",
+            size = 8)
 
-## Adding alternative colours to distinguish different model outputs
-imp_model_summary_ft <- bg(imp_model_summary_ft, j = c(5,6,9,10), bg = "#D3D3D3", part = "body")
-imp_model_summary_ft <- bg(imp_model_summary_ft, j = c(3,4,7,8), bg = "beige", part = "body")
-imp_model_summary_ft <- bold(imp_model_summary_ft, part = "header")
-imp_model_summary_ft <- autofit(imp_model_summary_ft)
 
-## Copy-paste the output on word
-imp_model_summary_ft
+
+
+
+######################################### Now let's plot the effect of interview date for model 1
+#################################################################################################
+
+## Draw conditional effects plot
+spline_plot_mod1 <- conditional_effects(mod1_v2, "Interview_Date") 
+
+## Get the data conditional effects used to generate this plot
+time_effect_data_mod1 <- spline_plot_mod1$D.D_Interview_Date
+
+# To reverse it, use the mean and sd of Interview_Date from the original dataset where interview dates weren't transformed:
+mean_interview_date <- attr(dep_data$Interview_Date, "scaled:center")
+sd_interview_date <- attr(dep_data$Interview_Date, "scaled:scale")
+
+## Reversing the standardisation and converting it to date format
+time_effect_data_mod1$Interview_Date <- (time_effect_data_mod1$Interview_Date * sd_interview_date) + mean_interview_date
+time_effect_data_mod1$Interview_Date <- as.POSIXct(time_effect_data_mod1$Interview_Date, origin = "1970-01-01")
+
+# Step 3: Update the plot
+time_effect_mod1_plot <- ggplot(time_effect_data_mod1, aes(x = Interview_Date, y = estimate__)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.1) +
+  geom_point(data = time_effect_data_mod1[time_effect_data_mod1$points__, ], aes(x = Interview_Date, y = estimate__)) +
+  labs(title = "(c) Spline Prediction - Model 1", x = "Interview Date", y = "Standardized Depression Score") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Title style same as mod2
+    axis.title.x = element_text(family = "Helvetica", size = 16),  # xlab font style and size
+    axis.title.y = element_text(family = "Helvetica", size = 18),  # ylab font style and size
+    axis.text.x = element_text(family = "Helvetica", size = 16),   # To keep x-axis tick labels consistent
+    axis.text.y = element_text(family = "Helvetica", size = 18)    # To keep y-axis tick labels consistent
+  )
+
+
+######################################### Now let's plot the effect of interview date for model 2
+
+## Draw conditional effects plot
+spline_plot_mod2 <- conditional_effects(mod2_v2, "Interview_Date") 
+
+## Get the data conditional effects used to generate this plot
+time_effect_data_mod2 <- spline_plot_mod2$D.D_Interview_Date
+
+## Reversing the standardisation and converting it to date format
+time_effect_data_mod2$Interview_Date <- (time_effect_data_mod2$Interview_Date * sd_interview_date) + mean_interview_date
+time_effect_data_mod2$Interview_Date <- as.POSIXct(time_effect_data_mod2$Interview_Date, origin = "1970-01-01")
+
+# Step 3: Update the plot
+time_effect_mod2_plot <- ggplot(time_effect_data_mod2, aes(x = Interview_Date, y = estimate__)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.1) +
+  geom_point(data = time_effect_data_mod2[time_effect_data_mod2$points__, ], aes(x = Interview_Date, y = estimate__)) +
+  labs(title = " (d) Spline Prediction - Model 2", x = "Interview Date", y = "Standardized Depression Score") +
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Title style same as mod2
+    axis.title.x = element_text(family = "Helvetica", size = 16),  # xlab font style and size
+    axis.title.y = element_text(family = "Helvetica", size = 18),  # ylab font style and size
+    axis.text.x = element_text(family = "Helvetica", size = 16),   # To keep x-axis tick labels consistent
+    axis.text.y = element_text(family = "Helvetica", size = 18)    # To keep y-axis tick labels consistent
+  )
+
+
+######################################### Now let's plot the ICCs
+#################################################################################################
+
+
+############ Starting with Model 1
+
+# Calculate the adjusted ICCs
+icc_residual_1 <- ( (T1$sigma_D)^2 ) / 
+  ( (T1$sigma_D)^2 + 
+    (T1$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+    (T1$`sd_ComID__D_Intercept`)^2 + 
+    (T1$sd_Interviewer__D_Intercept)^2 )
+dens(icc_residual_1, col=2, lwd=4, xlab="ICC (Residual) of Model 1")
+
+icc_family_1 <- ( (T1$`sd_ComID:UniqueFamID__D_Intercept`)^2 ) / 
+  ( (T1$sigma_D)^2 + 
+    (T1$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+    (T1$`sd_ComID__D_Intercept`)^2 + 
+    (T1$sd_Interviewer__D_Intercept)^2 )
+dens(icc_family_1, col=2, lwd=4, xlab="ICC (Family) of Model 1")
+
+icc_community_1 <- ( (T1$`sd_ComID__D_Intercept`)^2 ) / 
+  ( (T1$sigma_D)^2 + 
+    (T1$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+    (T1$`sd_ComID__D_Intercept`)^2 + 
+    (T1$sd_Interviewer__D_Intercept)^2 )
+dens(icc_community_1, col=2, lwd=4, xlab="ICC (Community) of Model 1")
+
+icc_interviewer_1 <- ( (T1$sd_Interviewer__D_Intercept)^2 ) / 
+  ( (T1$sigma_D)^2 + 
+    (T1$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+    (T1$`sd_ComID__D_Intercept`)^2 + 
+    (T1$sd_Interviewer__D_Intercept)^2 )
+dens(icc_interviewer_1, col=2, lwd=4, xlab="ICC (Interviewer) of Model 1")
+
+
+# Combine ICC vectors into a dataframe to allow for easy plotting of the five density plots in the same figure
+icc_data_1 <- data.frame(
+  value = c(icc_residual_1, icc_family_1, icc_community_1, icc_interviewer_1),
+  group = rep(c("Residual", "Household", "Community", "Interviewer"), each = length(icc_residual_1))
+)
+
+# Convert group variable to factor with specified levels (important for color coding in the plots)
+icc_data_1$group <- factor(icc_data_1$group, levels = c("Residual", "Household", "Community", "Interviewer"))
+
+
+# Final Plot for model 1
+icc_plot_mod1 <- ggplot(icc_data_1, aes(x = value, color = group)) +
+  geom_density(size = 1.0) +
+  labs(title = "(a) Model 1 ICC",
+       x = "ICC",
+       y = "Density",
+       color = "ICC Type") +
+  theme_minimal() +
+  coord_cartesian(ylim = c(0, 25)) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
+  scale_color_manual(values = c("Residual" = "Green", "Household" = "orange", "Community" = "red", "Interviewer" = "darkcyan")) +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
+
+
+############ Now for Model 2
+
+## Calculate ICCs
+icc_residual_2 <- ( (T2$sigma_D)^2 ) / 
+  ( (T2$sigma_D)^2 + 
+      (T2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+      (T2$`sd_ComID__D_Intercept`)^2 + 
+      (T2$sd_Interviewer__D_Intercept)^2 )
+dens(icc_residual_2, col=2, lwd=4, xlab="ICC (Residual) of Model 2")
+
+icc_family_2 <- ( (T2$`sd_ComID:UniqueFamID__D_Intercept`)^2 ) / 
+  ( (T2$sigma_D)^2 + 
+      (T2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+      (T2$`sd_ComID__D_Intercept`)^2 + 
+      (T2$sd_Interviewer__D_Intercept)^2 )
+dens(icc_family_2, col=2, lwd=4, xlab="ICC (Family) of Model 2")
+
+icc_community_2 <- ( (T2$`sd_ComID__D_Intercept`)^2 ) / 
+  ( (T2$sigma_D)^2 + 
+      (T2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+      (T2$`sd_ComID__D_Intercept`)^2 + 
+      (T2$sd_Interviewer__D_Intercept)^2 )
+dens(icc_community_2, col=2, lwd=4, xlab="ICC (Community) of Model 2")
+
+icc_interviewer_2 <- ( (T2$sd_Interviewer__D_Intercept)^2 ) / 
+  ( (T2$sigma_D)^2 + 
+      (T2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+      (T2$`sd_ComID__D_Intercept`)^2 + 
+      (T2$sd_Interviewer__D_Intercept)^2 )
+dens(icc_interviewer_2, col=2, lwd=4, xlab="ICC (Interviewer) of Model 2")
+
+# Combine ICC vectors into a dataframe to allow for easy plotting of the five density plots in the same figure
+icc_data_2 <- data.frame(
+  value = c(icc_residual_2, icc_family_2, icc_community_2, icc_interviewer_2),
+  group = rep(c("Residual", "Household", "Community", "Interviewer"), each = length(icc_residual_2))
+)
+
+# Convert group variable to factor with specified levels (important for color coding in the plots)
+icc_data_2$group <- factor(icc_data_2$group, levels = c("Residual", "Household", "Community", "Interviewer"))
+
+# Final Plot for model 2
+icc_plot_mod2 <- ggplot(icc_data_2, aes(x = value, color = group)) +
+  geom_density(size = 1.0) +
+  labs(title = "(b) Model 2 ICC",
+       x = "ICC",
+       y = "Density",
+       color = "ICC Type") +
+  theme_minimal() +
+  coord_cartesian(ylim = c(0, 25)) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
+  scale_color_manual(values = c("Residual" = "Green", "Household" = "orange", "Community" = "red", "Interviewer" = "darkcyan")) +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
+
+
+## Combine all plots together into one mega summary plot
+
+## First for all model co-efficients
+combined_sum_scores_plot <- (mod1_density_plots | mod2_density_plots) / (time_effect_mod1_plot | time_effect_mod2_plot)
+
+## Now for ICC plots
+combined_icc_plot <- (icc_plot_mod1 | icc_plot_mod2)
+
+
+
+
+########### Let's plot the effects of the models reported in the appendix (i.e.one's with PID & Region) ###########################################
+#######################################################################################################################################################
+#######################################################################################################################################################
+
+## Look at summmaries first
+summary(mod1)
+summary(mod2)
+
+## Drawing the posteriors from these models
+T1_v2 <- as_draws_df(mod1)
+T2_v2 <- as_draws_df(mod2)
+
+## Renaming co-efficients for better readability on actual graphs
+T1_v2 <- T1_v2 %>% 
+  rename("Intercept" = "b_D_Intercept",
+         "Age" = "b_D_Age",
+         "Male" = "b_D_Sex1",
+         "SCI" = "bsp_D_miSCI",
+         "SFluency" = "bsp_D_miSFluency"
+  )
+
+T2_v2 <- T2_v2 %>%
+  rename("Intercept" = "b_D_Intercept",
+         "Age" = "b_D_Age",
+         "Male" = "b_D_Sex1",
+         "SCI" = "bsp_D_miSCI",
+         "SFluency" = "bsp_D_miSFluency",
+         "Town_Distance" = "b_D_Town_Distance",
+         "C_Size" = "b_D_Com_Size",
+         "H_Size" = "bsp_D_miHH_Size"
+  )
+
+## Now select these renamed parameters from the whole posterior draw
+T1_params <- c("Intercept", "Age", "Male", "SCI", "SFluency")
+T2_params <- c("Intercept", "Age", "Male", "SCI", "SFluency", "Town_Distance", "C_Size", "H_Size")
+
+
+######################################### Create density plot for Model 1 now
+mod1_density_plots_v2 <- mcmc_areas(
+  T1_v2 %>% select(all_of(T1_params)),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+mod1_density_plots_v2 <- mod1_density_plots_v2 +
+  scale_x_continuous(limits = c(-0.5, 0.7), breaks = seq(-0.5, 0.7, by = 0.1)) +
+  labs(title = "(a) Model 1") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+# Reverse parameter order to match mcmc_areas plot
+T1_params_rev <- rev(T1_params)
+
+# Calculate P(>0)
+text_labels_v2 <- tibble(
+  parameter = factor(T1_params_rev),  
+  label = paste0("P(>0) = ", round(colMeans(T1_v2[T1_params_rev] > 0), 2)),
+  y = seq_along(T1_params)  # sequential y-position from bottom (Intercept) to top (H_Size)
+)
+
+# Add text layer to plot
+mod1_density_plots_v2 <- mod1_density_plots_v2 +
+  geom_text(data = text_labels_v2,
+            aes(x = 0.5, y = y, label = label),
+            hjust = 0,
+            family = "Helvetica",
+            fontface = "italic",
+            color = "red",
+            size = 8)
+
+
+######################################### Create density plot for Model 2 now
+mod2_density_plots_v2 <- mcmc_areas(
+  T2_v2 %>% select(all_of(T2_params)),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+mod2_density_plots_v2 <- mod2_density_plots_v2 +
+  scale_x_continuous(limits = c(-0.5, 0.7), breaks = seq(-0.5, 0.7, by = 0.1)) +
+  labs(title = "(b) Model 2") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+# Reverse parameter order to match mcmc_areas plot
+T2_params_rev <- rev(T2_params)
+
+# Calculate P(>0)
+text_labels_v2 <- tibble(
+  parameter = factor(T2_params_rev),  
+  label = paste0("P(>0) = ", round(colMeans(T2_v2[T2_params_rev] > 0), 2)),
+  y = seq_along(T2_params)  # sequential y-position from bottom (Intercept) to top (H_Size)
+)
+
+# Add text layer to plot
+mod2_density_plots_v2 <- mod2_density_plots_v2 +
+  geom_text(data = text_labels_v2,
+            aes(x = 0.5, y = y, label = label),
+            hjust = 0,
+            family = "Helvetica",
+            fontface = "italic",
+            color = "red",
+            size = 8)
+
+
+
+
+
+
+######################################### Now let's plot the effect of interview date for model 1
+#################################################################################################
+
+## Draw conditional effects plot for Model 1
+spline_plot_mod1_v2 <- conditional_effects(mod1, "Interview_Date") 
+
+## Get the data conditional effects used to generate this plot
+time_effect_data_mod1_v2 <- spline_plot_mod1_v2$D.D_Interview_Date
+
+## Reversing the standardisation and converting it to date format
+time_effect_data_mod1_v2$Interview_Date <- (time_effect_data_mod1_v2$Interview_Date * sd_interview_date) + mean_interview_date
+time_effect_data_mod1_v2$Interview_Date <- as.POSIXct(time_effect_data_mod1_v2$Interview_Date, origin = "1970-01-01")
+
+# Update the plot
+time_effect_mod1_v2_plot <- ggplot(time_effect_data_mod1_v2, aes(x = Interview_Date, y = estimate__)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.1) +
+  geom_point(data = time_effect_data_mod1_v2[time_effect_data_mod1_v2$points__, ], aes(x = Interview_Date, y = estimate__)) +
+  labs(title = "(c) Spline Prediction - Model 1", x = "Interview Date", y = "Standardized Depression Score") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),
+    axis.title.x = element_text(family = "Helvetica", size = 16),
+    axis.title.y = element_text(family = "Helvetica", size = 18),
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18)
+  )
+
+
+######################################### Now plot the effect of interview date for Model 2
+
+## Draw conditional effects plot
+spline_plot_mod2_v2 <- conditional_effects(mod2, "Interview_Date") 
+
+## Get the data conditional effects used to generate this plot
+time_effect_data_mod2_v2 <- spline_plot_mod2_v2$D.D_Interview_Date
+
+## Reversing the standardisation and converting it to date format
+time_effect_data_mod2_v2$Interview_Date <- (time_effect_data_mod2_v2$Interview_Date * sd_interview_date) + mean_interview_date
+time_effect_data_mod2_v2$Interview_Date <- as.POSIXct(time_effect_data_mod2_v2$Interview_Date, origin = "1970-01-01")
+
+# Update the plot
+time_effect_mod2_v2_plot <- ggplot(time_effect_data_mod2_v2, aes(x = Interview_Date, y = estimate__)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.1) +
+  geom_point(data = time_effect_data_mod2_v2[time_effect_data_mod2_v2$points__, ], aes(x = Interview_Date, y = estimate__)) +
+  labs(title = "(d) Spline Prediction - Model 2", x = "Interview Date", y = "Standardized Depression Score") +
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),
+    axis.title.x = element_text(family = "Helvetica", size = 16),
+    axis.title.y = element_text(family = "Helvetica", size = 18),
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18)
+  )
+
+
+
+######################################### Now let's plot the ICCs
+#################################################################################################
+
+
+############ Starting with Model 1
+
+## Calculating ICCs for residual, individual, family, community, region, and interviewer levels (Model 1)
+
+icc_residual_1_v2 <-  ((T1_v2$sigma_D)^2) / 
+  ((T1_v2$sigma_D)^2 + 
+     (T1_v2$sd_PID__D_Intercept)^2 + 
+     (T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T1_v2$`sd_Region:ComID__D_Intercept`)^2 + 
+     (T1_v2$sd_Region__D_Intercept)^2 + 
+     (T1_v2$sd_Interviewer__D_Intercept)^2)
+
+dens(icc_residual_1_v2, col=2, lwd=4 , xlab="ICC (Residual) of Model 1")
+
+icc_individual_1_v2 <-  ((T1_v2$sd_PID__D_Intercept)^2) / 
+  ((T1_v2$sigma_D)^2 + 
+     (T1_v2$sd_PID__D_Intercept)^2 + 
+     (T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T1_v2$`sd_Region:ComID__D_Intercept`)^2 + 
+     (T1_v2$sd_Region__D_Intercept)^2 + 
+     (T1_v2$sd_Interviewer__D_Intercept)^2)
+
+dens(icc_individual_1_v2, col=2, lwd=4 , xlab="ICC (Individual) of Model 1")
+
+icc_family_1_v2 <- ((T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2) / 
+  ((T1_v2$sigma_D)^2 + 
+     (T1_v2$sd_PID__D_Intercept)^2 + 
+     (T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T1_v2$`sd_Region:ComID__D_Intercept`)^2 + 
+     (T1_v2$sd_Region__D_Intercept)^2 + 
+     (T1_v2$sd_Interviewer__D_Intercept)^2)
+
+dens(icc_family_1_v2, col=2, lwd=4 , xlab="ICC (Family) of Model 1")
+
+icc_community_1_v2 <- ((T1_v2$`sd_Region:ComID__D_Intercept`)^2) / 
+  ((T1_v2$sigma_D)^2 + 
+     (T1_v2$sd_PID__D_Intercept)^2 + 
+     (T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T1_v2$`sd_Region:ComID__D_Intercept`)^2 + 
+     (T1_v2$sd_Region__D_Intercept)^2 + 
+     (T1_v2$sd_Interviewer__D_Intercept)^2)
+
+dens(icc_community_1_v2, col=2, lwd=4 , xlab="ICC (Community) of Model 1")
+
+icc_region_1_v2 <-  ((T1_v2$sd_Region__D_Intercept)^2) / 
+  ((T1_v2$sigma_D)^2 + 
+     (T1_v2$sd_PID__D_Intercept)^2 + 
+     (T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T1_v2$`sd_Region:ComID__D_Intercept`)^2 + 
+     (T1_v2$sd_Region__D_Intercept)^2 + 
+     (T1_v2$sd_Interviewer__D_Intercept)^2)
+
+dens(icc_region_1_v2, col=2, lwd=4 , xlab="ICC (Region) of Model 1")
+
+icc_interviewer_1_v2 <- ((T1_v2$sd_Interviewer__D_Intercept)^2) / 
+  ((T1_v2$sigma_D)^2 + 
+     (T1_v2$sd_PID__D_Intercept)^2 + 
+     (T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T1_v2$`sd_Region:ComID__D_Intercept`)^2 + 
+     (T1_v2$sd_Region__D_Intercept)^2 + 
+     (T1_v2$sd_Interviewer__D_Intercept)^2)
+
+dens(icc_interviewer_1_v2, col=2, lwd=4 , xlab="ICC (Interviewer) of Model 1")
+
+# Combine ICC vectors into a dataframe to allow for easy plotting of the five density plots in the same figure
+icc_data_1_v2 <- data.frame(
+  value = c(icc_residual_1_v2, icc_individual_1_v2, icc_family_1_v2, icc_community_1_v2, icc_region_1_v2, icc_interviewer_1_v2),
+  group = rep(c("Residual", "Individual", "Household", "Community", "Region", "Interviewer"), each = length(icc_residual_1_v2))
+)
+
+# Convert group variable to factor with specified levels (important for color coding in the plots)
+icc_data_1_v2$group <- factor(icc_data_1_v2$group, levels = c("Residual", "Individual", "Household", "Community", "Region", "Interviewer"))
+
+
+# Final Plot for model 1
+icc_plot_mod1_v2 <- ggplot(icc_data_1_v2, aes(x = value, color = group)) +
+  geom_density(size = 1.0) +
+  labs(title = "(a) Model 1 ICC",
+       x = "ICC",
+       y = "Density",
+       color = "ICC Type") +
+  theme_minimal() +
+  coord_cartesian(ylim = c(0, 25)) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
+  scale_color_manual(values = c("Residual" = "Green", "Individual" = "black", "Household" = "orange", "Community" = "red", "Region" = "blue", "Interviewer" = "darkcyan")) +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
+
+
+
+
+############ Now for Model 2
+
+## Calculating ICCs for residual, individual, family, community, region, and interviewer levels (Model 2), using T2_v2
+
+icc_residual_2_v2 <-  ((T2_v2$sigma_D)^2) / 
+  ((T2_v2$sigma_D)^2 + 
+     (T2_v2$sd_PID__D_Intercept)^2 + 
+     (T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T2_v2$`sd_Region:ComID__D_Intercept`)^2 + 
+     (T2_v2$sd_Region__D_Intercept)^2 + 
+     (T2_v2$sd_Interviewer__D_Intercept)^2)
+
+dens(icc_residual_2_v2, col=2, lwd=4 , xlab="ICC (Residual) of Model 2")
+
+icc_individual_2_v2 <-  ((T2_v2$sd_PID__D_Intercept)^2) / 
+  ((T2_v2$sigma_D)^2 + 
+     (T2_v2$sd_PID__D_Intercept)^2 + 
+     (T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T2_v2$`sd_Region:ComID__D_Intercept`)^2 + 
+     (T2_v2$sd_Region__D_Intercept)^2 + 
+     (T2_v2$sd_Interviewer__D_Intercept)^2)
+
+dens(icc_individual_2_v2, col=2, lwd=4 , xlab="ICC (Individual) of Model 2")
+
+icc_family_2_v2 <- ((T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2) / 
+  ((T2_v2$sigma_D)^2 + 
+     (T2_v2$sd_PID__D_Intercept)^2 + 
+     (T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T2_v2$`sd_Region:ComID__D_Intercept`)^2 + 
+     (T2_v2$sd_Region__D_Intercept)^2 + 
+     (T2_v2$sd_Interviewer__D_Intercept)^2)
+
+dens(icc_family_2_v2, col=2, lwd=4 , xlab="ICC (Family) of Model 2")
+
+icc_community_2_v2 <- ((T2_v2$`sd_Region:ComID__D_Intercept`)^2) / 
+  ((T2_v2$sigma_D)^2 + 
+     (T2_v2$sd_PID__D_Intercept)^2 + 
+     (T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T2_v2$`sd_Region:ComID__D_Intercept`)^2 + 
+     (T2_v2$sd_Region__D_Intercept)^2 + 
+     (T2_v2$sd_Interviewer__D_Intercept)^2)
+
+dens(icc_community_2_v2, col=2, lwd=4 , xlab="ICC (Community) of Model 2")
+
+icc_region_2_v2 <-  ((T2_v2$sd_Region__D_Intercept)^2) / 
+  ((T2_v2$sigma_D)^2 + 
+     (T2_v2$sd_PID__D_Intercept)^2 + 
+     (T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T2_v2$`sd_Region:ComID__D_Intercept`)^2 + 
+     (T2_v2$sd_Region__D_Intercept)^2 + 
+     (T2_v2$sd_Interviewer__D_Intercept)^2)
+
+dens(icc_region_2_v2, col=2, lwd=4 , xlab="ICC (Region) of Model 2")
+
+icc_interviewer_2_v2 <- ((T2_v2$sd_Interviewer__D_Intercept)^2) / 
+  ((T2_v2$sigma_D)^2 + 
+     (T2_v2$sd_PID__D_Intercept)^2 + 
+     (T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T2_v2$`sd_Region:ComID__D_Intercept`)^2 + 
+     (T2_v2$sd_Region__D_Intercept)^2 + 
+     (T2_v2$sd_Interviewer__D_Intercept)^2)
+
+dens(icc_interviewer_2_v2, col=2, lwd=4 , xlab="ICC (Interviewer) of Model 2")
+
+
+# Combine ICC vectors into a dataframe to allow for easy plotting of the five density plots in the same figure
+icc_data_2_v2 <- data.frame(
+  value = c(icc_residual_2_v2, icc_individual_2_v2, icc_family_2_v2, icc_community_2_v2, icc_region_2_v2, icc_interviewer_2_v2),
+  group = rep(c("Residual", "Individual", "Household", "Community", "Region", "Interviewer"), each = length(icc_residual_2_v2))
+)
+
+# Convert group variable to factor with specified levels (important for color coding in the plots)
+icc_data_2_v2$group <- factor(icc_data_2_v2$group, levels = c("Residual", "Individual", "Household", "Community", "Region", "Interviewer"))
+
+# Final Plot for model 2
+icc_plot_mod2_v2 <- ggplot(icc_data_2_v2, aes(x = value, color = group)) +
+  geom_density(size = 1.0) +
+  labs(title = "(b) Model 2 ICC",
+       x = "ICC",
+       y = "Density",
+       color = "ICC Type") +
+  theme_minimal() +
+  coord_cartesian(ylim = c(0, 25)) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
+  scale_color_manual(values = c("Residual" = "Green", "Individual" = "black", "Household" = "orange", "Community" = "red", "Region" = "blue", "Interviewer" = "darkcyan")) +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+  )
+
+
+## Combine all plots together into one mega summary plot
+
+## First for all model co-efficients
+combined_sum_scores_plot_v2 <- (mod1_density_plots_v2 | mod2_density_plots_v2) / (time_effect_mod1_v2_plot | time_effect_mod2_v2_plot)
+
+## Now for ICC plots
+combined_icc_plot_v2 <- (icc_plot_mod1_v2 | icc_plot_mod2_v2)
+
+
+
+
+########### Let's plot the effects of the imputation models that ran alongside the main-text models ##################################################
+#######################################################################################################################################################
+#######################################################################################################################################################
+
+############# First for Model 1
+
+############### Social Conflict Index
+mod1_density_plots_SCI_imputation <- mcmc_areas(
+  T1 %>% select(b_SCI_Intercept, b_SCI_Age, b_SCI_Sex1),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+mod1_density_plots_SCI_imputation <- mod1_density_plots_SCI_imputation +
+  scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1)) +
+  labs(title = "(a) Model 1 Imputation - Social Conflict Index") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+############### Spanish Fluency
+
+mod1_density_plots_SFluency_imputation <- mcmc_areas(
+  T1 %>% select(b_SFluency_Intercept, b_SFluency_Age, b_SFluency_Sex1),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+mod1_density_plots_SFluency_imputation <- mod1_density_plots_SFluency_imputation +
+  scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1))  +
+  labs(title = "(b) Model 1 Imputation - Spanish Fluency") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+
+############# Now for Model 2
+
+
+############### Social Conflict Index
+mod2_density_plots_SCI_imputation <- mcmc_areas(
+  T2 %>% select(b_SCI_Intercept, b_SCI_Age, b_SCI_Sex1),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+mod2_density_plots_SCI_imputation <- mod2_density_plots_SCI_imputation +
+  scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1)) +
+  labs(title = "(c) Model 2 Imputation - Social Conflict Index") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+############### Spanish Fluency
+
+mod2_density_plots_SFluency_imputation <- mcmc_areas(
+  T2 %>% select(b_SFluency_Intercept, b_SFluency_Age, b_SFluency_Sex1),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+mod2_density_plots_SFluency_imputation <- mod2_density_plots_SFluency_imputation +
+  scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1))  +
+  labs(title = "(d) Model 2 Imputation - Spanish Fluency") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+############### Household Size
+
+mod2_density_plots_HHSize_imputation <- mcmc_areas(
+  T2 %>% select(b_HHSize_Intercept, b_HHSize_Age, b_HHSize_Sex1, b_HHSize_Com_Size),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+mod2_density_plots_HHSize_imputation <- mod2_density_plots_HHSize_imputation +
+  scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1))  +
+  labs(title = "(e) Model 2 Imputation - Household Size") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+
+
+############ Now plotting their sigmas 
+
+## First wrangling everything into a single dataframe
+imputation_sigmas <- data.frame(
+  SCI_sigma_Model1 = T1$sigma_SCI,
+  SFluency_sigma_Model1 = T1$sigma_SFluency,
+  SCI_sigma_Model2 = T2$sigma_SCI,
+  SFluency_sigma_Model2 = T2$sigma_SFluency,
+  HHSize_sigma_Model2 = T2$sigma_HHSize
+)
+
+# Plot
+imputation_sigmas_plot <- mcmc_areas(
+  imputation_sigmas,
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+imputation_sigmas_plot <- imputation_sigmas_plot +
+  labs(title = "(f) Imputation Model Sigmas") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+
+
+############### Combine all plots
+imp_models_fixed_effects_plot <- (mod1_density_plots_SCI_imputation | mod1_density_plots_SFluency_imputation) / (mod2_density_plots_SCI_imputation | mod2_density_plots_SFluency_imputation) / (mod2_density_plots_HHSize_imputation | imputation_sigmas_plot)
+
+
+########### Now let's do the same for the models reported in the appendix  ##################################################
+#######################################################################################################################################################
+#######################################################################################################################################################
+
+############# First for Model 1
+
+############### Social Conflict Index
+mod1_density_plots_SCI_imputation_v2 <- mcmc_areas(
+  T1_v2 %>% select(b_SCI_Intercept, b_SCI_Age, b_SCI_Sex1),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+mod1_density_plots_SCI_imputation_v2 <- mod1_density_plots_SCI_imputation_v2 +
+  scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1)) +
+  labs(title = "(a) Model 1 Imputation - Social Conflict Index") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+############### Spanish Fluency
+
+mod1_density_plots_SFluency_imputation_v2 <- mcmc_areas(
+  T1_v2 %>% select(b_SFluency_Intercept, b_SFluency_Age, b_SFluency_Sex1),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+mod1_density_plots_SFluency_imputation_v2 <- mod1_density_plots_SFluency_imputation_v2 +
+  scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1))  +
+  labs(title = "(b) Model 1 Imputation - Spanish Fluency") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+
+############# Now for Model 2
+
+
+############### Social Conflict Index
+mod2_density_plots_SCI_imputation_v2 <- mcmc_areas(
+  T2_v2 %>% select(b_SCI_Intercept, b_SCI_Age, b_SCI_Sex1),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+mod2_density_plots_SCI_imputation_v2 <- mod2_density_plots_SCI_imputation_v2 +
+  scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1)) +
+  labs(title = "(c) Model 2 Imputation - Social Conflict Index") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+############### Spanish Fluency
+
+mod2_density_plots_SFluency_imputation_v2 <- mcmc_areas(
+  T2_v2 %>% select(b_SFluency_Intercept, b_SFluency_Age, b_SFluency_Sex1),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+mod2_density_plots_SFluency_imputation_v2 <- mod2_density_plots_SFluency_imputation_v2 +
+  scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1))  +
+  labs(title = "(d) Model 2 Imputation - Spanish Fluency") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+############### Household Size
+
+mod2_density_plots_HHSize_imputation_v2 <- mcmc_areas(
+  T2_v2 %>% select(b_HHSize_Intercept, b_HHSize_Age, b_HHSize_Sex1, b_HHSize_Com_Size),
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+mod2_density_plots_HHSize_imputation_v2 <- mod2_density_plots_HHSize_imputation_v2 +
+  scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1))  +
+  labs(title = "(e) Model 2 Imputation - Household Size") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+
+
+############ Now plotting their sigmas 
+
+## First wrangling everything into a single dataframe
+imputation_sigmas_v2 <- data.frame(
+  SCI_sigma_Model1 = T1_v2$sigma_SCI,
+  SFluency_sigma_Model1 = T1_v2$sigma_SFluency,
+  SCI_sigma_Model2 = T2_v2$sigma_SCI,
+  SFluency_sigma_Model2 = T2_v2$sigma_SFluency,
+  HHSize_sigma_Model2 = T2_v2$sigma_HHSize
+)
+
+# Plot
+imputation_sigmas_plot_v2 <- mcmc_areas(
+  imputation_sigmas_v2,
+  prob = 0.95,         
+  prob_outer = 0.95,   
+  point_est = "mean"
+)
+
+# Make it a bit more tidy
+imputation_sigmas_plot_v2 <- imputation_sigmas_plot_v2 +
+  labs(title = "(f) Imputation Model Sigmas") +
+  geom_line(color = "black", size = 1) +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 19),
+    axis.text.y = element_text(family = "Helvetica", size = 20)
+  )
+
+## Now combine all the plots into one
+imp_models_fixed_effects_plot_v2 <- (mod1_density_plots_SCI_imputation_v2 | mod1_density_plots_SFluency_imputation_v2) / (mod2_density_plots_SCI_imputation_v2 | mod2_density_plots_SFluency_imputation_v2) / (mod2_density_plots_HHSize_imputation_v2 | imputation_sigmas_plot_v2)
+
+
+
 
