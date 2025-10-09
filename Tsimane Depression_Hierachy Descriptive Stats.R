@@ -269,20 +269,30 @@ cor(depression_data_v2$Age, depression_data_v2$DisabilityScore, use = "complete.
 # Make summary dataframe for the multilevel structure of our dataset
 multilevel_summary_stats <- depression_data_v2 %>%
   summarise(
-    Variable = c("Regions", "Communities", "Households", "Individuals", "Total Observations contributed by all these levels"),
-    N = c(n_distinct(region), n_distinct(ComID), n_distinct(UniqueFamID), n_distinct(PID_FAMID), n()))
+    Variable = c("Regions", "Communities", "Households", "Individuals", "Total Observations"),
+    N = c(n_distinct(region), n_distinct(ComID), n_distinct(UniqueFamID), n_distinct(PID), n() )) %>%
+  mutate(Variable = factor(Variable, levels = c("Regions", "Communities", "Households", "Individuals", "Total Observations")))
 
 
-################### Now the summary table of the multilevel structure of our data table
-multilevel_summary_stats_ft <- flextable(multilevel_summary_stats)
 
-# Bold the column headers, apply a grey backdrop to the first column and autofit the table
-multilevel_summary_stats_ft <- bold(multilevel_summary_stats_ft, part = "header")
-multilevel_summary_stats_ft <- bg(multilevel_summary_stats_ft, j = 1, bg = "#D3D3D3", part = "body")
-multilevel_summary_stats_ft <- autofit(multilevel_summary_stats_ft)
-
-## Can copy the table directly from here on to word
-multilevel_summary_stats_ft
+# Basic vertical bar plot
+simple_summary <- ggplot(multilevel_summary_stats, aes(x = Variable, y = N)) +
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = N), vjust = -0.5, size = 4) +
+  labs(
+    title = "(e) Multilevel Data Structure Summary",
+    x = "Data Grouping Level",
+    y = "Number of Groups at each Level"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
+        axis.title.x = element_text(size = 20),  # Increase x axis title size
+        axis.title.y = element_text(size = 20),   # Increase y axis title size)
+        legend.title = element_text(size = 19),  # Increase legend title size
+        legend.text = element_text(size = 18),
+        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
+        axis.text.y = element_text(size = 14)
+        )
 
 
 #### Visualising the multilevel structure of the dataset via plots
@@ -373,7 +383,7 @@ plot3 <- ggplot(id_per_hh, aes(x = factor(n), y = num_hh)) +
 ##################################################################
 ## Now we count how many observations are present for each individual
 obs_per_id <- depression_data_v2 %>%
-  count(PID_FAMID) %>%                                     
+  count(PID) %>%                                     
   count(n, name = "num_id") 
 
 ## Plot
@@ -395,10 +405,6 @@ plot4 <- ggplot(obs_per_id, aes(x = factor(n), y = num_id)) +
         axis.text.y = element_text(size = 14)
   )
 
-################ Combined Plot of Multilevel structure
-
-## Combine plots from all four models
-combined_hierarchy_plot <- (plot1 | plot2) / (plot3 | plot4)
 
 
 #### Visualising Distribution of Datapoints across interviewers
@@ -428,7 +434,7 @@ interviewer_plot <- ggplot(interviewer_count, aes(x = interviewer_anon, y = n, f
   geom_bar(stat = "identity") +
   scale_fill_brewer(palette = "Set3") + 
   labs(
-    title = "Observations Recorded Per Interviewer Across Different Regions",
+    title = "(f) Observations Recorded Per Interviewer Across Different Regions",
     x = "Interviewer",
     y = "Number of Observations",
     fill = "Region"
@@ -446,6 +452,10 @@ interviewer_plot <- ggplot(interviewer_count, aes(x = interviewer_anon, y = n, f
 
 
 
+################ Combined Plot of Multilevel structure
+
+## Combine plots from all four models
+combined_hierarchy_plot <- (plot1 | plot2) / (plot3 | plot4) / (simple_summary | interviewer_plot)
 
 
 
@@ -455,7 +465,7 @@ interviewer_plot <- ggplot(interviewer_count, aes(x = interviewer_anon, y = n, f
 ######## Calculating number of males in our dataset
 ## First, we retain only one observation per individual (since there are repeated observations from certain individuals which might inflate the prevalence of males/females)
 unique_individuals <- depression_data_v2 %>% 
-  distinct(PID_FAMID, .keep_all = TRUE)
+  distinct(PID, .keep_all = TRUE)
 
 ## Now calculate the percentage
 percentage_males <- round((sum(unique_individuals$Male)/nrow(unique_individuals))*100, 2)
@@ -502,7 +512,7 @@ summary_stats <- depression_data_v2 %>%
                  "Social Conflict Index (possible range: 0 - 6)", "Spanish Fluency (possible range: 0 - 2)",
                  "Route Distance of Community to Town (in kms)", "Maximum Community Size recorded during fieldwork",
                  "Household Size", "Depression Interview Date"),
-    Summary_Statistics_Calculated_Over = c("Entire Sample: 2665", "Entire Sample: 2665", "Unique Individuals: 1876", "Entire Sample: 2665", "Entire Sample: 2665",
+    Summary_Statistics_Calculated_Over = c("Entire Sample: 2665", "Entire Sample: 2665", "Unique Individuals: 1803", "Entire Sample: 2665", "Entire Sample: 2665",
                                            "Unique Communities: 68", "Unique Communities: 68", "Entire Sample: 2665", "Entire Sample: 2665"),
     Mean = c(round(mean(DepressionScoreM2), 2), round(mean(Age), 2), paste(percentage_males, "% of Males"), round(mean(SocialConflictIndex, na.rm = TRUE), 2), 
              round(mean(SpanishFluency, na.rm = TRUE), 2), mean_distance, mean_csize, round(mean(household_size, na.rm = TRUE), 2), mean_date_only),
@@ -524,227 +534,7 @@ summary_stats <- depression_data_v2 %>%
 
 
 
-######## Summarizing all the model outputs in one table
-#########################################################
 
-## We use the draws from each model (T1, T2, T3, T4) to summarise estimates of each model in a dataframe
-## The dataframe is then converted to a flextable
-
-# Conditional R2 for all models which are manually added to the dataframe
-mod1_R2 <- bayes_R2(mod1)
-mod2_R2 <- bayes_R2(mod2)
-mod3_R3 <- bayes_R2(mod3)
-mod4_R4 <- bayes_R2(mod4)
-
-
-## Generating the data frame now
-models_summary <- data.frame(Predictors = c("Intercept", "Age", "Sex", "Social Conflict Index (SCI)", 
-                                            "Spanish Fluency", "Interview Date (Spline Fixed Effect)", "Interview Date (Spline Smooth Term)",
-                                            "Distance to Town", "Maximum Community Size", "Household Size", 
-                                            "Residual Variance", 
-                                            "Between-Cluster Variance", " ", " ", " ", " ", "ICC", " ", " ", " ", " ", " ", "Conditional R2"), 
-                             Estimates_Model_1 = c( round(mean(T1$Intercept),2), round(mean(T1$Age),2), round(mean(T1$Male),2), 
-                                                    round(mean(T1$SCI),2), round(mean(T1$SFluency),2), "-", "-", 
-                                                    "-", "-", "-", round(mean((T1$sigma_D)^2), 2), 
-                                                    paste(round(mean((T1$sd_PID__D_Intercept)^2), 2), " (PID)"),  "-", "-", "-", "-", paste(round(mean(icc_residual), 2), " (Residual)"), paste(round(mean(icc_individual), 2), "(Individual)"),
-                                                    "-", "-", "-", "-", round(mod1_R2["R2D", "Estimate"], 2)),
-                             CI_Model_1 = c( paste(round(quantile(T1$Intercept, 0.025), 2), "-", round(quantile(T1$Intercept, 0.975), 2)), paste(round(quantile(T1$Age, 0.025), 2), "-", round(quantile(T1$Age, 0.975), 2)),
-                                             paste(round(quantile(T1$Male, 0.025), 2), "-", round(quantile(T1$Male, 0.975), 2)), paste(round(quantile(T1$SCI, 0.025), 2), "-", round(quantile(T1$SCI, 0.975), 2)),
-                                             paste(round(quantile(T1$SFluency, 0.025), 2), "-", round(quantile(T1$SFluency, 0.975), 2)), "-", "-",
-                                             "-", "-", "-",
-                                             paste(round(quantile((T1$sigma_D)^2, 0.025), 2), "-", round(quantile((T1$sigma_D)^2, 0.975), 2)), 
-                                             paste(round(quantile((T1$sd_PID__D_Intercept)^2, 0.025), 2), "-", round(quantile((T1$sd_PID__D_Intercept)^2, 0.975), 2)), "-", "-", "-", "-",
-                                             paste(round(quantile(icc_residual, 0.025), 2), "-", round(quantile(icc_residual, 0.975), 2)), 
-                                             paste(round(quantile(icc_individual, 0.025), 2), "-", round(quantile(icc_individual, 0.975), 2)), "-", "-", "-", "-", paste(round(mod1_R2["R2D", "Q2.5"], 2), "-", round(mod1_R2["R2D", "Q97.5"], 2))),
-                             
-                             
-                             Estimates_Model_2 = c( round(mean(T2$Intercept),2), round(mean(T2$Age),2), round(mean(T2$Male),2), round(mean(T2$SCI),2), round(mean(T2$SFluency),2),
-                                                    "-", "-",
-                                                    "-", "-", "-", round(mean((T2$sigma_D)^2), 2), 
-                                                    paste(round(mean((T2$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2), 2), " (PID)"), paste(round(mean((T2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2), 2), " (FamID)"),
-                                                    paste(round(mean((T2$`sd_Region:ComID__D_Intercept`)^2), 2), " (ComID)"), paste(round(mean((T2$sd_Region__D_Intercept)^2), 2), " (RegionID)"), "-",
-                                                    paste(round(mean(icc_residual_2), 2), " (Residual)"), paste(round(mean(icc_individual_2), 2), "(Individual)"),
-                                                    paste(round(mean(icc_family_2), 2), "(Household)"), paste(round(mean(icc_community_2), 2), "(Community)"),
-                                                    paste(round(mean(icc_region_2), 2), "(Region)"), "-", round(mod2_R2["R2D", "Estimate"], 2)), 
-                             CI_Model_2 = c( paste(round(quantile(T2$Intercept, 0.025), 2), "-", round(quantile(T2$Intercept, 0.975), 2)), paste(round(quantile(T2$Age, 0.025), 2), "-", round(quantile(T2$Age, 0.975), 2)),
-                                             paste(round(quantile(T2$Male, 0.025), 2), "-", round(quantile(T2$Male, 0.975), 2)), paste(round(quantile(T2$SCI, 0.025), 2), "-", round(quantile(T2$SCI, 0.975), 2)), 
-                                             paste(round(quantile(T2$SFluency, 0.025), 2), "-", round(quantile(T2$SFluency, 0.975), 2)), "-", "-",
-                                             "-", "-", "-",
-                                             paste(round(quantile((T2$sigma_D)^2, 0.025), 2), "-", round(quantile((T2$sigma_D)^2, 0.975), 2)), 
-                                             paste(round(quantile((T2$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T2$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2, 0.975), 2)), 
-                                             paste(round(quantile((T2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2, 0.975), 2)),
-                                             paste(round(quantile((T2$`sd_Region:ComID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T2$`sd_Region:ComID__D_Intercept`)^2, 0.975), 2)),
-                                             paste(round(quantile((T2$sd_Region__D_Intercept)^2, 0.025), 2), "-", round(quantile((T2$sd_Region__D_Intercept)^2, 0.975), 2)), "-",
-                                             paste(round(quantile(icc_residual_2, 0.025), 2), "-", round(quantile(icc_residual_2, 0.975), 2)), 
-                                             paste(round(quantile(icc_individual_2, 0.025), 2), "-", round(quantile(icc_individual_2, 0.975), 2)), 
-                                             paste(round(quantile(icc_family_2, 0.025), 2), "-", round(quantile(icc_family_2, 0.975), 2)),
-                                             paste(round(quantile(icc_community_2, 0.025), 2), "-", round(quantile(icc_community_2, 0.975), 2)),
-                                             paste(round(quantile(icc_region_2, 0.025), 2), "-", round(quantile(icc_region_2, 0.975), 2)), "-", paste( round(mod2_R2["R2D", "Q2.5"],2), "-", round(mod2_R2["R2D", "Q97.5"],2) )),
-                            
-                              Estimates_Model_3 = c( round(mean(T3$Intercept),2), round(mean(T3$Age),2), round(mean(T3$Male),2), round(mean(T3$SCI),2), 
-                                                     round(mean(T3$SFluency),2), round(mean(T3$bs_D_sInterview_Date_1),2), round(mean(T3$sds_D_sInterview_Date_1),2),
-                                                     "-", "-", "-", round(mean((T3$sigma_D)^2), 2), 
-                                                    paste(round(mean((T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2), 2), " (PID)"), paste(round(mean((T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2), 2), " (FamID)"),
-                                                    paste(round(mean((T3$`sd_Region:ComID__D_Intercept`)^2), 2), " (ComID)"), paste(round(mean((T3$sd_Region__D_Intercept)^2), 2), " (RegionID)"), 
-                                                    paste(round(mean((T3$sd_Interviewer__D_Intercept)^2), 2), " (InterviewerID)"),
-                                                    paste(round(mean(icc_residual_3), 2), " (Residual)"), paste(round(mean(icc_individual_3), 2), "(Individual)"),
-                                                    paste(round(mean(icc_family_3), 2), "(Household)"), paste(round(mean(icc_community_3), 2), "(Community)"),
-                                                    paste(round(mean(icc_region_3), 2), "(Region)"), paste(round(mean(icc_interviewer_3), 2), "(Interviewer)"), 
-                                                    round(mod3_R3["R2D", "Estimate"], 2)), 
-                             CI_Model_3 = c( paste(round(quantile(T3$Intercept, 0.025), 2), "-", round(quantile(T3$Intercept, 0.975), 2)), paste(round(quantile(T3$Age, 0.025), 2), "-", round(quantile(T3$Age, 0.975), 2)),
-                                             paste(round(quantile(T3$Male, 0.025), 2), "-", round(quantile(T3$Male, 0.975), 2)), paste(round(quantile(T3$SCI, 0.025), 2), "-", round(quantile(T3$SCI, 0.975), 2)), 
-                                             paste(round(quantile(T3$SFluency, 0.025), 2), "-", round(quantile(T3$SFluency, 0.975), 2)), 
-                                             paste(round(quantile(T3$bs_D_sInterview_Date_1, 0.025), 2), "-", round(quantile(T3$bs_D_sInterview_Date_1, 0.975), 2)), 
-                                             paste(round(quantile(T3$sds_D_sInterview_Date_1, 0.025), 2), "-", round(quantile(T3$sds_D_sInterview_Date_1, 0.975), 2)),
-                                             "-",
-                                              "-", "-",
-                                             paste(round(quantile((T3$sigma_D)^2, 0.025), 2), "-", round(quantile((T3$sigma_D)^2, 0.975), 2)), 
-                                             paste(round(quantile((T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T3$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2, 0.975), 2)), 
-                                             paste(round(quantile((T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T3$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2, 0.975), 2)),
-                                             paste(round(quantile((T3$`sd_Region:ComID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T3$`sd_Region:ComID__D_Intercept`)^2, 0.975), 2)),
-                                             paste(round(quantile((T3$sd_Region__D_Intercept)^2, 0.025), 2), "-", round(quantile((T3$sd_Region__D_Intercept)^2, 0.975), 2)), 
-                                             paste(round(quantile((T3$sd_Interviewer__D_Intercept)^2, 0.025), 2), "-", round(quantile((T3$sd_Interviewer__D_Intercept)^2, 0.975), 2)),
-                                             paste(round(quantile(icc_residual_3, 0.025), 2), "-", round(quantile(icc_residual_3, 0.975), 2)), 
-                                             paste(round(quantile(icc_individual_3, 0.025), 2), "-", round(quantile(icc_individual_3, 0.975), 2)), 
-                                             paste(round(quantile(icc_family_3, 0.025), 2), "-", round(quantile(icc_family_3, 0.975), 2)),
-                                             paste(round(quantile(icc_community_3, 0.025), 2), "-", round(quantile(icc_community_3, 0.975), 2)),
-                                             paste(round(quantile(icc_region_3, 0.025), 2), "-", round(quantile(icc_region_3, 0.975), 2)), 
-                                             paste(round(quantile(icc_interviewer_3, 0.025), 2), "-", round(quantile(icc_interviewer_3, 0.975), 2)),
-                                             paste( round(mod3_R3["R2D", "Q2.5"], 2), "-", round(mod3_R3["R2D", "Q97.5"], 2)  )),
-                             
-                             Estimates_Model_4 = c( round(mean(T4$Intercept),2), round(mean(T4$Age),2), round(mean(T4$Male),2), round(mean(T4$SCI),2), 
-                                                    round(mean(T4$SFluency),2), round(mean(T4$bs_D_sInterview_Date_1),2), round(mean(T4$sds_D_sInterview_Date_1),2),
-                                                    round(mean(T4$Town_Distance),2), round(mean(T4$C_Size),2), round(mean(T4$H_Size),2),
-                                                    round(mean((T4$sigma_D)^2), 2), 
-                                                    paste(round(mean((T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2), 2), " (PID)"), paste(round(mean((T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2), 2), " (FamID)"),
-                                                    paste(round(mean((T4$`sd_Region:ComID__D_Intercept`)^2), 2), " (ComID)"), paste(round(mean((T4$sd_Region__D_Intercept)^2), 2), " (RegionID)"),
-                                                    paste(round(mean((T4$sd_Interviewer__D_Intercept)^2), 2), " (InterviewerID)"),
-                                                    paste(round(mean(icc_residual_4), 2), " (Residual)"), paste(round(mean(icc_individual_4), 2), "(Individual)"),
-                                                    paste(round(mean(icc_family_4), 2), "(Household)"), paste(round(mean(icc_community_4), 2), "(Community)"),
-                                                    paste(round(mean(icc_region_4), 2), "(Region)"), paste(round(mean(icc_interviewer_4), 2), "(Interviewer)"), round(mod4_R4["R2D", "Estimate"], 2) ),
-                             CI_Model_4 = c( paste(round(quantile(T4$Intercept, 0.025), 2), "-", round(quantile(T4$Intercept, 0.975), 2)), paste(round(quantile(T4$Age, 0.025), 2), "-", round(quantile(T4$Age, 0.975), 2)),
-                                             paste(round(quantile(T4$Male, 0.025), 2), "-", round(quantile(T4$Male, 0.975), 2)), paste(round(quantile(T4$SCI, 0.025), 2), "-", round(quantile(T4$SCI, 0.975), 2)), 
-                                             paste(round(quantile(T4$SFluency, 0.025), 2), "-", round(quantile(T4$SFluency, 0.975), 2)),
-                                             paste(round(quantile(T4$bs_D_sInterview_Date_1, 0.025), 2), "-", round(quantile(T4$bs_D_sInterview_Date_1, 0.975), 2)),
-                                             paste(round(quantile(T4$sds_D_sInterview_Date_1, 0.025), 2), "-", round(quantile(T4$sds_D_sInterview_Date_1, 0.975), 2)),
-                                             paste(round(quantile(T4$Town_Distance, 0.025), 2), "-", round(quantile(T4$Town_Distance, 0.975), 2)),
-                                             paste(round(quantile(T4$C_Size, 0.025), 2), "-", round(quantile(T4$C_Size, 0.975), 2)),
-                                             paste(round(quantile(T4$H_Size, 0.025), 2), "-", round(quantile(T4$H_Size, 0.975), 2)),
-                                             
-                                             paste(round(quantile((T4$sigma_D)^2, 0.025), 2), "-", round(quantile((T4$sigma_D)^2, 0.975), 2)), 
-                                             paste(round(quantile((T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T4$`sd_Region:ComID:UniqueFamID:PID__D_Intercept`)^2, 0.975), 2)), 
-                                             paste(round(quantile((T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T4$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2, 0.975), 2)),
-                                             paste(round(quantile((T4$`sd_Region:ComID__D_Intercept`)^2, 0.025), 2), "-", round(quantile((T4$`sd_Region:ComID__D_Intercept`)^2, 0.975), 2)),
-                                             paste(round(quantile((T4$sd_Region__D_Intercept)^2, 0.025), 2), "-", round(quantile((T4$sd_Region__D_Intercept)^2, 0.975), 2)),
-                                             paste(round(quantile((T4$sd_Interviewer__D_Intercept)^2, 0.025), 2), "-", round(quantile((T4$sd_Interviewer__D_Intercept)^2, 0.975), 2)),
-                                             paste(round(quantile(icc_residual_4, 0.025), 2), "-", round(quantile(icc_residual_4, 0.975), 2)), 
-                                             paste(round(quantile(icc_individual_4, 0.025), 2), "-", round(quantile(icc_individual_4, 0.975), 2)), 
-                                             paste(round(quantile(icc_family_4, 0.025), 2), "-", round(quantile(icc_family_4, 0.975), 2)),
-                                             paste(round(quantile(icc_community_4, 0.025), 2), "-", round(quantile(icc_community_4, 0.975), 2)),
-                                             paste(round(quantile(icc_region_4, 0.025), 2), "-", round(quantile(icc_region_4, 0.975), 2)), 
-                                             paste(round(quantile(icc_interviewer_4, 0.025), 2), "-", round(quantile(icc_interviewer_4, 0.975), 2)), paste( round(mod4_R4["R2D", "Q2.5"],2) , "-", round(mod4_R4["R2D", "Q97.5"],2)  ))
-                             
-)
-
-
-####### Summarising outputs for imputation models that were run during model fitting
-
-## Creating data frame for imputed model outputs
-imputed_model_summary <- data.frame(Missing_Variables = c("Social Conflict Index", "-", "-", "-",
-                                                          "Spanish Fluency", "-", "-", "-",
-                                                          "Household Size", "-", "-", "-", "-"),
-                                    Predictors = c("Intercept", "Age", "Male", "Residual Variance", 
-                                                   "Intercept", "Age", "Sex", "Residual Variance", 
-                                                   "Intercept", "Age", "Sex", "Community Size", "Residual Variance"),
-                                    
-                                    Estimates_Model_1 = c(round(mean(T1$b_SCI_Intercept), 2), 
-                                                          round(mean(T1$b_SCI_Age), 2), 
-                                                          round(mean(T1$b_SCI_Sex1), 2), 
-                                                          round(mean((T1$sigma_SCI)^2), 2),
-                                                          round(mean(T1$b_SFluency_Intercept), 2), 
-                                                          round(mean(T1$b_SFluency_Age), 2), 
-                                                          round(mean(T1$b_SFluency_Sex1), 2), 
-                                                          round(mean((T1$sigma_SFluency)^2), 2),
-                                                          "-", "-", "-", "-", "-"),
-                                    CI_Model_1 = c(paste(round(quantile(T1$b_SCI_Intercept, 0.025), 2), "-", round(quantile(T1$b_SCI_Intercept, 0.975), 2)), 
-                                                   paste(round(quantile(T1$b_SCI_Age, 0.025), 2), "-", round(quantile(T1$b_SCI_Age, 0.975), 2)),
-                                                   paste(round(quantile(T1$b_SCI_Sex1, 0.025), 2), "-", round(quantile(T1$b_SCI_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T1$sigma_SCI)^2, 0.025), 2), "-", round(quantile((T1$sigma_SCI)^2, 0.975), 2)),
-                                                   paste(round(quantile(T1$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(T1$b_SFluency_Intercept, 0.975), 2)),
-                                                   paste(round(quantile(T1$b_SFluency_Age, 0.025), 2), "-", round(quantile(T1$b_SFluency_Age, 0.975), 2)),
-                                                   paste(round(quantile(T1$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(T1$b_SFluency_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T1$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((T1$sigma_SFluency)^2, 0.975), 2)),
-                                                   "-", "-", "-", "-", "-"),
-                                     
-                                    Estimates_Model_2 = c(round(mean(T2$b_SCI_Intercept), 2), 
-                                                          round(mean(T2$b_SCI_Age), 2), 
-                                                          round(mean(T2$b_SCI_Sex1), 2), 
-                                                          round(mean((T2$sigma_SCI)^2), 2),
-                                                          round(mean(T2$b_SFluency_Intercept), 2), 
-                                                          round(mean(T2$b_SFluency_Age), 2), 
-                                                          round(mean(T2$b_SFluency_Sex1), 2), 
-                                                          round(mean((T2$sigma_SFluency)^2), 2),
-                                                          "-", "-", "-", "-", "-"),
-                                    CI_Model_2 = c(paste(round(quantile(T2$b_SCI_Intercept, 0.025), 2), "-", round(quantile(T2$b_SCI_Intercept, 0.975), 2)), 
-                                                   paste(round(quantile(T2$b_SCI_Age, 0.025), 2), "-", round(quantile(T2$b_SCI_Age, 0.975), 2)),
-                                                   paste(round(quantile(T2$b_SCI_Sex1, 0.025), 2), "-", round(quantile(T2$b_SCI_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T2$sigma_SCI)^2, 0.025), 2), "-", round(quantile((T2$sigma_SCI)^2, 0.975), 2)),
-                                                   paste(round(quantile(T2$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(T2$b_SFluency_Intercept, 0.975), 2)),
-                                                   paste(round(quantile(T2$b_SFluency_Age, 0.025), 2), "-", round(quantile(T2$b_SFluency_Age, 0.975), 2)),
-                                                   paste(round(quantile(T2$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(T2$b_SFluency_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T2$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((T2$sigma_SFluency)^2, 0.975), 2)),
-                                                   "-", "-", "-", "-", "-"),
-                                    
-                                    Estimates_Model_3 = c(round(mean(T3$b_SCI_Intercept), 2), 
-                                                          round(mean(T3$b_SCI_Age), 2), 
-                                                          round(mean(T3$b_SCI_Sex1), 2), 
-                                                          round(mean((T3$sigma_SCI)^2), 2),
-                                                          round(mean(T3$b_SFluency_Intercept), 2),
-                                                          round(mean(T3$b_SFluency_Age), 2), 
-                                                          round(mean(T3$b_SFluency_Sex1), 2), 
-                                                          round(mean((T3$sigma_SFluency)^2), 2),
-                                                          "-", "-", "-", "-", "-"),
-                                    CI_Model_3 = c(paste(round(quantile(T3$b_SCI_Intercept, 0.025), 2), "-", round(quantile(T3$b_SCI_Intercept, 0.975), 2)), 
-                                                   paste(round(quantile(T3$b_SCI_Age, 0.025), 2), "-", round(quantile(T3$b_SCI_Age, 0.975), 2)),
-                                                   paste(round(quantile(T3$b_SCI_Sex1, 0.025), 2), "-", round(quantile(T3$b_SCI_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T3$sigma_SCI)^2, 0.025), 2), "-", round(quantile((T3$sigma_SCI)^2, 0.975), 2)),
-                                                   paste(round(quantile(T3$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(T3$b_SFluency_Intercept, 0.975), 2)),
-                                                   paste(round(quantile(T3$b_SFluency_Age, 0.025), 2), "-", round(quantile(T3$b_SFluency_Age, 0.975), 2)),
-                                                   paste(round(quantile(T3$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(T3$b_SFluency_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T3$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((T3$sigma_SFluency)^2, 0.975), 2)),
-                                                   "-", "-", "-", "-", "-"),
-                                    
-                                    Estimates_Model_4 = c(round(mean(T4$b_SCI_Intercept), 2), 
-                                                          round(mean(T4$b_SCI_Age), 2), 
-                                                          round(mean(T4$b_SCI_Sex1), 2), 
-                                                          round(mean((T4$sigma_SCI)^2), 2),
-                                                          round(mean(T4$b_SFluency_Intercept), 2), 
-                                                          round(mean(T4$b_SFluency_Age), 2), 
-                                                          round(mean(T4$b_SFluency_Sex1), 2), 
-                                                          round(mean((T4$sigma_SFluency)^2), 2),
-                                                          round(mean(T4$b_HHSize_Intercept), 2), 
-                                                          round(mean(T4$b_HHSize_Age), 2), 
-                                                          round(mean(T4$b_HHSize_Sex1), 2), 
-                                                          round(mean(T4$b_HHSize_Com_Size), 2), 
-                                                          round(mean((T4$sigma_HHSize)^2), 2)
-                                                          ),
-                                    CI_Model_4 = c(paste(round(quantile(T4$b_SCI_Intercept, 0.025), 2), "-", round(quantile(T4$b_SCI_Intercept, 0.975), 2)), 
-                                                   paste(round(quantile(T4$b_SCI_Age, 0.025), 2), "-", round(quantile(T4$b_SCI_Age, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_SCI_Sex1, 0.025), 2), "-", round(quantile(T4$b_SCI_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T4$sigma_SCI)^2, 0.025), 2), "-", round(quantile((T4$sigma_SCI)^2, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_SFluency_Intercept, 0.025), 2), "-", round(quantile(T4$b_SFluency_Intercept, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_SFluency_Age, 0.025), 2), "-", round(quantile(T4$b_SFluency_Age, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_SFluency_Sex1, 0.025), 2), "-", round(quantile(T4$b_SFluency_Sex1, 0.975), 2)),
-                                                   paste(round(quantile((T4$sigma_SFluency)^2, 0.025), 2), "-", round(quantile((T4$sigma_SFluency)^2, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_HHSize_Intercept, 0.025), 2), "-", round(quantile(T4$b_HHSize_Intercept, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_HHSize_Age, 0.025), 2), "-", round(quantile(T4$b_HHSize_Age, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_HHSize_Sex1, 0.025), 2), "-", round(quantile(T4$b_HHSize_Sex1, 0.975), 2)),
-                                                   paste(round(quantile(T4$b_HHSize_Com_Size, 0.025), 2), "-", round(quantile(T4$b_HHSize_Com_Size, 0.975), 2)),
-                                                   paste(round(quantile((T4$sigma_HHSize)^2, 0.025), 2), "-", round(quantile((T4$sigma_HHSize)^2, 0.975), 2)) 
-                                                   ))
-                                    
-                                  
-                                  
 
 #################### Generating the summary tables that are used in the manuscript
 ##################################################################################
@@ -762,43 +552,5 @@ summary_stats_ft <- autofit(summary_stats_ft)
 summary_stats_ft
 
 
-################### Now the summary table of the multilevel structure of our data table
-multilevel_summary_stats_ft <- flextable(multilevel_summary_stats)
 
-# Bold the column headers, apply a grey backdrop to the first column and autofit the table
-multilevel_summary_stats_ft <- bold(multilevel_summary_stats_ft, part = "header")
-multilevel_summary_stats_ft <- bg(multilevel_summary_stats_ft, j = 1, bg = "#D3D3D3", part = "body")
-multilevel_summary_stats_ft <- autofit(multilevel_summary_stats_ft)
-
-## Can copy the table directly from here on to word
-multilevel_summary_stats_ft
-
-
-
-################## Now the model summary output
-
-## Converting to a flextable format
-models_summary_ft <- flextable(models_summary)
-
-## Adding alternative colours to distinguish different model outputs
-models_summary_ft <- bg(models_summary_ft, j = c(4,5,8,9), bg = "#D3D3D3", part = "body")
-models_summary_ft <- bg(models_summary_ft, j = c(2,3,6,7), bg = "beige", part = "body")
-models_summary_ft <- bold(models_summary_ft, part = "header")
-models_summary_ft <- autofit(models_summary_ft)
-
-## Copy-paste the output on word
-models_summary_ft
-
-
-################## Now the imputed models output
-imp_model_summary_ft <- flextable(imputed_model_summary)
-
-## Adding alternative colours to distinguish different model outputs
-imp_model_summary_ft <- bg(imp_model_summary_ft, j = c(5,6,9,10), bg = "#D3D3D3", part = "body")
-imp_model_summary_ft <- bg(imp_model_summary_ft, j = c(3,4,7,8), bg = "beige", part = "body")
-imp_model_summary_ft <- bold(imp_model_summary_ft, part = "header")
-imp_model_summary_ft <- autofit(imp_model_summary_ft)
-
-## Copy-paste the output on word
-imp_model_summary_ft
 
