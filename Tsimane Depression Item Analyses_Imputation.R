@@ -1079,5 +1079,946 @@ item18 <- readRDS("item18.RDS")
 
 ## Model summary
 summary(item18)
-          
+
+
+########### Plotting ICCs of all 16 items first on one graph  ##################
+################################################################################################################################# 
+
+### IMPORTANT: Note that some of these files and posteriors are quite big and won't execute in one go due to your machine's memory constraints
+## I recommend running the script first, by loading the first 7 items and extracting draws.
+## And then repeat for the remaining items
+
+
+## Extract posterior draws first from all item models 
+## Prolly recommend doing so for Items 1 to 7 first. This is what I have done in the lines below
+i1 <- as_draws_df(item1)
+i2 <- as_draws_df(item2)
+i3 <- as_draws_df(item3)
+i4 <- as_draws_df(item4)
+i5 <- as_draws_df(item5)
+i6 <- as_draws_df(item6)
+i7 <- as_draws_df(item7)
+i8 <- as_draws_df(item8)
+i9 <- as_draws_df(item9)
+i10 <- as_draws_df(item10)      
+i11 <- as_draws_df(item11)
+i12 <- as_draws_df(item12)
+i13 <- as_draws_df(item13)
+i14 <- as_draws_df(item14)
+i16 <- as_draws_df(item16)      
+i18 <- as_draws_df(item18)  
+
+## Now calculate interviewer adjusted ICC for each item
+
+## Item 1
+icc_int_i1 <- ((i1$sd_Interviewer__D1Sad_Intercept)^2) / ((i1$`sd_ComID__D1Sad_Intercept`)^2 + (i1$`sd_ComID:UniqueFamID__D1Sad_Intercept`)^2 + 
+                                                            (i1$sd_Interviewer__D1Sad_Intercept)^2 + (((pi)^2)/3))
+dens(icc_int_i1, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 1")
+
+## Item 2
+icc_int_i2 <- ((i2$sd_Interviewer__D2Cry_Intercept)^2) / ((i2$`sd_ComID__D2Cry_Intercept`)^2 + (i2$`sd_ComID:UniqueFamID__D2Cry_Intercept`)^2 + 
+                                                            (i2$sd_Interviewer__D2Cry_Intercept)^2 + (((pi)^2)/3))
+dens(icc_int_i2, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 2")
+
+## Item 3
+icc_int_i3 <- ((i3$sd_Interviewer__D3SelfCritical_Intercept)^2) / ((i3$`sd_ComID__D3SelfCritical_Intercept`)^2 + (i3$`sd_ComID:UniqueFamID__D3SelfCritical_Intercept`)^2 + 
+                                                                     (i3$sd_Interviewer__D3SelfCritical_Intercept)^2 + (((pi)^2)/3))
+dens(icc_int_i3, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 3")
+
+## Item 4
+icc_int_i4 <- ((i4$sd_Interviewer__D4LifeNotValuable_Intercept)^2) / ((i4$`sd_ComID__D4LifeNotValuable_Intercept`)^2 + (i4$`sd_ComID:UniqueFamID__D4LifeNotValuable_Intercept`)^2 + 
+                                                                        (i4$sd_Interviewer__D4LifeNotValuable_Intercept)^2 + (((pi)^2)/3))
+dens(icc_int_i4, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 4")
+
+## Item 5
+icc_int_i5 <- ((i5$sd_Interviewer__D5Useless_Intercept)^2) / ((i5$`sd_ComID__D5Useless_Intercept`)^2 + (i5$`sd_ComID:UniqueFamID__D5Useless_Intercept`)^2 + 
+                                                                (i5$sd_Interviewer__D5Useless_Intercept)^2 + (((pi)^2)/3))
+dens(icc_int_i5, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 5")
+
+## Item 6
+icc_int_i6 <- ((i6$sd_Interviewer__D6NoInterest_Intercept)^2) / ((i6$`sd_ComID__D6NoInterest_Intercept`)^2 + (i6$`sd_ComID:UniqueFamID__D6NoInterest_Intercept`)^2 + 
+                                                                   (i6$sd_Interviewer__D6NoInterest_Intercept)^2 + (((pi)^2)/3))
+dens(icc_int_i6, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 6")
+
+## Item 7
+icc_int_i7 <- ((i7$sd_Interviewer__D7Tired_Intercept)^2) / ((i7$`sd_ComID__D7Tired_Intercept`)^2 + (i7$`sd_ComID:UniqueFamID__D7Tired_Intercept`)^2 + 
+                                                              (i7$sd_Interviewer__D7Tired_Intercept)^2 + (((pi)^2)/3))
+dens(icc_int_i7, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 7")
+
+
+## Now calculate community adjusted ICC for each item
+#########################################################
+
+## Item 1
+icc_com_i1 <- ((i1$`sd_ComID__D1Sad_Intercept`)^2) / ((i1$`sd_ComID__D1Sad_Intercept`)^2 + (i1$`sd_ComID:UniqueFamID__D1Sad_Intercept`)^2 + 
+                                                        (i1$sd_Interviewer__D1Sad_Intercept)^2 + (((pi)^2)/3))
+dens(icc_com_i1, col=2, lwd=4 , xlab="ICC (Community) of Item 1")
+
+## Item 2
+icc_com_i2 <- ((i2$`sd_ComID__D2Cry_Intercept`)^2) / ((i2$`sd_ComID__D2Cry_Intercept`)^2 + (i2$`sd_ComID:UniqueFamID__D2Cry_Intercept`)^2 + 
+                                                        (i2$sd_Interviewer__D2Cry_Intercept)^2 + (((pi)^2)/3))
+dens(icc_com_i2, col=2, lwd=4 , xlab="ICC (Community) of Item 2")
+
+## Item 3
+icc_com_i3 <- ((i3$`sd_ComID__D3SelfCritical_Intercept`)^2) / ((i3$`sd_ComID__D3SelfCritical_Intercept`)^2 + (i3$`sd_ComID:UniqueFamID__D3SelfCritical_Intercept`)^2 + 
+                                                                 (i3$sd_Interviewer__D3SelfCritical_Intercept)^2 + (((pi)^2)/3))
+dens(icc_com_i3, col=2, lwd=4 , xlab="ICC (Community) of Item 3")
+
+## Item 4
+icc_com_i4 <- ((i4$`sd_ComID__D4LifeNotValuable_Intercept`)^2) / ((i4$`sd_ComID__D4LifeNotValuable_Intercept`)^2 + (i4$`sd_ComID:UniqueFamID__D4LifeNotValuable_Intercept`)^2 + 
+                                                                    (i4$sd_Interviewer__D4LifeNotValuable_Intercept)^2 + (((pi)^2)/3))
+dens(icc_com_i4, col=2, lwd=4 , xlab="ICC (Community) of Item 4")
+
+## Item 5
+icc_com_i5 <- ((i5$`sd_ComID__D5Useless_Intercept`)^2) / ((i5$`sd_ComID__D5Useless_Intercept`)^2 + (i5$`sd_ComID:UniqueFamID__D5Useless_Intercept`)^2 + 
+                                                            (i5$sd_Interviewer__D5Useless_Intercept)^2 + (((pi)^2)/3))
+dens(icc_com_i5, col=2, lwd=4 , xlab="ICC (Community) of Item 5")
+
+## Item 6
+icc_com_i6 <- ((i6$`sd_ComID__D6NoInterest_Intercept`)^2) / ((i6$`sd_ComID__D6NoInterest_Intercept`)^2 + (i6$`sd_ComID:UniqueFamID__D6NoInterest_Intercept`)^2 + 
+                                                               (i6$sd_Interviewer__D6NoInterest_Intercept)^2 + (((pi)^2)/3))
+dens(icc_com_i6, col=2, lwd=4 , xlab="ICC (Community) of Item 6")
+
+## Item 7
+icc_com_i7 <- ((i7$`sd_ComID__D7Tired_Intercept`)^2) / ((i7$`sd_ComID__D7Tired_Intercept`)^2 + (i7$`sd_ComID:UniqueFamID__D7Tired_Intercept`)^2 + 
+                                                          (i7$sd_Interviewer__D7Tired_Intercept)^2 + (((pi)^2)/3))
+dens(icc_com_i7, col=2, lwd=4 , xlab="ICC (Community) of Item 7")
+
+
+## Now calculate household adjusted ICC for each item
+#########################################################
+
+## Item 1
+icc_hh_i1 <- ((i1$`sd_ComID:UniqueFamID__D1Sad_Intercept`)^2) / ((i1$`sd_ComID__D1Sad_Intercept`)^2 + (i1$`sd_ComID:UniqueFamID__D1Sad_Intercept`)^2 + 
+                                                                   (i1$sd_Interviewer__D1Sad_Intercept)^2 + (((pi)^2)/3))
+dens(icc_hh_i1, col=2, lwd=4 , xlab="ICC (Household) of Item 1")
+
+## Item 2
+icc_hh_i2 <- ((i2$`sd_ComID:UniqueFamID__D2Cry_Intercept`)^2) / ((i2$`sd_ComID__D2Cry_Intercept`)^2 + (i2$`sd_ComID:UniqueFamID__D2Cry_Intercept`)^2 + 
+                                                                   (i2$sd_Interviewer__D2Cry_Intercept)^2 + (((pi)^2)/3))
+dens(icc_hh_i2, col=2, lwd=4 , xlab="ICC (Household) of Item 2")
+
+## Item 3
+icc_hh_i3 <- ((i3$`sd_ComID:UniqueFamID__D3SelfCritical_Intercept`)^2) / ((i3$`sd_ComID__D3SelfCritical_Intercept`)^2 + (i3$`sd_ComID:UniqueFamID__D3SelfCritical_Intercept`)^2 + 
+                                                                            (i3$sd_Interviewer__D3SelfCritical_Intercept)^2 + (((pi)^2)/3))
+dens(icc_hh_i3, col=2, lwd=4 , xlab="ICC (Household) of Item 3")
+
+## Item 4
+icc_hh_i4 <- ((i4$`sd_ComID:UniqueFamID__D4LifeNotValuable_Intercept`)^2) / ((i4$`sd_ComID__D4LifeNotValuable_Intercept`)^2 + (i4$`sd_ComID:UniqueFamID__D4LifeNotValuable_Intercept`)^2 + 
+                                                                               (i4$sd_Interviewer__D4LifeNotValuable_Intercept)^2 + (((pi)^2)/3))
+dens(icc_hh_i4, col=2, lwd=4 , xlab="ICC (Household) of Item 4")
+
+## Item 5
+icc_hh_i5 <- ((i5$`sd_ComID:UniqueFamID__D5Useless_Intercept`)^2) / ((i5$`sd_ComID__D5Useless_Intercept`)^2 + (i5$`sd_ComID:UniqueFamID__D5Useless_Intercept`)^2 + 
+                                                                       (i5$sd_Interviewer__D5Useless_Intercept)^2 + (((pi)^2)/3))
+dens(icc_hh_i5, col=2, lwd=4 , xlab="ICC (Household) of Item 5")
+
+## Item 6
+icc_hh_i6 <- ((i6$`sd_ComID:UniqueFamID__D6NoInterest_Intercept`)^2) / ((i6$`sd_ComID__D6NoInterest_Intercept`)^2 + (i6$`sd_ComID:UniqueFamID__D6NoInterest_Intercept`)^2 + 
+                                                                          (i6$sd_Interviewer__D6NoInterest_Intercept)^2 + (((pi)^2)/3))
+dens(icc_hh_i6, col=2, lwd=4 , xlab="ICC (Household) of Item 6")
+
+## Item 7
+icc_hh_i7 <- ((i7$`sd_ComID:UniqueFamID__D7Tired_Intercept`)^2) / ((i7$`sd_ComID__D7Tired_Intercept`)^2 + (i7$`sd_ComID:UniqueFamID__D7Tired_Intercept`)^2 + 
+                                                                     (i7$sd_Interviewer__D7Tired_Intercept)^2 + (((pi)^2)/3))
+dens(icc_hh_i7, col=2, lwd=4 , xlab="ICC (Household) of Item 7")
+
+############## Intermediate steps to preserve computer memory
+#############################################################
+
+## Combining initial interviewer icc vectors into a dataframe
+icc_item_data <- data.frame(
+  Item1 = icc_int_i1,
+  Item2 = icc_int_i2,
+  Item3 = icc_int_i3,
+  Item4 = icc_int_i4,
+  Item5 = icc_int_i5,
+  Item6 = icc_int_i6,
+  Item7 = icc_int_i7
+)
+
+## Combining initial community icc vectors into a dataframe
+icc_item_data_com <- data.frame(
+  Item1 = icc_com_i1,
+  Item2 = icc_com_i2,
+  Item3 = icc_com_i3,
+  Item4 = icc_com_i4,
+  Item5 = icc_com_i5,
+  Item6 = icc_com_i6,
+  Item7 = icc_com_i7
+)
+
+## Combining initial household icc vectors into a dataframe
+icc_item_data_hh <- data.frame(
+  Item1 = icc_hh_i1,
+  Item2 = icc_hh_i2,
+  Item3 = icc_hh_i3,
+  Item4 = icc_hh_i4,
+  Item5 = icc_hh_i5,
+  Item6 = icc_hh_i6,
+  Item7 = icc_hh_i7
+)
+
+
+## Saving this all to csv files
+write.csv(icc_item_data, "Interviewer_ICC_I1_I7.csv")
+write.csv(icc_item_data_com, "Community_ICC_I1_I7.csv")      
+write.csv(icc_item_data_hh, "Household_ICC_I1_I7.csv")        
+
+
+#############################################################
+#############################################################
+### Reload these files and think of starting this script afresh, where we are now calculating the ICCs of the remaining items
+
+icc_item_data <- read.csv("Interviewer_ICC_I1_I7.csv")
+icc_item_data_com <- read.csv("Community_ICC_I1_I7.csv")
+icc_item_data_hh <- read.csv("Household_ICC_I1_I7.csv")
+
+# Okay, now let's calculate the Interviewer Adjusted ICCs for Item 8 - 18
+#############################################################
+
+## Item 8
+icc_int_i8 <- ((i8$sd_Interviewer__D8CantConcentrate_Intercept)^2) / (
+  (i8$`sd_ComID__D8CantConcentrate_Intercept`)^2 + 
+    (i8$`sd_ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2 + 
+    (i8$sd_Interviewer__D8CantConcentrate_Intercept)^2  + 
+    (((pi)^2)/3)
+)
+dens(icc_int_i8, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 8")
+
+## Item 9
+icc_int_i9 <- ((i9$sd_Interviewer__D9Nervous_Intercept)^2) / (
+  (i9$`sd_ComID__D9Nervous_Intercept`)^2 + 
+    (i9$`sd_ComID:UniqueFamID__D9Nervous_Intercept`)^2 + 
+    (i9$sd_Interviewer__D9Nervous_Intercept)^2  + 
+    (((pi)^2)/3)
+)
+dens(icc_int_i9, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 9")
+
+## Item 10
+icc_int_i10 <- ((i10$sd_Interviewer__D10Paranoid_Intercept)^2) / (
+  (i10$`sd_ComID__D10Paranoid_Intercept`)^2 + 
+    (i10$`sd_ComID:UniqueFamID__D10Paranoid_Intercept`)^2 + 
+    (i10$sd_Interviewer__D10Paranoid_Intercept)^2  + 
+    (((pi)^2)/3)
+)
+dens(icc_int_i10, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 10")
+
+## Item 11
+icc_int_i11 <- ((i11$sd_Interviewer__D11CantSleep_Intercept)^2) / (
+  (i11$`sd_ComID__D11CantSleep_Intercept`)^2 + 
+    (i11$`sd_ComID:UniqueFamID__D11CantSleep_Intercept`)^2 + 
+    (i11$sd_Interviewer__D11CantSleep_Intercept)^2  + 
+    (((pi)^2)/3)
+)
+dens(icc_int_i11, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 11")
+
+## Item 12
+icc_int_i12 <- ((i12$sd_Interviewer__D12CantEat_Intercept)^2) / (
+  (i12$`sd_ComID__D12CantEat_Intercept`)^2 + 
+    (i12$`sd_ComID:UniqueFamID__D12CantEat_Intercept`)^2 + 
+    (i12$sd_Interviewer__D12CantEat_Intercept)^2  + 
+    (((pi)^2)/3)
+)
+dens(icc_int_i12, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 12")
+
+## Item 13
+icc_int_i13 <- ((i13$sd_Interviewer__D13CantFuck_Intercept)^2) / (
+  (i13$`sd_ComID__D13CantFuck_Intercept`)^2 + 
+    (i13$`sd_ComID:UniqueFamID__D13CantFuck_Intercept`)^2 + 
+    (i13$sd_Interviewer__D13CantFuck_Intercept)^2  + 
+    (((pi)^2)/3)
+)
+dens(icc_int_i13, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 13")
+
+## Item 14
+icc_int_i14 <- ((i14$sd_Interviewer__D14Pessimistic_Intercept)^2) / (
+  (i14$`sd_ComID__D14Pessimistic_Intercept`)^2 + 
+    (i14$`sd_ComID:UniqueFamID__D14Pessimistic_Intercept`)^2 + 
+    (i14$sd_Interviewer__D14Pessimistic_Intercept)^2  + 
+    (((pi)^2)/3)
+)
+dens(icc_int_i14, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 14")
+
+## Item 16
+icc_int_i16 <- ((i16$sd_Interviewer__D16PunishMe_Intercept)^2) / (
+  (i16$`sd_ComID__D16PunishMe_Intercept`)^2 + 
+    (i16$`sd_ComID:UniqueFamID__D16PunishMe_Intercept`)^2 + 
+    (i16$sd_Interviewer__D16PunishMe_Intercept)^2  + 
+    (((pi)^2)/3)
+)
+dens(icc_int_i16, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 16")
+
+## Item 18
+icc_int_i18 <- ((i18$sd_Interviewer__D18HeavyThoughts_Intercept)^2) / (
+  (i18$`sd_ComID__D18HeavyThoughts_Intercept`)^2 + 
+    (i18$`sd_ComID:UniqueFamID__D18HeavyThoughts_Intercept`)^2 + 
+    (i18$sd_Interviewer__D18HeavyThoughts_Intercept)^2  + 
+    (((pi)^2)/3)
+)
+dens(icc_int_i18, col=2, lwd=4 , xlab="ICC (Interviewer) of Item 18")
+
+
+## Now calculate community adjusted ICC for each item
+#########################################################
+
+## Item 8
+icc_com_i8 <- ((i8$`sd_ComID__D8CantConcentrate_Intercept`)^2) / (
+  (i8$`sd_ComID__D8CantConcentrate_Intercept`)^2 + 
+    (i8$`sd_ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2 + 
+    (i8$sd_Interviewer__D8CantConcentrate_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_com_i8, col=2, lwd=4 , xlab="ICC (Community) of Item 8")
+
+## Item 9
+icc_com_i9 <- ((i9$`sd_ComID__D9Nervous_Intercept`)^2) / (
+  (i9$`sd_ComID__D9Nervous_Intercept`)^2 + 
+    (i9$`sd_ComID:UniqueFamID__D9Nervous_Intercept`)^2 + 
+    (i9$sd_Interviewer__D9Nervous_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_com_i9, col=2, lwd=4 , xlab="ICC (Community) of Item 9")
+
+## Item 10
+icc_com_i10 <- ((i10$`sd_ComID__D10Paranoid_Intercept`)^2) / (
+  (i10$`sd_ComID__D10Paranoid_Intercept`)^2 + 
+    (i10$`sd_ComID:UniqueFamID__D10Paranoid_Intercept`)^2 + 
+    (i10$sd_Interviewer__D10Paranoid_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_com_i10, col=2, lwd=4 , xlab="ICC (Community) of Item 10")
+
+## Item 11
+icc_com_i11 <- ((i11$`sd_ComID__D11CantSleep_Intercept`)^2) / (
+  (i11$`sd_ComID__D11CantSleep_Intercept`)^2 + 
+    (i11$`sd_ComID:UniqueFamID__D11CantSleep_Intercept`)^2 + 
+    (i11$sd_Interviewer__D11CantSleep_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_com_i11, col=2, lwd=4 , xlab="ICC (Community) of Item 11")
+
+## Item 12
+icc_com_i12 <- ((i12$`sd_ComID__D12CantEat_Intercept`)^2) / (
+  (i12$`sd_ComID__D12CantEat_Intercept`)^2 + 
+    (i12$`sd_ComID:UniqueFamID__D12CantEat_Intercept`)^2 + 
+    (i12$sd_Interviewer__D12CantEat_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_com_i12, col=2, lwd=4 , xlab="ICC (Community) of Item 12")
+
+## Item 13
+icc_com_i13 <- ((i13$`sd_ComID__D13CantFuck_Intercept`)^2) / (
+  (i13$`sd_ComID__D13CantFuck_Intercept`)^2 + 
+    (i13$`sd_ComID:UniqueFamID__D13CantFuck_Intercept`)^2 + 
+    (i13$sd_Interviewer__D13CantFuck_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_com_i13, col=2, lwd=4 , xlab="ICC (Community) of Item 13")
+
+## Item 14
+icc_com_i14 <- ((i14$`sd_ComID__D14Pessimistic_Intercept`)^2) / (
+  (i14$`sd_ComID__D14Pessimistic_Intercept`)^2 + 
+    (i14$`sd_ComID:UniqueFamID__D14Pessimistic_Intercept`)^2 + 
+    (i14$sd_Interviewer__D14Pessimistic_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_com_i14, col=2, lwd=4 , xlab="ICC (Community) of Item 14")
+
+## Item 16
+icc_com_i16 <- ((i16$`sd_ComID__D16PunishMe_Intercept`)^2) / (
+  (i16$`sd_ComID__D16PunishMe_Intercept`)^2 + 
+    (i16$`sd_ComID:UniqueFamID__D16PunishMe_Intercept`)^2 + 
+    (i16$sd_Interviewer__D16PunishMe_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_com_i16, col=2, lwd=4 , xlab="ICC (Community) of Item 16")
+
+## Item 18
+icc_com_i18 <- ((i18$`sd_ComID__D18HeavyThoughts_Intercept`)^2) / (
+  (i18$`sd_ComID__D18HeavyThoughts_Intercept`)^2 + 
+    (i18$`sd_ComID:UniqueFamID__D18HeavyThoughts_Intercept`)^2 + 
+    (i18$sd_Interviewer__D18HeavyThoughts_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_com_i18, col=2, lwd=4 , xlab="ICC (Community) of Item 18")
+
+
+## Now calculate household adjusted ICC for each item
+#########################################################
+
+## Item 8
+icc_hh_i8 <- ((i8$`sd_ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2) / (
+  (i8$`sd_ComID__D8CantConcentrate_Intercept`)^2 + 
+    (i8$`sd_ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2 + 
+    (i8$sd_Interviewer__D8CantConcentrate_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_hh_i8, col=2, lwd=4 , xlab="ICC (Household) of Item 8")
+
+## Item 9
+icc_hh_i9 <- ((i9$`sd_ComID:UniqueFamID__D9Nervous_Intercept`)^2) / (
+  (i9$`sd_ComID__D9Nervous_Intercept`)^2 + 
+    (i9$`sd_ComID:UniqueFamID__D9Nervous_Intercept`)^2 + 
+    (i9$sd_Interviewer__D9Nervous_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_hh_i9, col=2, lwd=4 , xlab="ICC (Household) of Item 9")
+
+## Item 10
+icc_hh_i10 <- ((i10$`sd_ComID:UniqueFamID__D10Paranoid_Intercept`)^2) / (
+  (i10$`sd_ComID__D10Paranoid_Intercept`)^2 + 
+    (i10$`sd_ComID:UniqueFamID__D10Paranoid_Intercept`)^2 + 
+    (i10$sd_Interviewer__D10Paranoid_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_hh_i10, col=2, lwd=4 , xlab="ICC (Household) of Item 10")
+
+## Item 11
+icc_hh_i11 <- ((i11$`sd_ComID:UniqueFamID__D11CantSleep_Intercept`)^2) / (
+  (i11$`sd_ComID__D11CantSleep_Intercept`)^2 + 
+    (i11$`sd_ComID:UniqueFamID__D11CantSleep_Intercept`)^2 + 
+    (i11$sd_Interviewer__D11CantSleep_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_hh_i11, col=2, lwd=4 , xlab="ICC (Household) of Item 11")
+
+## Item 12
+icc_hh_i12 <- ((i12$`sd_ComID:UniqueFamID__D12CantEat_Intercept`)^2) / (
+  (i12$`sd_ComID__D12CantEat_Intercept`)^2 + 
+    (i12$`sd_ComID:UniqueFamID__D12CantEat_Intercept`)^2 + 
+    (i12$sd_Interviewer__D12CantEat_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_hh_i12, col=2, lwd=4 , xlab="ICC (Household) of Item 12")
+
+## Item 13
+icc_hh_i13 <- ((i13$`sd_ComID:UniqueFamID__D13CantFuck_Intercept`)^2) / (
+  (i13$`sd_ComID__D13CantFuck_Intercept`)^2 + 
+    (i13$`sd_ComID:UniqueFamID__D13CantFuck_Intercept`)^2 + 
+    (i13$sd_Interviewer__D13CantFuck_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_hh_i13, col=2, lwd=4 , xlab="ICC (Household) of Item 13")
+
+## Item 14
+icc_hh_i14 <- ((i14$`sd_ComID:UniqueFamID__D14Pessimistic_Intercept`)^2) / (
+  (i14$`sd_ComID__D14Pessimistic_Intercept`)^2 + 
+    (i14$`sd_ComID:UniqueFamID__D14Pessimistic_Intercept`)^2 + 
+    (i14$sd_Interviewer__D14Pessimistic_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_hh_i14, col=2, lwd=4 , xlab="ICC (Household) of Item 14")
+
+## Item 16
+icc_hh_i16 <- ((i16$`sd_ComID:UniqueFamID__D16PunishMe_Intercept`)^2) / (
+  (i16$`sd_ComID__D16PunishMe_Intercept`)^2 + 
+    (i16$`sd_ComID:UniqueFamID__D16PunishMe_Intercept`)^2 + 
+    (i16$sd_Interviewer__D16PunishMe_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_hh_i16, col=2, lwd=4 , xlab="ICC (Household) of Item 16")
+
+## Item 18
+icc_hh_i18 <- ((i18$`sd_ComID:UniqueFamID__D18HeavyThoughts_Intercept`)^2) / (
+  (i18$`sd_ComID__D18HeavyThoughts_Intercept`)^2 + 
+    (i18$`sd_ComID:UniqueFamID__D18HeavyThoughts_Intercept`)^2 + 
+    (i18$sd_Interviewer__D18HeavyThoughts_Intercept)^2 + 
+    (((pi)^2)/3)
+)
+dens(icc_hh_i18, col=2, lwd=4 , xlab="ICC (Household) of Item 18")
+
+
+############## Final steps to now combine previous ICC data
+#############################################################
+
+## Combining the recent interviewer icc vectors into a dataframe
+icc_item_data_v2 <- data.frame(
+  Item8  = icc_int_i8,
+  Item9  = icc_int_i9,
+  Item10 = icc_int_i10,
+  Item11 = icc_int_i11,
+  Item12 = icc_int_i12,
+  Item13 = icc_int_i13,
+  Item14 = icc_int_i14,
+  Item16 = icc_int_i16,
+  Item18 = icc_int_i18
+)
+
+## Combining recent community icc vectors into a dataframe
+icc_item_data_com_v2 <- data.frame(
+  Item8  = icc_com_i8,
+  Item9  = icc_com_i9,
+  Item10 = icc_com_i10,
+  Item11 = icc_com_i11,
+  Item12 = icc_com_i12,
+  Item13 = icc_com_i13,
+  Item14 = icc_com_i14,
+  Item16 = icc_com_i16,
+  Item18 = icc_com_i18
+)
+
+## Combining initial community icc vectors into a dataframe
+icc_item_data_hh_v2 <- data.frame(
+  Item8  = icc_hh_i8,
+  Item9  = icc_hh_i9,
+  Item10 = icc_hh_i10,
+  Item11 = icc_hh_i11,
+  Item12 = icc_hh_i12,
+  Item13 = icc_hh_i13,
+  Item14 = icc_hh_i14,
+  Item16 = icc_hh_i16,
+  Item18 = icc_hh_i18
+)
+
+
+### Now we aim to combine our initial and recently created icc dataframes so that we can visualise ICCs across items
+
+## First, remove the first extra column (added due to loading it as a csv) from the previous dataframes
+icc_item_data <- icc_item_data[, -1]
+icc_item_data_com <- icc_item_data_com[, -1]
+icc_item_data_hh <- icc_item_data_hh[, -1]
+
+## Now combine the dataframes
+icc_item_data_combined <- bind_cols(icc_item_data, icc_item_data_v2)
+icc_item_data_com_combined <- bind_cols(icc_item_data_com, icc_item_data_com_v2)
+icc_item_data_hh_combined <- bind_cols(icc_item_data_hh, icc_item_data_hh_v2)
+
+##################### PLOT
+
+### Interviewer ICC Plots
+interview_icc <- mcmc_areas(
+  icc_item_data_combined,
+  prob = 1,     # inner interval
+  prob_outer = 1, # outer interval
+  point_est = "mean"
+) +
+  scale_x_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) +
+  labs(title = "(c) Interviewer ICC ") +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
+
+
+### Community ICC Plots
+community_icc <- mcmc_areas(
+  icc_item_data_com_combined,
+  prob = 1,     # inner interval
+  prob_outer = 1, # outer interval
+  point_est = "mean"
+) +
+  scale_x_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) +
+  labs(title = "(a) Community ICC ") +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
+
+
+### Household ICC Plots
+household_icc <- mcmc_areas(
+  icc_item_data_hh_combined,
+  prob = 1,     # inner interval
+  prob_outer = 1, # outer interval
+  point_est = "mean"
+) +
+  scale_x_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0, 1)) +
+  labs(title = "(b) Household ICC ") +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
+
+
+## Combining all plots
+Combined_ICC <- (community_icc | household_icc | interview_icc)
+
+
+
+
+# PLOTTING VARYING ASSOCIATIONS OF HIGHER LEVEL DETERMINANTS BETWEEN ITEMS
+##########################################################################
+#########################################################################
+
+# Let's start with the predictors
+##########################################################################
+
+# First, distance to market town
+## Again, we are doing certain items initially (due to my local machine's memory constraints)
+# We are exponentiating to make the associations interpretable to odds-ratio
+I1_dist <- exp(i1$b_D1Sad_Town_Distance)
+I2_dist <- exp(i2$b_D2Cry_Town_Distance)
+I3_dist <- exp(i3$b_D3SelfCritical_Town_Distance)
+I4_dist <- exp(i4$b_D4LifeNotValuable_Town_Distance)
+I5_dist <- exp(i5$b_D5Useless_Town_Distance)
+I6_dist <- exp(i6$b_D6NoInterest_Town_Distance)
+I7_dist <- exp(i7$b_D7Tired_Town_Distance)
+I8_dist <- exp(i8$b_D8CantConcentrate_Town_Distance)
+
+## Now doing this for Community Size
+I1_comsize <- exp(i1$b_D1Sad_Com_Size)
+I2_comsize <- exp(i2$b_D2Cry_Com_Size)
+I3_comsize <- exp(i3$b_D3SelfCritical_Com_Size)
+I4_comsize <- exp(i4$b_D4LifeNotValuable_Com_Size)
+I5_comsize <- exp(i5$b_D5Useless_Com_Size)
+I6_comsize <- exp(i6$b_D6NoInterest_Com_Size)
+I7_comsize <- exp(i7$b_D7Tired_Com_Size)
+I8_comsize <- exp(i8$b_D8CantConcentrate_Com_Size)
+
+## Now doing this for Household Size
+I1_hhsize <- exp(i1$bsp_D1Sad_miHH_Size)
+I2_hhsize <- exp(i2$bsp_D2Cry_miHH_Size)
+I3_hhsize <- exp(i3$bsp_D3SelfCritical_miHH_Size)
+I4_hhsize <- exp(i4$bsp_D4LifeNotValuable_miHH_Size)
+I5_hhsize <- exp(i5$bsp_D5Useless_miHH_Size)
+I6_hhsize <- exp(i6$bsp_D6NoInterest_miHH_Size)
+I7_hhsize <- exp(i7$bsp_D7Tired_miHH_Size)
+I8_hhsize <- exp(i8$bsp_D8CantConcentrate_miHH_Size)
+
+
+############## Intermediate steps to preserve computer memory
+#############################################################
+
+# Combining distance to market town posteriors into a data frame (columns = items)
+posterior_com_dist <- as.data.frame(cbind(
+  Item1 = I1_dist,
+  Item2 = I2_dist,
+  Item3 = I3_dist,
+  Item4 = I4_dist,
+  Item5 = I5_dist,
+  Item6 = I6_dist,
+  Item7 = I7_dist,
+  Item8 = I8_dist
+))
+
+# Combining community size posteriors into a data frame (columns = items)
+posterior_com_size <- as.data.frame(cbind(
+  Item1 = I1_comsize,
+  Item2 = I2_comsize,
+  Item3 = I3_comsize,
+  Item4 = I4_comsize,
+  Item5 = I5_comsize,
+  Item6 = I6_comsize,
+  Item7 = I7_comsize,
+  Item8 = I8_comsize
+))
+
+# Combining household size posteriors into a data frame (columns = items)
+posterior_hh_size <- as.data.frame(cbind(
+  Item1 = I1_hhsize,
+  Item2 = I2_hhsize,
+  Item3 = I3_hhsize,
+  Item4 = I4_hhsize,
+  Item5 = I5_hhsize,
+  Item6 = I6_hhsize,
+  Item7 = I7_hhsize,
+  Item8 = I8_hhsize
+))
+
+
+## Saving this all to csv files
+write.csv(posterior_com_dist, "Com_Dist_I1_I8.csv")
+write.csv(posterior_com_size, "Com_Size_I1_I8.csv")      
+write.csv(posterior_hh_size, "HH_Size_I1_I8.csv")        
+
+
+#############################################################
+#############################################################
+### Reload these files and think of starting this script afresh, where we are now extracting the posteriors of the remaining items
+
+posterior_com_dist <- read.csv("Com_Dist_I1_I8.csv")
+posterior_com_size <- read.csv("Com_Size_I1_I8.csv")
+posterior_hh_size <- read.csv("HH_Size_I1_I8.csv")
+
+
+#############################################################
+#############################################################
+## Now extracting posteriors of predictors for the other 8 items
+
+### First for distance to market town
+I9_dist <- exp(i9$b_D9Nervous_Town_Distance)
+I10_dist <- exp(i10$b_D10Paranoid_Town_Distance)
+I11_dist <- exp(i11$b_D11CantSleep_Town_Distance)
+I12_dist <- exp(i12$b_D12CantEat_Town_Distance)
+I13_dist <- exp(i13$b_D13CantFuck_Town_Distance)
+I14_dist <- exp(i14$b_D14Pessimistic_Town_Distance)
+I16_dist <- exp(i16$b_D16PunishMe_Town_Distance)
+I18_dist <- exp(i18$b_D18HeavyThoughts_Town_Distance)
+
+### Now for community size
+I9_comsize <- exp(i9$b_D9Nervous_Com_Size)
+I10_comsize <- exp(i10$b_D10Paranoid_Com_Size)
+I11_comsize <- exp(i11$b_D11CantSleep_Com_Size)
+I12_comsize <- exp(i12$b_D12CantEat_Com_Size)
+I13_comsize <- exp(i13$b_D13CantFuck_Com_Size)
+I14_comsize <- exp(i14$b_D14Pessimistic_Com_Size)
+I16_comsize <- exp(i16$b_D16PunishMe_Com_Size)
+I18_comsize <- exp(i18$b_D18HeavyThoughts_Com_Size)
+
+### Now for household size
+I9_hhsize <- exp(i9$bsp_D9Nervous_miHH_Size)
+I10_hhsize <- exp(i10$bsp_D10Paranoid_miHH_Size)
+I11_hhsize <- exp(i11$bsp_D11CantSleep_miHH_Size)
+I12_hhsize <- exp(i12$bsp_D12CantEat_miHH_Size)
+I13_hhsize <- exp(i13$bsp_D13CantFuck_miHH_Size)
+I14_hhsize <- exp(i14$bsp_D14Pessimistic_miHH_Size)
+I16_hhsize <- exp(i16$bsp_D16PunishMe_miHH_Size)
+I18_hhsize <- exp(i18$bsp_D18HeavyThoughts_miHH_Size)
+
+## Now combining all of these into a dataframe
+
+# Combining distance to market town posteriors into a data frame 
+posterior_com_dist_v2 <- as.data.frame(cbind(
+  Item9 = I9_dist,
+  Item10 = I10_dist,
+  Item11 = I11_dist,
+  Item12 = I12_dist,
+  Item13 = I13_dist,
+  Item14 = I14_dist,
+  Item16 = I16_dist,
+  Item18 = I18_dist
+))
+
+# Now Combining community size posteriors into a data frame 
+posterior_com_size_v2 <- as.data.frame(cbind(
+  Item9  = I9_comsize,
+  Item10 = I10_comsize,
+  Item11 = I11_comsize,
+  Item12 = I12_comsize,
+  Item13 = I13_comsize,
+  Item14 = I14_comsize,
+  Item16 = I16_comsize,
+  Item18 = I18_comsize
+))
+
+# Now Combining household size posteriors into a data frame 
+posterior_hh_size_v2 <- as.data.frame(cbind(
+  Item9  = I9_hhsize,
+  Item10 = I10_hhsize,
+  Item11 = I11_hhsize,
+  Item12 = I12_hhsize,
+  Item13 = I13_hhsize,
+  Item14 = I14_hhsize,
+  Item16 = I16_hhsize,
+  Item18 = I18_hhsize
+))
+
+
+### Now we aim to combine our initial and recently created posterior dataframes so that we can visualise posteriors of predictors across items
+
+## First, remove the first extra column (added due to loading it as a csv) from the previous dataframes
+posterior_com_dist <- posterior_com_dist[, -1]
+posterior_com_size <- posterior_com_size[, -1]
+posterior_hh_size <- posterior_hh_size[, -1]
+
+## Now combine the dataframes
+posterior_com_dist_combined <- bind_cols(posterior_com_dist, posterior_com_dist_v2)
+posterior_com_size_combined <- bind_cols(posterior_com_size, posterior_com_size_v2)
+posterior_hh_size_combined <- bind_cols(posterior_hh_size, posterior_hh_size_v2)
+
+
+### Now, PLOTTING TIME
+
+### Plotting posteriors now for distance to market town across items
+com_dist_density_plots <- mcmc_areas(
+  posterior_com_dist_combined,
+  prob = 0.95,     # inner interval
+  prob_outer = 0.95, # outer interval
+  point_est = "mean"
+) +
+  geom_vline(xintercept = 1.00, color = "black", linetype = "solid", size = 0.6) +
+  scale_x_continuous(breaks = seq(0.5, 1.75, by = 0.25), limits = c(0.5, 1.75)) +
+  labs(title = "(a) Distance to Market Town") +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
+
+# Reverse parameter order (if needed)
+param_names <- colnames(posterior_com_dist_combined)
+param_names_rev <- rev(param_names)
+
+# Calculate P(>0) for each parameter in reversed order
+text_labels_com_dist <- tibble(
+  parameter = factor(param_names_rev, levels = param_names_rev),
+  label = paste0("P(>0) = ", round(colMeans(posterior_com_dist_combined[, param_names_rev] > 1), 2)),
+  y = seq_along(param_names)  # y position for labels
+)
+
+# Add the text labels to the existing plot
+com_dist_density_plots <- com_dist_density_plots +
+  geom_text(
+    data = text_labels_com_dist,
+    aes(x = 1.65, y = y, label = label),  # adjust x position to fit nicely on your scale
+    hjust = 0,
+    family = "Helvetica",
+    fontface = "italic",
+    color = "red",
+    size = 5  # adjust size to fit your plot better
+  )
+
+
+
+
+
+
+#################################### Plotting posteriors now for community size across items
+com_size_density_plots <- mcmc_areas(
+  posterior_com_size_combined,
+  prob = 0.95,     # inner interval
+  prob_outer = 0.95, # outer interval
+  point_est = "mean"
+) +
+  geom_vline(xintercept = 1.00, color = "black", linetype = "solid", size = 0.6) +
+  scale_x_continuous(breaks = seq(0.5, 1.75, by = 0.25), limits = c(0.5, 1.75)) +
+  labs(title = "(b) Community Size") +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
+
+
+# Reverse parameter order (if needed)
+param_names <- colnames(posterior_com_size_combined)
+param_names_rev <- rev(param_names)
+
+# Calculate P(>0) for each parameter in reversed order
+text_labels_com_size <- tibble(
+  parameter = factor(param_names_rev, levels = param_names_rev),
+  label = paste0("P(>0) = ", round(colMeans(posterior_com_size_combined[, param_names_rev] > 1), 2)),
+  y = seq_along(param_names)  # y position for labels
+)
+
+# Add the text labels to the existing plot
+com_size_density_plots <- com_size_density_plots +
+  geom_text(
+    data = text_labels_com_size,
+    aes(x = 1.65, y = y, label = label),  # adjust x position to fit nicely on your scale
+    hjust = 0,
+    family = "Helvetica",
+    fontface = "italic",
+    color = "red",
+    size = 5  # adjust size to fit your plot better
+  )
+
+
+
+######################## Plotting posteriors now for household size across items
+hh_size_density_plots <- mcmc_areas(
+  posterior_hh_size_combined,
+  prob = 0.95,     # inner interval
+  prob_outer = 0.95, # outer interval
+  point_est = "mean"
+) +
+  geom_vline(xintercept = 1.00, color = "black", linetype = "solid", size = 0.6) +
+  scale_x_continuous(breaks = seq(0.5, 1.75, by = 0.25), limits = c(0.5, 1.75)) + 
+  labs(title = "(c) Household Size") +
+  theme(
+    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
+    axis.text.x = element_text(family = "Helvetica", size = 16),
+    axis.text.y = element_text(family = "Helvetica", size = 18))
+
+# Reverse parameter order (if needed)
+param_names <- colnames(posterior_hh_size_combined)
+param_names_rev <- rev(param_names)
+
+# Calculate P(>0) for each parameter in reversed order
+text_labels_hh_size <- tibble(
+  parameter = factor(param_names_rev, levels = param_names_rev),
+  label = paste0("P(>0) = ", round(colMeans(posterior_hh_size_combined[, param_names_rev] > 1), 2)),
+  y = seq_along(param_names)  # y position for labels
+)
+
+# Add the text labels to the existing plot
+hh_size_density_plots <- hh_size_density_plots +
+  geom_text(
+    data = text_labels_hh_size,
+    aes(x = 1.65, y = y, label = label),  # adjust x position to fit nicely on your scale
+    hjust = 0,
+    family = "Helvetica",
+    fontface = "italic",
+    color = "red",
+    size = 5  # adjust size to fit your plot better
+  )
+
+
+##### Combine all plots into 1 plot
+post_plots_combined <- (com_dist_density_plots | com_size_density_plots | hh_size_density_plots)
+
+
+
+
+
+######## Summarizing all model outputs in one table (Item 1 - Item 4)
+#########################################################
+
+### Item 1
+i1_icc_residual <- ( ((pi)^2)/3 ) / (
+  (i1$`sd_ComID__D1Sad_Intercept`)^2 + 
+    (i1$`sd_ComID:UniqueFamID__D1Sad_Intercept`)^2 + 
+    (i1$sd_Interviewer__D1Sad_Intercept)^2 +  
+    (((pi)^2)/3)
+)
+
+### Item 2
+i2_icc_residual <- ( ((pi)^2)/3 ) / (
+  (i2$`sd_ComID__D2Cry_Intercept`)^2 + 
+    (i2$`sd_ComID:UniqueFamID__D2Cry_Intercept`)^2 + 
+    (i2$sd_Interviewer__D2Cry_Intercept)^2 +  
+    (((pi)^2)/3)
+)
+
+### Item 3
+i3_icc_residual <- ( ((pi)^2)/3 ) / (
+  (i3$`sd_ComID__D3SelfCritical_Intercept`)^2 + 
+    (i3$`sd_ComID:UniqueFamID__D3SelfCritical_Intercept`)^2 + 
+    (i3$sd_Interviewer__D3SelfCritical_Intercept)^2 +  
+    (((pi)^2)/3)
+)
+
+### Item 4
+i4_icc_residual <- ( ((pi)^2)/3 ) / (
+  (i4$`sd_ComID__D4LifeNotValuable_Intercept`)^2 + 
+    (i4$`sd_ComID:UniqueFamID__D4LifeNotValuable_Intercept`)^2 + 
+    (i4$sd_Interviewer__D4LifeNotValuable_Intercept)^2 +  
+    (((pi)^2)/3)
+)
+
+### Item 5
+i5_icc_residual <- ( ((pi)^2)/3 ) / (
+  (i5$`sd_ComID__D5Useless_Intercept`)^2 + 
+    (i5$`sd_ComID:UniqueFamID__D5Useless_Intercept`)^2 + 
+    (i5$sd_Interviewer__D5Useless_Intercept)^2 +  
+    (((pi)^2)/3)
+)
+
+### Item 6
+i6_icc_residual <- ( ((pi)^2)/3 ) / (
+  (i6$`sd_ComID__D6NoInterest_Intercept`)^2 + 
+    (i6$`sd_ComID:UniqueFamID__D6NoInterest_Intercept`)^2 + 
+    (i6$sd_Interviewer__D6NoInterest_Intercept)^2 +  
+    (((pi)^2)/3)
+)
+
+### Item 7
+i7_icc_residual <- ( ((pi)^2)/3 ) / (
+  (i7$`sd_ComID__D7Tired_Intercept`)^2 + 
+    (i7$`sd_ComID:UniqueFamID__D7Tired_Intercept`)^2 + 
+    (i7$sd_Interviewer__D7Tired_Intercept)^2 +  
+    (((pi)^2)/3)
+)
+
+### Item 8
+i8_icc_residual <- ( ((pi)^2)/3 ) / (
+  (i8$`sd_ComID__D8CantConcentrate_Intercept`)^2 + 
+    (i8$`sd_ComID:UniqueFamID__D8CantConcentrate_Intercept`)^2 + 
+    (i8$sd_Interviewer__D8CantConcentrate_Intercept)^2 +  
+    (((pi)^2)/3)
+)
+
+
+
+
+
          
