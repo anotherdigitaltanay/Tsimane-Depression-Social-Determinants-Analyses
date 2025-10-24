@@ -269,9 +269,9 @@ cor(depression_data_v2$Age, depression_data_v2$DisabilityScore, use = "complete.
 # Make summary dataframe for the multilevel structure of our dataset
 multilevel_summary_stats <- depression_data_v2 %>%
   summarise(
-    Variable = c("Regions", "Communities", "Households", "Individuals", "Total Observations"),
-    N = c(n_distinct(region), n_distinct(ComID), n_distinct(UniqueFamID), n_distinct(PID), n() )) %>%
-  mutate(Variable = factor(Variable, levels = c("Regions", "Communities", "Households", "Individuals", "Total Observations")))
+    Variable = c("Communities", "Households", "Individuals", "Total Observations"),
+    N = c(n_distinct(ComID), n_distinct(UniqueFamID), n_distinct(PID), n() )) %>%
+  mutate(Variable = factor(Variable, levels = c("Communities", "Households", "Individuals", "Total Observations")))
 
 
 
@@ -280,7 +280,7 @@ simple_summary <- ggplot(multilevel_summary_stats, aes(x = Variable, y = N)) +
   geom_col(fill = "steelblue") +
   geom_text(aes(label = N), vjust = -0.5, size = 4) +
   labs(
-    title = "(e) Multilevel Data Structure Summary",
+    title = "(d) Multilevel Data Structure Summary",
     x = "Data Grouping Level",
     y = "Number of Groups at each Level"
   ) +
@@ -298,44 +298,19 @@ simple_summary <- ggplot(multilevel_summary_stats, aes(x = Variable, y = N)) +
 #### Visualising the multilevel structure of the dataset via plots
 ##################################################################
 
-## First we count how many communities are present in each region
-com_per_region <- depression_data_v2 %>%
-  distinct(region, ComID) %>%                           # Outlines the communities present in each region
-  count(region) %>%                                     # Now precisely counting how many communities present in each region (in a summary estimate)
-  count(n, name = "num_regions")                        # Counting now how many regions have the same count of communities
-
-## Plot
-plot1 <- ggplot(com_per_region, aes(x = factor(n), y = num_regions)) +
-  geom_bar(stat = "identity", fill = "red") +
-  labs(
-    title = "(a) Distribution of Communities per Region",
-    x = "Number of Communities in Region",
-    y = "Number of Regions"
-  ) +
-  scale_y_continuous(breaks = 0:max(com_per_region$num_regions)) +
-  coord_flip() +
-  theme_minimal() +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
 
 ##################################################################
-## Now we count how many households are present in each communities
+## First we count how many households are present in each communities
 hh_per_com <- depression_data_v2 %>%
   distinct(ComID, UniqueFamID) %>%                           
   count(ComID) %>%                                     
   count(n, name = "num_coms") 
 
 ## Plot
-plot2 <- ggplot(hh_per_com, aes(x = factor(n), y = num_coms)) +
+plot1 <- ggplot(hh_per_com, aes(x = factor(n), y = num_coms)) +
   geom_bar(stat = "identity", fill = "orange") +
   labs(
-    title = "(b) Distribution of Households per Community",
+    title = "(a) Distribution of Households per Community",
     x = "Number of Households in Community",
     y = "Number of Communities"
   ) +
@@ -360,10 +335,10 @@ id_per_hh <- depression_data_v2 %>%
   count(n, name = "num_hh") 
 
 ## Plot
-plot3 <- ggplot(id_per_hh, aes(x = factor(n), y = num_hh)) +
+plot2 <- ggplot(id_per_hh, aes(x = factor(n), y = num_hh)) +
   geom_bar(stat = "identity", fill = "Blue") +
   labs(
-    title = " (c) Distribution of Individuals per Household",
+    title = " (b) Distribution of Individuals per Household",
     x = "Number of Individuals in Household",
     y = "Number of Households"
   ) +
@@ -387,10 +362,10 @@ obs_per_id <- depression_data_v2 %>%
   count(n, name = "num_id") 
 
 ## Plot
-plot4 <- ggplot(obs_per_id, aes(x = factor(n), y = num_id)) +
+plot3 <- ggplot(obs_per_id, aes(x = factor(n), y = num_id)) +
   geom_bar(stat = "identity", fill = "Green") +
   labs(
-    title = "(d) Distribution of Observations per Individual",
+    title = "(c) Distribution of Observations per Individual",
     x = "Number of observations per Individual",
     y = "Number of Individuals"
   ) +
@@ -407,55 +382,11 @@ plot4 <- ggplot(obs_per_id, aes(x = factor(n), y = num_id)) +
 
 
 
-#### Visualising Distribution of Datapoints across interviewers
-##################################################################
-
-# First, create anonmyized interviewer names
-interviewer_key <- depression_data_v2 %>%
-  distinct(Interviewer) %>%
-  mutate(interviewer_anon = paste0("Interviewer_", row_number()))
-
-# Next, let's create anonmyized region names
-region_key <- depression_data_v2 %>%
-  distinct(region) %>%
-  mutate(region_anon = paste0("Region_", row_number()))
-
-## Sync these anonymous names to the dataset
-depression_data_v2 <- depression_data_v2 %>%
-  left_join(interviewer_key, by = "Interviewer") %>%
-  left_join(region_key, by = "region")
-
-## Count the number of observations per interviewer now
-interviewer_count <- depression_data_v2 %>%
-  count(interviewer_anon, region_anon)
-
-## Now lets plot
-interviewer_plot <- ggplot(interviewer_count, aes(x = interviewer_anon, y = n, fill = region_anon)) +
-  geom_bar(stat = "identity") +
-  scale_fill_brewer(palette = "Set3") + 
-  labs(
-    title = "(f) Observations Recorded Per Interviewer Across Different Regions",
-    x = "Interviewer",
-    y = "Number of Observations",
-    fill = "Region"
-  ) +
-  theme_minimal() +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
-
-
-
 
 ################ Combined Plot of Multilevel structure
 
 ## Combine plots from all four models
-combined_hierarchy_plot <- (plot1 | plot2) / (plot3 | plot4) / (simple_summary | interviewer_plot)
+combined_hierarchy_plot <- (plot1 | plot2) / (plot3 | simple_summary)
 
 
 

@@ -306,7 +306,7 @@ str(dep_data)
 ## This will inform the prior we use for this and subsequent models
 
 ## Specifying the model
-mod1_formula <- bf(D ~ 1 + Age + Sex + mi(SCI) + mi(SFluency) + s(Interview_Date) + (1 |Interviewer) + (1 | Region/ComID/UniqueFamID) + (1 | PID)) +
+mod1_formula <- bf(D ~ 1 + Age + Sex + mi(SCI) + mi(SFluency) + s(Interview_Date) + (1 |Interviewer) + (1 | ComID/UniqueFamID) + (1 | PID)) +
   bf(SCI | mi() ~ 1 + Age + Sex) + bf(SFluency | mi() ~ 1 + Age + Sex) + set_rescor(FALSE)
 
 
@@ -390,7 +390,7 @@ str(dep_data$D)
 ######################### Checking prior implications for model 2 investigating social determinants
 
 ## Specifying the model
-mod2_formula <- bf(D ~ 1 + Age + Sex + mi(SCI) + mi(SFluency) + s(Interview_Date) + Town_Distance + Com_Size + mi(HH_Size) + (1 |Interviewer) + (1 | Region/ComID/UniqueFamID) + (1 | PID)) +
+mod2_formula <- bf(D ~ 1 + Age + Sex + mi(SCI) + mi(SFluency) + s(Interview_Date) + Town_Distance + Com_Size + mi(HH_Size) + (1 |Interviewer) + (1 | ComID/UniqueFamID) + (1 | PID)) +
   bf(SCI | mi() ~ 1 + Age + Sex) + bf(SFluency | mi() ~ 1 + Age + Sex) + bf(HH_Size | mi() ~ 1 + Age + Sex + Com_Size) +  set_rescor(FALSE)
 
 
@@ -940,7 +940,7 @@ combined_icc_plot <- (icc_plot_mod1 | icc_plot_mod2)
 
 
 
-########### Let's plot the effects of the models reported in the appendix (i.e.one's with PID & Region) ###########################################
+########### Let's plot the effects of the models reported in the appendix (i.e.one's with PID) ###########################################
 #######################################################################################################################################################
 #######################################################################################################################################################
 
@@ -1127,74 +1127,65 @@ time_effect_mod2_v2_plot <- ggplot(time_effect_data_mod2_v2, aes(x = Interview_D
 
 ## Calculating ICCs for residual, individual, family, community, region, and interviewer levels (Model 1)
 
+# Residual ICC Calculation
 icc_residual_1_v2 <-  ((T1_v2$sigma_D)^2) / 
   ((T1_v2$sigma_D)^2 + 
      (T1_v2$sd_PID__D_Intercept)^2 + 
-     (T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
-     (T1_v2$`sd_Region:ComID__D_Intercept`)^2 + 
-     (T1_v2$sd_Region__D_Intercept)^2 + 
+     (T1_v2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T1_v2$`sd_ComID__D_Intercept`)^2 + 
      (T1_v2$sd_Interviewer__D_Intercept)^2)
 
 dens(icc_residual_1_v2, col=2, lwd=4 , xlab="ICC (Residual) of Model 1")
 
+# Individual ICC Calculation
 icc_individual_1_v2 <-  ((T1_v2$sd_PID__D_Intercept)^2) / 
   ((T1_v2$sigma_D)^2 + 
      (T1_v2$sd_PID__D_Intercept)^2 + 
-     (T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
-     (T1_v2$`sd_Region:ComID__D_Intercept`)^2 + 
-     (T1_v2$sd_Region__D_Intercept)^2 + 
+     (T1_v2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T1_v2$`sd_ComID__D_Intercept`)^2 + 
      (T1_v2$sd_Interviewer__D_Intercept)^2)
 
 dens(icc_individual_1_v2, col=2, lwd=4 , xlab="ICC (Individual) of Model 1")
 
-icc_family_1_v2 <- ((T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2) / 
+# Family ICC Calculation
+icc_family_1_v2 <- ((T1_v2$`sd_ComID:UniqueFamID__D_Intercept`)^2) / 
   ((T1_v2$sigma_D)^2 + 
      (T1_v2$sd_PID__D_Intercept)^2 + 
-     (T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
-     (T1_v2$`sd_Region:ComID__D_Intercept`)^2 + 
-     (T1_v2$sd_Region__D_Intercept)^2 + 
+     (T1_v2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T1_v2$`sd_ComID__D_Intercept`)^2 + 
      (T1_v2$sd_Interviewer__D_Intercept)^2)
 
 dens(icc_family_1_v2, col=2, lwd=4 , xlab="ICC (Family) of Model 1")
 
-icc_community_1_v2 <- ((T1_v2$`sd_Region:ComID__D_Intercept`)^2) / 
+# Community ICC Calculation
+icc_community_1_v2 <- ((T1_v2$`sd_ComID__D_Intercept`)^2) / 
   ((T1_v2$sigma_D)^2 + 
      (T1_v2$sd_PID__D_Intercept)^2 + 
-     (T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
-     (T1_v2$`sd_Region:ComID__D_Intercept`)^2 + 
-     (T1_v2$sd_Region__D_Intercept)^2 + 
+     (T1_v2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T1_v2$`sd_ComID__D_Intercept`)^2 + 
      (T1_v2$sd_Interviewer__D_Intercept)^2)
 
 dens(icc_community_1_v2, col=2, lwd=4 , xlab="ICC (Community) of Model 1")
 
-icc_region_1_v2 <-  ((T1_v2$sd_Region__D_Intercept)^2) / 
-  ((T1_v2$sigma_D)^2 + 
-     (T1_v2$sd_PID__D_Intercept)^2 + 
-     (T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
-     (T1_v2$`sd_Region:ComID__D_Intercept`)^2 + 
-     (T1_v2$sd_Region__D_Intercept)^2 + 
-     (T1_v2$sd_Interviewer__D_Intercept)^2)
 
-dens(icc_region_1_v2, col=2, lwd=4 , xlab="ICC (Region) of Model 1")
-
+# Interviewer ICC Calculation
 icc_interviewer_1_v2 <- ((T1_v2$sd_Interviewer__D_Intercept)^2) / 
   ((T1_v2$sigma_D)^2 + 
      (T1_v2$sd_PID__D_Intercept)^2 + 
-     (T1_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
-     (T1_v2$`sd_Region:ComID__D_Intercept`)^2 + 
-     (T1_v2$sd_Region__D_Intercept)^2 + 
+     (T1_v2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T1_v2$`sd_ComID__D_Intercept`)^2 + 
      (T1_v2$sd_Interviewer__D_Intercept)^2)
 
 dens(icc_interviewer_1_v2, col=2, lwd=4 , xlab="ICC (Interviewer) of Model 1")
 
 # Combine ICC vectors into a dataframe to allow for easy plotting of the five density plots in the same figure
 icc_data_1_v2 <- data.frame(
-  value = c(icc_residual_1_v2, icc_individual_1_v2, icc_family_1_v2, icc_community_1_v2, icc_region_1_v2, icc_interviewer_1_v2),
-  group = rep(c("Residual", "Individual", "Household", "Community", "Region", "Interviewer"), each = length(icc_residual_1_v2))
+  value = c(icc_residual_1_v2, icc_individual_1_v2, icc_family_1_v2, icc_community_1_v2, icc_interviewer_1_v2),
+  group = rep(c("Residual", "Individual", "Household", "Community", "Interviewer"), each = length(icc_residual_1_v2))
 )
 
 # Convert group variable to factor with specified levels (important for color coding in the plots)
-icc_data_1_v2$group <- factor(icc_data_1_v2$group, levels = c("Residual", "Individual", "Household", "Community", "Region", "Interviewer"))
+icc_data_1_v2$group <- factor(icc_data_1_v2$group, levels = c("Residual", "Individual", "Household", "Community", "Interviewer"))
 
 
 # Final Plot for model 1
@@ -1207,7 +1198,7 @@ icc_plot_mod1_v2 <- ggplot(icc_data_1_v2, aes(x = value, color = group)) +
   theme_minimal() +
   coord_cartesian(ylim = c(0, 25)) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
-  scale_color_manual(values = c("Residual" = "Green", "Individual" = "black", "Household" = "orange", "Community" = "red", "Region" = "blue", "Interviewer" = "darkcyan")) +
+  scale_color_manual(values = c("Residual" = "Green", "Individual" = "black", "Household" = "orange", "Community" = "red", "Interviewer" = "darkcyan")) +
   theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
         axis.title.x = element_text(size = 20),  # Increase x axis title size
         axis.title.y = element_text(size = 20),   # Increase y axis title size)
@@ -1224,62 +1215,52 @@ icc_plot_mod1_v2 <- ggplot(icc_data_1_v2, aes(x = value, color = group)) +
 
 ## Calculating ICCs for residual, individual, family, community, region, and interviewer levels (Model 2), using T2_v2
 
+# Residual ICC Calculation for Model 2
 icc_residual_2_v2 <-  ((T2_v2$sigma_D)^2) / 
   ((T2_v2$sigma_D)^2 + 
      (T2_v2$sd_PID__D_Intercept)^2 + 
-     (T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
-     (T2_v2$`sd_Region:ComID__D_Intercept`)^2 + 
-     (T2_v2$sd_Region__D_Intercept)^2 + 
+     (T2_v2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T2_v2$`sd_ComID__D_Intercept`)^2 + 
      (T2_v2$sd_Interviewer__D_Intercept)^2)
 
 dens(icc_residual_2_v2, col=2, lwd=4 , xlab="ICC (Residual) of Model 2")
 
+# Individual ICC Calculation for Model 2
 icc_individual_2_v2 <-  ((T2_v2$sd_PID__D_Intercept)^2) / 
   ((T2_v2$sigma_D)^2 + 
      (T2_v2$sd_PID__D_Intercept)^2 + 
-     (T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
-     (T2_v2$`sd_Region:ComID__D_Intercept`)^2 + 
-     (T2_v2$sd_Region__D_Intercept)^2 + 
+     (T2_v2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T2_v2$`sd_ComID__D_Intercept`)^2 + 
      (T2_v2$sd_Interviewer__D_Intercept)^2)
 
 dens(icc_individual_2_v2, col=2, lwd=4 , xlab="ICC (Individual) of Model 2")
 
-icc_family_2_v2 <- ((T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2) / 
+# Family ICC Calculation for Model 2
+icc_family_2_v2 <- ((T2_v2$`sd_ComID:UniqueFamID__D_Intercept`)^2) / 
   ((T2_v2$sigma_D)^2 + 
      (T2_v2$sd_PID__D_Intercept)^2 + 
-     (T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
-     (T2_v2$`sd_Region:ComID__D_Intercept`)^2 + 
-     (T2_v2$sd_Region__D_Intercept)^2 + 
+     (T2_v2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T2_v2$`sd_ComID__D_Intercept`)^2 + 
      (T2_v2$sd_Interviewer__D_Intercept)^2)
 
 dens(icc_family_2_v2, col=2, lwd=4 , xlab="ICC (Family) of Model 2")
 
-icc_community_2_v2 <- ((T2_v2$`sd_Region:ComID__D_Intercept`)^2) / 
+# Community ICC Calculation for Model 2
+icc_community_2_v2 <- ((T2_v2$`sd_ComID__D_Intercept`)^2) / 
   ((T2_v2$sigma_D)^2 + 
      (T2_v2$sd_PID__D_Intercept)^2 + 
-     (T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
-     (T2_v2$`sd_Region:ComID__D_Intercept`)^2 + 
-     (T2_v2$sd_Region__D_Intercept)^2 + 
+     (T2_v2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T2_v2$`sd_ComID__D_Intercept`)^2 + 
      (T2_v2$sd_Interviewer__D_Intercept)^2)
 
 dens(icc_community_2_v2, col=2, lwd=4 , xlab="ICC (Community) of Model 2")
 
-icc_region_2_v2 <-  ((T2_v2$sd_Region__D_Intercept)^2) / 
-  ((T2_v2$sigma_D)^2 + 
-     (T2_v2$sd_PID__D_Intercept)^2 + 
-     (T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
-     (T2_v2$`sd_Region:ComID__D_Intercept`)^2 + 
-     (T2_v2$sd_Region__D_Intercept)^2 + 
-     (T2_v2$sd_Interviewer__D_Intercept)^2)
-
-dens(icc_region_2_v2, col=2, lwd=4 , xlab="ICC (Region) of Model 2")
-
+# Interviewer ICC Calculation for Model 2
 icc_interviewer_2_v2 <- ((T2_v2$sd_Interviewer__D_Intercept)^2) / 
   ((T2_v2$sigma_D)^2 + 
      (T2_v2$sd_PID__D_Intercept)^2 + 
-     (T2_v2$`sd_Region:ComID:UniqueFamID__D_Intercept`)^2 + 
-     (T2_v2$`sd_Region:ComID__D_Intercept`)^2 + 
-     (T2_v2$sd_Region__D_Intercept)^2 + 
+     (T2_v2$`sd_ComID:UniqueFamID__D_Intercept`)^2 + 
+     (T2_v2$`sd_ComID__D_Intercept`)^2 + 
      (T2_v2$sd_Interviewer__D_Intercept)^2)
 
 dens(icc_interviewer_2_v2, col=2, lwd=4 , xlab="ICC (Interviewer) of Model 2")
@@ -1287,12 +1268,12 @@ dens(icc_interviewer_2_v2, col=2, lwd=4 , xlab="ICC (Interviewer) of Model 2")
 
 # Combine ICC vectors into a dataframe to allow for easy plotting of the five density plots in the same figure
 icc_data_2_v2 <- data.frame(
-  value = c(icc_residual_2_v2, icc_individual_2_v2, icc_family_2_v2, icc_community_2_v2, icc_region_2_v2, icc_interviewer_2_v2),
-  group = rep(c("Residual", "Individual", "Household", "Community", "Region", "Interviewer"), each = length(icc_residual_2_v2))
+  value = c(icc_residual_2_v2, icc_individual_2_v2, icc_family_2_v2, icc_community_2_v2, icc_interviewer_2_v2),
+  group = rep(c("Residual", "Individual", "Household", "Community", "Interviewer"), each = length(icc_residual_2_v2))
 )
 
 # Convert group variable to factor with specified levels (important for color coding in the plots)
-icc_data_2_v2$group <- factor(icc_data_2_v2$group, levels = c("Residual", "Individual", "Household", "Community", "Region", "Interviewer"))
+icc_data_2_v2$group <- factor(icc_data_2_v2$group, levels = c("Residual", "Individual", "Household", "Community", "Interviewer"))
 
 # Final Plot for model 2
 icc_plot_mod2_v2 <- ggplot(icc_data_2_v2, aes(x = value, color = group)) +
@@ -1304,7 +1285,7 @@ icc_plot_mod2_v2 <- ggplot(icc_data_2_v2, aes(x = value, color = group)) +
   theme_minimal() +
   coord_cartesian(ylim = c(0, 25)) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
-  scale_color_manual(values = c("Residual" = "Green", "Individual" = "black", "Household" = "orange", "Community" = "red", "Region" = "blue", "Interviewer" = "darkcyan")) +
+  scale_color_manual(values = c("Residual" = "Green", "Individual" = "black", "Household" = "orange", "Community" = "red", "Interviewer" = "darkcyan")) +
   theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
         axis.title.x = element_text(size = 20),  # Increase x axis title size
         axis.title.y = element_text(size = 20),   # Increase y axis title size)
