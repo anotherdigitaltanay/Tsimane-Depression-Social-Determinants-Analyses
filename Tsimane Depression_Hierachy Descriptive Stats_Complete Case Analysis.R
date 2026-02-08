@@ -101,7 +101,6 @@ plot1 <- ggplot(hh_per_com, aes(x = factor(n), y = num_coms)) +
     y = "Number of Communities"
   ) +
   scale_y_continuous(breaks = 0:max(hh_per_com$num_coms)) +
-  coord_flip() +
   theme_minimal() +
   theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
         axis.title.x = element_text(size = 20),  # Increase x axis title size
@@ -128,7 +127,6 @@ plot2 <- ggplot(id_per_hh, aes(x = factor(n), y = num_hh)) +
     x = "Number of Individuals in Household",
     y = "Number of Households"
   ) +
-  coord_flip() +
   theme_minimal() +
   theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
         axis.title.x = element_text(size = 20),  # Increase x axis title size
@@ -155,7 +153,6 @@ plot3 <- ggplot(obs_per_id, aes(x = factor(n), y = num_id)) +
     x = "Number of observations per Individual",
     y = "Number of Individuals"
   ) +
-  coord_flip() +
   theme_minimal() +
   theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
         axis.title.x = element_text(size = 20),  # Increase x axis title size
