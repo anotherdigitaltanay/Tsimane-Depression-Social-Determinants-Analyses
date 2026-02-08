@@ -855,7 +855,7 @@ icc_plot_mod1 <- ggplot(icc_data_1, aes(x = value, color = group)) +
        y = "Density",
        color = "ICC Type") +
   theme_minimal() +
-  coord_cartesian(ylim = c(0, 25)) +
+  coord_cartesian(ylim = c(0, 20)) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
   scale_color_manual(values = c("Residual" = "Green", "Household" = "orange", "Community" = "red", "Interviewer" = "darkcyan")) +
   theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
@@ -916,7 +916,7 @@ icc_plot_mod2 <- ggplot(icc_data_2, aes(x = value, color = group)) +
        y = "Density",
        color = "ICC Type") +
   theme_minimal() +
-  coord_cartesian(ylim = c(0, 25)) +
+  coord_cartesian(ylim = c(0, 20)) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
   scale_color_manual(values = c("Residual" = "Green", "Household" = "orange", "Community" = "red", "Interviewer" = "darkcyan")) +
   theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
