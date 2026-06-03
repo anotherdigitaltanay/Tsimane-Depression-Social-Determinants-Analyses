@@ -3,6 +3,31 @@
 ############### The script also generates a cleaned csv file that will be used for the complete case analyses (i.e. excluding missing data) in another script #################
 ############### Summary Tables and Plots that are used in the manuscript are generated towards the end of the script           #################
 
+
+######################### IMPORTANT!!!!!: Please read the following instructions below before running the script ########################
+####################################################################################################################################
+
+# Often, when existing scripts (like this one) are run on new machines, they sometimes fail to run OR new errors are introduced
+# This is because either the various package versions in R have been updated, and take in different arguments OR
+# One is not running the version of R that was initially used to run the script
+
+# To avoid this situation and ensure complete reproducibility, 
+# please follow the following steps before running the scripts
+
+## 1. Download rig on your machine. Instructions available at (https://github.com/r-lib/rig?tab=readme-ov-file#id-installation)
+## 2. Once installed, open either Terminal (Mac) or Command Prompt (Windows) and type "rig install 4.1.1"
+## 3. This will install the R version that was used to design this script
+## 4. Additionally, for Windows machines, you need to download Rtools from this link (https://cran.r-project.org/bin/windows/Rtools/rtools40.html). This will ensure smooth installation of old packages on Windows machine
+## 5. [ONLY FOR WINDOWS MACHINES] Open RStudio first and then go to Tools -> Global Options -> General and select the R version for running this script (4.1.1). Now, restart Rstudio and open the cleaning script
+## 6. [ONLY FOR MAC MACHINES] Open terminal and type rig default 4.1.1. When you open RStudio now, the R version will have changed. [NOTE: Rig has some known issues on the new M chip macs where it raises a false alarm regarding failed installation. Always type rig list to find the specific name for the R installation]
+## 7. Type install.packages("renv")
+## 8. Then type renv::restore(packages = "renv"). This is so that the package version of renv initialises to the one that was used for this script
+## 9. Then type renv::restore(). This should install all the package versions used for running this script. 
+## 10. Scripts should be good to go now!
+
+
+
+
 ############### Loading the relevant packages #################
 ###############################################################
 
@@ -14,7 +39,6 @@ library(dplyr)
 library(tidyverse)
 library(ggplot2)
 library(brms)
-library(ggplot2)
 library(patchwork)
 library(knitr)
 library(tidybayes)
@@ -686,6 +710,7 @@ text_labels <- tibble(
 
 # Add text layer to plot
 mod1_density_plots <- mod1_density_plots +
+  geom_vline(xintercept = 0, color = "darkgray", size = 1.5, linetype = "solid") +
   geom_text(data = text_labels,
             aes(x = 0.5, y = y, label = label),
             hjust = 0,
@@ -728,6 +753,7 @@ text_labels <- tibble(
 
 # Add text layer to plot
 mod2_density_plots <- mod2_density_plots +
+  geom_vline(xintercept = 0, color = "darkgray", size = 1.5, linetype = "solid") +
   geom_text(data = text_labels,
             aes(x = 0.5, y = y, label = label),
             hjust = 0,
@@ -932,7 +958,7 @@ icc_plot_mod2 <- ggplot(icc_data_2, aes(x = value, color = group)) +
 ## Combine all plots together into one mega summary plot
 
 ## First for all model co-efficients
-combined_sum_scores_plot <- (mod1_density_plots | mod2_density_plots) / (time_effect_mod1_plot | time_effect_mod2_plot)
+combined_sum_scores_plot <- (mod1_density_plots | mod2_density_plots) # / (time_effect_mod1_plot | time_effect_mod2_plot)
 
 ## Now for ICC plots
 combined_icc_plot <- (icc_plot_mod1 | icc_plot_mod2)
