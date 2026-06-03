@@ -209,6 +209,31 @@ T1_params <- c("Intercept", "Age", "Male", "SCI", "SFluency")
 T2_params <- c("Intercept", "Age", "Male", "SCI", "SFluency", "Town_Distance", "C_Size", "H_Size")
 
 
+######################################### Defining a global plot aesthetics theme that will be applied to all plots
+###########################################################################################################################
+###########################################################################################################################
+
+# Defining a constant size for geom_text (which uses millimeters, not points)
+manuscript_text_size <- 3.5 
+
+# Setting the plot aesthetics
+custom_theme <- theme_minimal(base_family = "Helvetica") +
+  theme(
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    axis.line = element_line(color = "black", size = 0.5), # Adds distinct axis lines
+    legend.title = element_text(size = 12, face = "bold"),
+    legend.text = element_text(size = 11),
+    legend.position = "bottom", 
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank() 
+  )
+
+# Set it globally! All ggplot/mcmc_areas objects will now use this by default.
+theme_set(custom_theme)
+
+
 ######################################### Create density plot for Model 1 now
 mod1_density_plots <- mcmc_areas(
   T1 %>% select(all_of(T1_params)),
@@ -221,11 +246,7 @@ mod1_density_plots <- mcmc_areas(
 mod1_density_plots <- mod1_density_plots +
   scale_x_continuous(limits = c(-0.5, 0.7), breaks = seq(-0.5, 0.7, by = 0.1)) +
   labs(title = "(a) Model 1") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20))
+  geom_line(color = "black", size = 1) 
 
 # Calculate how much of the posterior is above 0
 
@@ -248,7 +269,7 @@ mod1_density_plots <- mod1_density_plots +
             family = "Helvetica",
             fontface = "italic",
             color = "red",
-            size = 8)
+            size = manuscript_text_size)
 
 
 ######################################### Create density plot for Model 2 now
@@ -263,11 +284,7 @@ mod2_density_plots <- mcmc_areas(
 mod2_density_plots <- mod2_density_plots +
   scale_x_continuous(limits = c(-0.5, 0.7), breaks = seq(-0.5, 0.7, by = 0.1)) +
   labs(title = "(b) Model 2") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20))
+  geom_line(color = "black", size = 1) 
 
 # Calculate how much of the posterior is above 0
 
@@ -290,7 +307,7 @@ mod2_density_plots <- mod2_density_plots +
             family = "Helvetica",
             fontface = "italic",
             color = "red",
-            size = 8)
+            size = manuscript_text_size)
 
 
 ######################################### Now let's plot the effect of interview date for model 1
@@ -315,15 +332,8 @@ time_effect_mod1_plot <- ggplot(time_effect_data_mod1, aes(x = Interview_Date, y
   geom_line() +
   geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.1) +
   geom_point(data = time_effect_data_mod1[time_effect_data_mod1$points__, ], aes(x = Interview_Date, y = estimate__)) +
-  labs(title = "(c) Spline Prediction - Model 1", x = "Interview Date", y = "Standardized Depression Score") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Title style same as mod2
-    axis.title.x = element_text(family = "Helvetica", size = 16),  # xlab font style and size
-    axis.title.y = element_text(family = "Helvetica", size = 18),  # ylab font style and size
-    axis.text.x = element_text(family = "Helvetica", size = 16),   # To keep x-axis tick labels consistent
-    axis.text.y = element_text(family = "Helvetica", size = 18)    # To keep y-axis tick labels consistent
-  )
+  labs(title = "(c) Spline Prediction - Model 1", x = "Interview Date", y = "Standardized Depression Score") 
+ 
 
 
 ######################################### Now let's plot the effect of interview date for model 2
@@ -343,15 +353,8 @@ time_effect_mod2_plot <- ggplot(time_effect_data_mod2, aes(x = Interview_Date, y
   geom_line() +
   geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.1) +
   geom_point(data = time_effect_data_mod2[time_effect_data_mod2$points__, ], aes(x = Interview_Date, y = estimate__)) +
-  labs(title = " (d) Spline Prediction - Model 2", x = "Interview Date", y = "Standardized Depression Score") +
-  theme_minimal() + 
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Title style same as mod2
-    axis.title.x = element_text(family = "Helvetica", size = 16),  # xlab font style and size
-    axis.title.y = element_text(family = "Helvetica", size = 18),  # ylab font style and size
-    axis.text.x = element_text(family = "Helvetica", size = 16),   # To keep x-axis tick labels consistent
-    axis.text.y = element_text(family = "Helvetica", size = 18)    # To keep y-axis tick labels consistent
-  )
+  labs(title = " (d) Spline Prediction - Model 2", x = "Interview Date", y = "Standardized Depression Score") 
+ 
 
 
 ######################################### Now let's plot the ICCs
@@ -413,18 +416,10 @@ icc_plot_mod1 <- ggplot(icc_data_1, aes(x = value, color = group)) +
        x = "ICC",
        y = "Density",
        color = "ICC Type") +
-  theme_minimal() +
   coord_cartesian(ylim = c(0, 25)) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
-  scale_color_manual(values = c("Residual" = "Green", "Household" = "orange", "Community" = "red", "Interviewer" = "darkcyan")) +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
+  scale_color_manual(values = c("Residual" = "Green", "Household" = "orange", "Community" = "red", "Interviewer" = "darkcyan"))
+
 
 
 ############ Now for Model 2
@@ -474,18 +469,9 @@ icc_plot_mod2 <- ggplot(icc_data_2, aes(x = value, color = group)) +
        x = "ICC",
        y = "Density",
        color = "ICC Type") +
-  theme_minimal() +
   coord_cartesian(ylim = c(0, 25)) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
-  scale_color_manual(values = c("Residual" = "Green", "Household" = "orange", "Community" = "red", "Interviewer" = "darkcyan")) +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
+  scale_color_manual(values = c("Residual" = "Green", "Household" = "orange", "Community" = "red", "Interviewer" = "darkcyan")) 
 
 ## Combine all plots together into one mega summary plot
 
@@ -496,8 +482,27 @@ combined_sum_scores_plot <- (mod1_density_plots | mod2_density_plots) / (time_ef
 combined_icc_plot <- (icc_plot_mod1 | icc_plot_mod2)
 
 
+## Saving these combined plots at a resolution that is readable on a page
+ggsave(filename = "SumScoreModels_CompleteCase_Posteriors.png", 
+       plot = combined_sum_scores_plot, 
+       width = 14,        # Canvas width in inches
+       height = 12,       # Canvas height in inches
+       dpi = 300,         # Minimum standard resolution for academic print
+       bg = "white")
 
-########### Let's plot the effects of the models with PID & Region ####################################################################################
+ggsave(filename = "SumScoreModels_CompleteCase_ICCs.png", 
+       plot = combined_icc_plot, 
+       width = 14,        # Canvas width in inches
+       height = 12,       # Canvas height in inches
+       dpi = 300,         # Minimum standard resolution for academic print
+       bg = "white")
+
+
+
+
+
+
+########### Let's plot the effects of the models with PID  ####################################################################################
 #######################################################################################################################################################
 #######################################################################################################################################################
 
@@ -546,12 +551,7 @@ mod1_density_plots_v2 <- mcmc_areas(
 mod1_density_plots_v2 <- mod1_density_plots_v2 +
   scale_x_continuous(limits = c(-0.5, 0.7), breaks = seq(-0.5, 0.7, by = 0.1)) +
   labs(title = "(a) Model 1") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1) 
 
 # Reverse parameter order to match mcmc_areas plot
 T1_params_rev <- rev(T1_params)
@@ -571,7 +571,7 @@ mod1_density_plots_v2 <- mod1_density_plots_v2 +
             family = "Helvetica",
             fontface = "italic",
             color = "red",
-            size = 8)
+            size = manuscript_text_size)
 
 
 ######################################### Create density plot for Model 2 now
@@ -586,12 +586,7 @@ mod2_density_plots_v2 <- mcmc_areas(
 mod2_density_plots_v2 <- mod2_density_plots_v2 +
   scale_x_continuous(limits = c(-0.5, 0.7), breaks = seq(-0.5, 0.7, by = 0.1)) +
   labs(title = "(b) Model 2") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1) 
 
 # Reverse parameter order to match mcmc_areas plot
 T2_params_rev <- rev(T2_params)
@@ -611,7 +606,7 @@ mod2_density_plots_v2 <- mod2_density_plots_v2 +
             family = "Helvetica",
             fontface = "italic",
             color = "red",
-            size = 8)
+            size = manuscript_text_size)
 
 ######################################### Now let's plot the effect of interview date for model 1
 #################################################################################################
@@ -631,15 +626,8 @@ time_effect_mod1_v2_plot <- ggplot(time_effect_data_mod1_v2, aes(x = Interview_D
   geom_line() +
   geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.1) +
   geom_point(data = time_effect_data_mod1_v2[time_effect_data_mod1_v2$points__, ], aes(x = Interview_Date, y = estimate__)) +
-  labs(title = "(c) Spline Prediction - Model 1", x = "Interview Date", y = "Standardized Depression Score") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),
-    axis.title.x = element_text(family = "Helvetica", size = 16),
-    axis.title.y = element_text(family = "Helvetica", size = 18),
-    axis.text.x = element_text(family = "Helvetica", size = 16),
-    axis.text.y = element_text(family = "Helvetica", size = 18)
-  )
+  labs(title = "(c) Spline Prediction - Model 1", x = "Interview Date", y = "Standardized Depression Score") 
+  
 
 
 ######################################### Now plot the effect of interview date for Model 2
@@ -659,15 +647,8 @@ time_effect_mod2_v2_plot <- ggplot(time_effect_data_mod2_v2, aes(x = Interview_D
   geom_line() +
   geom_ribbon(aes(ymin = lower__, ymax = upper__), alpha = 0.1) +
   geom_point(data = time_effect_data_mod2_v2[time_effect_data_mod2_v2$points__, ], aes(x = Interview_Date, y = estimate__)) +
-  labs(title = "(d) Spline Prediction - Model 2", x = "Interview Date", y = "Standardized Depression Score") +
-  theme_minimal() + 
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),
-    axis.title.x = element_text(family = "Helvetica", size = 16),
-    axis.title.y = element_text(family = "Helvetica", size = 18),
-    axis.text.x = element_text(family = "Helvetica", size = 16),
-    axis.text.y = element_text(family = "Helvetica", size = 18)
-  )
+  labs(title = "(d) Spline Prediction - Model 2", x = "Interview Date", y = "Standardized Depression Score") 
+ 
 
 
 
@@ -747,19 +728,10 @@ icc_plot_mod1_v2 <- ggplot(icc_data_1_v2, aes(x = value, color = group)) +
        x = "ICC",
        y = "Density",
        color = "ICC Type") +
-  theme_minimal() +
   coord_cartesian(ylim = c(0, 25)) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
-  scale_color_manual(values = c("Residual" = "Green", "Individual" = "black", "Household" = "orange", "Community" = "red", "Interviewer" = "darkcyan")) +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
-
+  scale_color_manual(values = c("Residual" = "Green", "Individual" = "black", "Household" = "orange", "Community" = "red", "Interviewer" = "darkcyan")) 
+  
 
 ############ Now for Model 2
 
@@ -837,18 +809,10 @@ icc_plot_mod2_v2 <- ggplot(icc_data_2_v2, aes(x = value, color = group)) +
        x = "ICC",
        y = "Density",
        color = "ICC Type") +
-  theme_minimal() +
   coord_cartesian(ylim = c(0, 25)) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
-  scale_color_manual(values = c("Residual" = "Green", "Individual" = "black", "Household" = "orange", "Community" = "red", "Region" = "blue", "Interviewer" = "darkcyan")) +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
+  scale_color_manual(values = c("Residual" = "Green", "Individual" = "black", "Household" = "orange", "Community" = "red", "Region" = "blue", "Interviewer" = "darkcyan")) 
+  
 
 ## Combine all plots together into one mega summary plot
 
@@ -858,6 +822,20 @@ combined_sum_scores_plot_v2 <- (mod1_density_plots_v2 | mod2_density_plots_v2) /
 ## Now for ICC plots
 combined_icc_plot_v2 <- (icc_plot_mod1_v2 | icc_plot_mod2_v2)
 
+## Saving these combined plots at a resolution that is readable on a page
+ggsave(filename = "SumScoreModels_CompleteCase_wPID_Posteriors.png", 
+       plot = combined_sum_scores_plot_v2, 
+       width = 14,        # Canvas width in inches
+       height = 12,       # Canvas height in inches
+       dpi = 300,         # Minimum standard resolution for academic print
+       bg = "white")
+
+ggsave(filename = "SumScoreModels_CompleteCase_wPID_ICCs.png", 
+       plot = combined_icc_plot_v2, 
+       width = 14,        # Canvas width in inches
+       height = 12,       # Canvas height in inches
+       dpi = 300,         # Minimum standard resolution for academic print
+       bg = "white")
 
 
 
