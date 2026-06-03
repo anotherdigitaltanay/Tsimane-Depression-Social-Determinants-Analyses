@@ -42,12 +42,33 @@ dep_data_v1 <- dep_data
 dep_data_v1$InterviewDate <- as.POSIXct(dep_data_v1$InterviewDate, tz = "UTC")
 
 
-
-
-
-
-
 ################### Summary Tables and Plots
+
+######################################### Defining a global plot aesthetics theme that will be applied to all plots
+###########################################################################################################################
+###########################################################################################################################
+
+# Defining a constant size for geom_text (which uses millimeters, not points)
+manuscript_text_size <- 3.5 
+
+# Setting the plot aesthetics
+custom_theme <- theme_minimal(base_family = "Helvetica") +
+  theme(
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    axis.line = element_line(color = "black", size = 0.5), # Adds distinct axis lines
+    legend.title = element_text(size = 12, face = "bold"),
+    legend.text = element_text(size = 11),
+    legend.position = "bottom", 
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank() 
+  )
+
+# Set it globally! All ggplot/mcmc_areas objects will now use this by default.
+theme_set(custom_theme)
+
+
 
 #### Summarizing the multilevel structure of the dataset in a summary stats table
 #################################################################################
@@ -69,16 +90,7 @@ simple_summary <- ggplot(multilevel_summary_stats, aes(x = Variable, y = N)) +
     title = "(d) Multilevel Data Structure Summary",
     x = "Data Grouping Level",
     y = "Number of Groups at each Level"
-  ) +
-  theme_minimal() +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
+  ) 
 
 
 
@@ -100,16 +112,7 @@ plot1 <- ggplot(hh_per_com, aes(x = factor(n), y = num_coms)) +
     x = "Number of Households in Community",
     y = "Number of Communities"
   ) +
-  scale_y_continuous(breaks = 0:max(hh_per_com$num_coms)) +
-  theme_minimal() +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
+  scale_y_continuous(breaks = 0:max(hh_per_com$num_coms)) 
   
 
 ##################################################################
@@ -126,16 +129,7 @@ plot2 <- ggplot(id_per_hh, aes(x = factor(n), y = num_hh)) +
     title = " (b) Distribution of Individuals per Household",
     x = "Number of Individuals in Household",
     y = "Number of Households"
-  ) +
-  theme_minimal() +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
+  ) 
 
 
 
@@ -152,16 +146,7 @@ plot3 <- ggplot(obs_per_id, aes(x = factor(n), y = num_id)) +
     title = "(c) Distribution of Observations per Individual",
     x = "Number of observations per Individual",
     y = "Number of Individuals"
-  ) +
-  theme_minimal() +
-  theme(plot.title = element_text(color = "darkblue", size = 24, hjust = 0.5),
-        axis.title.x = element_text(size = 20),  # Increase x axis title size
-        axis.title.y = element_text(size = 20),   # Increase y axis title size)
-        legend.title = element_text(size = 19),  # Increase legend title size
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size = 11.5),  # Increase x axis number size
-        axis.text.y = element_text(size = 14)
-  )
+  ) 
 
 
 
@@ -170,6 +155,15 @@ plot3 <- ggplot(obs_per_id, aes(x = factor(n), y = num_id)) +
 
 ## Combine plots from all four models
 combined_hierarchy_plot <- (plot1 | plot2) / (plot3 | simple_summary )
+
+
+## Saving these combined plots at a resolution that is readable on a page
+ggsave(filename = "Multilevel_SummaryStats_CompleteCase.png", 
+       plot = combined_hierarchy_plot, 
+       width = 14,        # Canvas width in inches
+       height = 12,       # Canvas height in inches
+       dpi = 300,         # Minimum standard resolution for academic print
+       bg = "white")
 
 
 
