@@ -1300,12 +1300,8 @@ mod1_density_plots_SCI_imputation <- mcmc_areas(
 mod1_density_plots_SCI_imputation <- mod1_density_plots_SCI_imputation +
   scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1)) +
   labs(title = "(a) Model 1 Imputation - Social Conflict Index") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1) 
+
 
 ############### Spanish Fluency
 
@@ -1320,12 +1316,7 @@ mod1_density_plots_SFluency_imputation <- mcmc_areas(
 mod1_density_plots_SFluency_imputation <- mod1_density_plots_SFluency_imputation +
   scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1))  +
   labs(title = "(b) Model 1 Imputation - Spanish Fluency") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1) 
 
 
 ############# Now for Model 2
@@ -1343,12 +1334,8 @@ mod2_density_plots_SCI_imputation <- mcmc_areas(
 mod2_density_plots_SCI_imputation <- mod2_density_plots_SCI_imputation +
   scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1)) +
   labs(title = "(c) Model 2 Imputation - Social Conflict Index") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1) 
+
 
 ############### Spanish Fluency
 
@@ -1363,12 +1350,8 @@ mod2_density_plots_SFluency_imputation <- mcmc_areas(
 mod2_density_plots_SFluency_imputation <- mod2_density_plots_SFluency_imputation +
   scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1))  +
   labs(title = "(d) Model 2 Imputation - Spanish Fluency") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1)
+
 
 ############### Household Size
 
@@ -1383,12 +1366,7 @@ mod2_density_plots_HHSize_imputation <- mcmc_areas(
 mod2_density_plots_HHSize_imputation <- mod2_density_plots_HHSize_imputation +
   scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1))  +
   labs(title = "(e) Model 2 Imputation - Household Size") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1) 
 
 
 
@@ -1414,20 +1392,22 @@ imputation_sigmas_plot <- mcmc_areas(
 # Make it a bit more tidy
 imputation_sigmas_plot <- imputation_sigmas_plot +
   labs(title = "(f) Imputation Model Sigmas") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
-
+  geom_line(color = "black", size = 1)
 
 
 ############### Combine all plots
 imp_models_fixed_effects_plot <- (mod1_density_plots_SCI_imputation | mod1_density_plots_SFluency_imputation) / (mod2_density_plots_SCI_imputation | mod2_density_plots_SFluency_imputation) / (mod2_density_plots_HHSize_imputation | imputation_sigmas_plot)
 
+## Saving these combined plots at a resolution that is readable on a page
+ggsave(filename = "SumScoreModels_Imputation Model Fitting Posteriors.png", 
+       plot = imp_models_fixed_effects_plot, 
+       width = 14,        # Canvas width in inches
+       height = 12,       # Canvas height in inches
+       dpi = 300,         # Minimum standard resolution for academic print
+       bg = "white")
 
-########### Now let's do the same for the models reported in the appendix  ##################################################
+
+########### Now let's do the same for the models (i.e. ones with the PID random intercept) reported in the appendix  ##################################################
 #######################################################################################################################################################
 #######################################################################################################################################################
 
@@ -1445,12 +1425,8 @@ mod1_density_plots_SCI_imputation_v2 <- mcmc_areas(
 mod1_density_plots_SCI_imputation_v2 <- mod1_density_plots_SCI_imputation_v2 +
   scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1)) +
   labs(title = "(a) Model 1 Imputation - Social Conflict Index") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1) 
+
 
 ############### Spanish Fluency
 
@@ -1465,12 +1441,7 @@ mod1_density_plots_SFluency_imputation_v2 <- mcmc_areas(
 mod1_density_plots_SFluency_imputation_v2 <- mod1_density_plots_SFluency_imputation_v2 +
   scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1))  +
   labs(title = "(b) Model 1 Imputation - Spanish Fluency") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1) 
 
 
 ############# Now for Model 2
@@ -1488,12 +1459,8 @@ mod2_density_plots_SCI_imputation_v2 <- mcmc_areas(
 mod2_density_plots_SCI_imputation_v2 <- mod2_density_plots_SCI_imputation_v2 +
   scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1)) +
   labs(title = "(c) Model 2 Imputation - Social Conflict Index") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1) 
+
 
 ############### Spanish Fluency
 
@@ -1508,12 +1475,7 @@ mod2_density_plots_SFluency_imputation_v2 <- mcmc_areas(
 mod2_density_plots_SFluency_imputation_v2 <- mod2_density_plots_SFluency_imputation_v2 +
   scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1))  +
   labs(title = "(d) Model 2 Imputation - Spanish Fluency") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1) 
 
 ############### Household Size
 
@@ -1528,12 +1490,7 @@ mod2_density_plots_HHSize_imputation_v2 <- mcmc_areas(
 mod2_density_plots_HHSize_imputation_v2 <- mod2_density_plots_HHSize_imputation_v2 +
   scale_x_continuous(limits = c(-0.5, 1), breaks = seq(-0.5, 1, by = 0.1))  +
   labs(title = "(e) Model 2 Imputation - Household Size") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1) 
 
 
 
@@ -1559,16 +1516,18 @@ imputation_sigmas_plot_v2 <- mcmc_areas(
 # Make it a bit more tidy
 imputation_sigmas_plot_v2 <- imputation_sigmas_plot_v2 +
   labs(title = "(f) Imputation Model Sigmas") +
-  geom_line(color = "black", size = 1) +
-  theme(
-    plot.title = element_text(family = "Helvetica", size = 24, face = "bold", hjust = 0.5),  # Center the title
-    axis.text.x = element_text(family = "Helvetica", size = 19),
-    axis.text.y = element_text(family = "Helvetica", size = 20)
-  )
+  geom_line(color = "black", size = 1) 
+
 
 ## Now combine all the plots into one
 imp_models_fixed_effects_plot_v2 <- (mod1_density_plots_SCI_imputation_v2 | mod1_density_plots_SFluency_imputation_v2) / (mod2_density_plots_SCI_imputation_v2 | mod2_density_plots_SFluency_imputation_v2) / (mod2_density_plots_HHSize_imputation_v2 | imputation_sigmas_plot_v2)
 
 
-
+## Saving these combined plots at a resolution that is readable on a page
+ggsave(filename = "SumScoreModels_wPID_Imputation Model Fitting Posteriors.png", 
+       plot = imp_models_fixed_effects_plot_v2, 
+       width = 14,        # Canvas width in inches
+       height = 12,       # Canvas height in inches
+       dpi = 300,         # Minimum standard resolution for academic print
+       bg = "white")
 
